@@ -1,7 +1,10 @@
 # TODO: Create a new module features.py to calculate the features from a moving window on
-#       the given base data (Ax, Ay, Az, Gz, Gy, Gz) provided as a string argument: e.g. "Ax"
-#       These features should be stored in a dictionary contained in features.py
-#       The dictionary should implement "feature_length" (first see if this is uniform for all features)
+#       the given (sub, sensor, base_data), where:
+#       sub: Subject(s)
+#       sensor: string(center, left, right); e.g. "center"
+#       base data: string(Ax, Ay, Az, Gz, Gy, Gz); e.g. "Ax"
+#       These features should be stored in a class contained in features.py
+#       The class should also implement "feature_length" (first see if this is uniform for all features)
 #       Implement prints in this module to indicate the truncation of the data taking place
 
 # TODO: Create a Dashboard which takes in a the base parameter as a string : e.g. "Ay"
@@ -39,12 +42,10 @@ if FIX:
     dm.dataset_rename()
     # Verifying that every subject has a data set in each sub-directory (Center, Right, Left)
     dm.dataset_analysis()
-    # This function is not required anymore due to the use of index_col=False when reading in the dataset
-    # However it is still available if the dataset needs to be fixed
 
 
 if __name__ == '__main__':
-    # Demonstrating the use of the Subject class and graph_plot function
+    # Demonstrating the use of the Subject class and data_plot function
 
     # Generating the subject list and subject data from the data set
     subs_list, subs_data = dm.generate_subjects_data(gen_csv=False)

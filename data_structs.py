@@ -1,4 +1,4 @@
-"""This module implements the data structures used for this project"""
+"""This module implements the data structures used to store the dataset"""
 
 import os
 import pandas as pd
