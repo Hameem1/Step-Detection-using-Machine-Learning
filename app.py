@@ -1,5 +1,3 @@
-# TODO: Fix the print representation issue in data_structs.py
-
 # TODO: Create a new module features.py to calculate the features from a moving window on
 #       the given base data (Ax, Ay, Az, Gz, Gy, Gz) provided as a string argument: e.g. "Ax"
 #       These features should be stored in a dictionary contained in features.py
@@ -48,12 +46,13 @@ if FIX:
 if __name__ == '__main__':
     # Demonstrating the use of the Subject class and graph_plot function
 
-    # Generating the subject list (Global variable) for the data set
+    # Generating the subject list and subject data from the data set
     subs_list, subs_data = dm.generate_subjects_data(gen_csv=False)
     sub = ds.Subject("Id000104.txt")
 
     # Plotting the subject data
     graph.data_plot(sub, sensor_axis="all")
+
 
 
 else:
