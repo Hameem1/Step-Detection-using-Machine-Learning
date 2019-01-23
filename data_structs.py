@@ -82,7 +82,11 @@ class Dataset:
                 print(f"'Dataset' object created for file :\n{path}\n")
 
     def __str__(self):
-        return "Dataset object"
+        label_name = str(input('Which "label" would you like to print for this dataset?')).lower()
+        if label_name in labels or label_name in labels_extra:
+            return self.label[label_name].to_string()
+        else:
+            return "Invalid Input!"
 
 
 class Subject:
@@ -109,7 +113,7 @@ class Subject:
             print("There is a problem with the 'Subject' object instantiation!\n")
 
     def __str__(self):
-        return "Subject object"
+        return f"Subject # {self.subject_id[0:8]}"
 
 
 # TODO : this function could get a speed boost if converted to a generator
@@ -143,7 +147,7 @@ def get_subjects_repo():
 
 def print_selection(selection):
     """
-    Prints a an entire selection of the Dataset
+    Prints an entire selection of the Dataset
 
     :param selection: The selection to print (e.g. sub.sensor_pos['left'].label['valid'])
     """
@@ -173,7 +177,3 @@ if __name__ == "__main__":
 
 else:
     print(f"\nModule imported : {__name__}\n")
-
-
-# TODO: add proper print representations for the Subject and Dataset classes (print out the entire data sets)
-#       Do this using the print_selection function
