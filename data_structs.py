@@ -145,17 +145,6 @@ def get_subjects_repo():
     return SUBJECTS_REPO
 
 
-def print_selection(selection):
-    """
-    Prints an entire selection of the Dataset
-
-    :param selection: The selection to print (e.g. sub.sensor_pos['left'].label['valid'])
-    """
-
-    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-        print(f"The selected data is :\n\n{selection}")
-
-
 if __name__ == "__main__":
 
     # This example code shows how to interact with the classes

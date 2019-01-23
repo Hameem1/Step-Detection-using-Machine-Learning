@@ -52,14 +52,7 @@ if __name__ == '__main__':
     subs_list, subs_data = dm.generate_subjects_data(gen_csv=False)
     sub = ds.Subject("Id000104.txt")
 
-    # printing out a selection of the subject data
-    # selection = sub.sensor_pos['center'].label['valid']
-    # ds.print_selection(selection)
-
-    # Graphing parameters
-    # Possible options provided next to the parameters
-    # Warning : step markers only display for - motion_type = "complete"
-
+    # Plotting the subject data
     graph.data_plot(sub, sensor_axis="all")
 
 
