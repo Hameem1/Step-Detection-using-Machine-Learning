@@ -188,7 +188,7 @@ def data_plot(subject, sensor_axis="all"):
     global sub, axis
     sub = subject
     axis = sensor_axis
-    app.run_server(debug=True)
+    app.run_server(debug=False, port=5000)
 
 
 if __name__ == '__main__':

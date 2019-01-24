@@ -29,26 +29,26 @@ class Features:
         self.window_size = 50
 
         # All the calculated features
-        self.mean = self.mean()
-        self.variance = self.variance()
-        self.standard_deviation = self.standard_deviation()
-        self.median = self.median()
-        self.value_max = self.max()
-        self.value_min = self.min()
-        self.index_max = self.index_max()
-        self.index_min = self.index_min()
-        self.rms = self.rms()
-        # self.signal_magnitude_area = self.signal_magnitude_area
-        # self.power = self.power()
-        # self.energy = self.energy()
-        # self.entropy = self.entropy()
-        # self.skewness = self.skewness()
-        # self.kurtosis = self.kurtosis()
-        # self.iqr = self.iqr()
-        # self.mean_abs_deviation = self.mean_abs_deviation()
-        # self.xy = self.xy()
-        # self.xz = self.xz()
-        # self.yz = self.yz()
+        self.mean = self.window(self.mean)
+        self.variance = self.window(self.variance)
+        self.standard_deviation = self.window(self.standard_deviation)
+        self.median = self.window(self.median)
+        self.value_max = self.window(self.value_max)
+        self.value_min = self.window(self.value_min)
+        self.index_max = self.window(self.index_max)
+        self.index_min = self.window(self.index_min)
+        self.rms = self.window(self.rms)
+        self.iqr = self.window(self.iqr)
+        # self.signal_magnitude_area = self.window(self.signal_magnitude_area)
+        # self.power = self.window(self.power)
+        # self.energy = self.window(self.energy)
+        # self.entropy = self.window(self.entropy)
+        # self.skewness = self.window(self.skewness)
+        # self.kurtosis = self.window(self.kurtosis)
+        # self.mean_abs_deviation = self.window(self.mean_abs_deviation)
+        # self.xy = self.window(self.xy)
+        # self.xz = self.window(self.xz)
+        # self.yz = self.window(self.yz)
 
         # list of features
         self.features = []
@@ -58,50 +58,65 @@ class Features:
         self.data_loss = 0.0
 
     # Class member functions
-    def mean(self):
-        print(len(self.data))
-        mean = stat.mean(self.data)
-        return mean
+    @staticmethod
+    def mean(data):
+        return stat.mean(data)
 
-    def variance(self):
-        print(len(self.data))
-        variance = np.var(self.data)
-        return variance
+    @staticmethod
+    def variance(data):
+        return np.var(data)
 
-    def standard_deviation(self):
-        print(len(self.data))
-        standard_deviation = np.var(self.data)
-        return standard_deviation
+    @staticmethod
+    def standard_deviation(data):
+        return np.var(data)
 
-    def median(self):
-        print(len(self.data))
-        median = stat.median(self.data)
-        return median
+    @staticmethod
+    def median(data):
+        return stat.median(data)
 
-    def max(self):
-        print(len(self.data))
-        value_max = np.max(self.data)
-        return value_max
+    @staticmethod
+    def value_max(data):
+        return np.max(data)
 
-    def min(self):
-        print(len(self.data))
-        value_min = np.min(self.data)
-        return value_min
+    @staticmethod
+    def value_min(data):
+        return np.min(data)
 
-    def index_max(self):
-        print(len(self.data))
-        index_max = self.data.idxmax()
-        return index_max
+    @staticmethod
+    def index_max(data):
+        data = list(data)
+        return data.index(min(data))
 
-    def index_min(self):
-        print(len(self.data))
-        index_min = self.data.idxmin()
-        return index_min
+    @staticmethod
+    def index_min(data):
+        data = list(data)
+        return data.index(max(data))
 
-    def rms(self):
-        print(len(self.data))
-        rms = np.sqrt(np.mean(np.array(self.data) ** 2))
-        return rms
+    @staticmethod
+    def rms(data):
+        return np.sqrt(np.mean(np.array(data) ** 2))
+
+    @staticmethod
+    def iqr(data):
+        q75, q25 = np.percentile(data, [75, 25])
+        return q75 - q25
+
+    def window(self, func):
+        ret = []
+        window_size = self.window_size
+        w_start = 0
+        w_stop = w_start + window_size
+        while w_stop < len(self.data):
+            window_data = self.data[w_start:w_stop]
+            # print(window_data)
+            temp = func(window_data)
+            if not float(temp).is_integer():
+                ret.append("{0:.5f}".format(temp))
+            else:
+                ret.append(temp)
+            w_start += 1
+            w_stop = w_start + window_size
+        return ret
 
     def get_features_list(self):
         self.features = list(

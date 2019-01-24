@@ -5,7 +5,7 @@
 #       the "feature_length" and then: [feature_length/fs]
 #       Should run on a different port (not the same as graphing.py)
 
-# TODO: Perform feature ranking on the data
+# TODO: Perform feature ranking on the data (Try to take cues from the visualization)
 
 
 """ This module implements the high level logic
@@ -22,10 +22,11 @@ This is required!
 import dataset_manipulator as dm
 import data_structs as ds
 import graphing as graph
+from features import feature_extractor
 
 # Configuration variables
 # True if the Data set needs to be fixed, otherwise False
-FIX = False
+FIX = True
 DEVELOPER_MODE = True
 
 # Fixing the entire Data set
@@ -40,12 +41,25 @@ if __name__ == '__main__':
     # Demonstrating the use of the Subject class and data_plot function
 
     # Generating the subject list and subject data from the data set
-    subs_list, subs_data = dm.generate_subjects_data(gen_csv=False)
+    # subs_list, subs_data = dm.generate_subjects_data(gen_csv=False)
     sub = ds.Subject("Id000104.txt")
 
     # Plotting the subject data
-    graph.data_plot(sub, sensor_axis="all")
+    # graph.data_plot(sub, sensor_axis="all")
 
+    features_list, features = feature_extractor(sub, "right", "Ax")
+    print(f'\n--------------------'
+          f'  Calculated Features  '
+          f'--------------------\n')
+    print(f'Base Data = Ax\n'
+          f'Sensor Position = Right\n'
+          f'# of calculated features = {len(features_list)}\n'
+          f'Length of Original Data = {len(sub.sensor_pos["right"].label["valid"]["Ax"])}\n')
+    print(f'--------------------\n')
+
+    for feature, value in features.items():
+        print(f"\n{feature} = {value}")
+        print(f"Length of {feature} = {len(value)}")
 
 
 else:
