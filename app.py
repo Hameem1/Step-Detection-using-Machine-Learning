@@ -1,17 +1,9 @@
-# TODO: Create a new module features.py to calculate the features from a moving window on
-#       the given (sub, sensor, base_data), where:
-#       sub: Subject(s)
-#       sensor: string(center, left, right); e.g. "center"
-#       base data: string(Ax, Ay, Az, Gz, Gy, Gz); e.g. "Ax"
-#       These features should be stored in a class contained in features.py
-#       The class should also implement "feature_length" (first see if this is uniform for all features)
-#       Implement prints in this module to indicate the truncation of the data taking place
-
 # TODO: Create a Dashboard which takes in a the base parameter as a string : e.g. "Ay"
 #       It then picks up the relevant features from features.py and plots them by giving
 #       the user a dropdown menu to select which feature is to be plotted
 #       The dashboard should calculate the x-axis for this data by checking the value of
 #       the "feature_length" and then: [feature_length/fs]
+#       Should run on a different port (not the same as graphing.py)
 
 # TODO: Perform feature ranking on the data
 

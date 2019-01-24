@@ -1,15 +1,19 @@
 """This module calculates the features from the base data using a moving window and stores them"""
 
 """
-Currently the following features have been implemented:
+Currently the following features have been calculated:
 
-->
-->
-->
-->
-->
+-> mean, variance, standard deviation
+-> median, max, min, rms
+-> signal magnitude area, index(min), index(max), power, energy, entropy, skewness, kurtosis, IQR , mean abs deviation
+-> xy, xz, yz
     
 """
+
+import statistics as stat
+import numpy as np
+
+# TODO: Create a decorator to implement a window over the existing functions
 
 
 class Features:
@@ -18,41 +22,99 @@ class Features:
     """
 
     def __init__(self, data):
+
+        # The data to be used
+        self.data = data
         # Width of the moving window (in # of samples)
         self.window_size = 50
+
         # All the calculated features
-        self.f1 = self.calculate_f1()
-        self.f2 = self.calculate_f2()
-        self.f3 = self.calculate_f3()
-        self.f4 = self.calculate_f4()
-        self.f5 = self.calculate_f5()
+        self.mean = self.mean()
+        self.variance = self.variance()
+        self.standard_deviation = self.standard_deviation()
+        self.median = self.median()
+        self.value_max = self.max()
+        self.value_min = self.min()
+        self.index_max = self.index_max()
+        self.index_min = self.index_min()
+        self.rms = self.rms()
+        # self.signal_magnitude_area = self.signal_magnitude_area
+        # self.power = self.power()
+        # self.energy = self.energy()
+        # self.entropy = self.entropy()
+        # self.skewness = self.skewness()
+        # self.kurtosis = self.kurtosis()
+        # self.iqr = self.iqr()
+        # self.mean_abs_deviation = self.mean_abs_deviation()
+        # self.xy = self.xy()
+        # self.xz = self.xz()
+        # self.yz = self.yz()
+
         # list of features
         self.features = []
         self.get_features_list()
         # List of lengths for all features
         self.feature_length = []
-        self.truncation = 0.0
+        self.data_loss = 0.0
 
-    def calculate_f1(self):
-        pass
+    # Class member functions
+    def mean(self):
+        print(len(self.data))
+        mean = stat.mean(self.data)
+        return mean
 
-    def calculate_f2(self):
-        pass
+    def variance(self):
+        print(len(self.data))
+        variance = np.var(self.data)
+        return variance
 
-    def calculate_f3(self):
-        pass
+    def standard_deviation(self):
+        print(len(self.data))
+        standard_deviation = np.var(self.data)
+        return standard_deviation
 
-    def calculate_f4(self):
-        pass
+    def median(self):
+        print(len(self.data))
+        median = stat.median(self.data)
+        return median
 
-    def calculate_f5(self):
-        pass
+    def max(self):
+        print(len(self.data))
+        value_max = np.max(self.data)
+        return value_max
+
+    def min(self):
+        print(len(self.data))
+        value_min = np.min(self.data)
+        return value_min
+
+    def index_max(self):
+        print(len(self.data))
+        index_max = self.data.idxmax()
+        return index_max
+
+    def index_min(self):
+        print(len(self.data))
+        index_min = self.data.idxmin()
+        return index_min
+
+    def rms(self):
+        print(len(self.data))
+        rms = np.sqrt(np.mean(np.array(self.data) ** 2))
+        return rms
 
     def get_features_list(self):
         self.features = list(
-            f for f in dir(self) if not f.startswith('__') and not callable(getattr(self, f)) and f is not "features")
+            f for f in dir(self) if not f.startswith('__')
+            and not callable(getattr(self, f))
+            and f is not "features"
+            and f is not "data"
+            and f is not "window_size"
+            and f is not "feature_length"
+            and f is not "data_loss")
 
 
+# This is the exposed endpoint for usage via import
 def feature_extractor(sub, sensor_pos, base_data):
     """This function returns the features dictionary for the requested data
 
