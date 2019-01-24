@@ -1,19 +1,18 @@
 """This module calculates the features from the base data using a moving window and stores them"""
 
 """
-Currently the following features have been calculated:
+Currently the following features are being calculated:
 
 -> mean, variance, standard deviation
 -> median, max, min, rms
--> signal magnitude area, index(min), index(max), power, energy, entropy, skewness, kurtosis, IQR , mean abs deviation
+-> index(min), index(max), IQR ,signal magnitude area, power, energy, entropy, skewness, kurtosis, mean abs deviation
 -> xy, xz, yz
     
 """
 
+# Imports
 import statistics as stat
 import numpy as np
-
-# TODO: Create a decorator to implement a window over the existing functions
 
 
 class Features:
@@ -23,6 +22,7 @@ class Features:
 
     def __init__(self, data):
 
+        # TODO: data should be a dictionary with x_data, y_data & z_data
         # The data to be used
         self.data = data
         # Width of the moving window (in # of samples)
@@ -57,7 +57,7 @@ class Features:
         self.feature_length = []
         self.data_loss = 0.0
 
-    # Class member functions
+    # Basic Calculations
     @staticmethod
     def mean(data):
         return stat.mean(data)
@@ -101,6 +101,7 @@ class Features:
         q75, q25 = np.percentile(data, [75, 25])
         return q75 - q25
 
+    # This window runs over every @staticmethod and calls every calculation
     def window(self, func):
         ret = []
         window_size = self.window_size
@@ -110,14 +111,17 @@ class Features:
             window_data = self.data[w_start:w_stop]
             # print(window_data)
             temp = func(window_data)
+            # If the data is a float (Store up to 5 decimal places)
             if not float(temp).is_integer():
                 ret.append("{0:.5f}".format(temp))
+            # if the data is an int
             else:
                 ret.append(temp)
             w_start += 1
             w_stop = w_start + window_size
         return ret
 
+    # Generates a list of available features from what has been calculated in the class
     def get_features_list(self):
         self.features = list(
             f for f in dir(self) if not f.startswith('__')
@@ -129,6 +133,7 @@ class Features:
             and f is not "data_loss")
 
 
+# TODO: change base_data to sensor_type('acc' or 'gyr') and store as x_data, y_data & z_data in the class
 # This is the exposed endpoint for usage via import
 def feature_extractor(sub, sensor_pos, base_data):
     """This function returns the features dictionary for the requested data
