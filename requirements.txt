@@ -32,3 +32,4 @@ traitlets
 urllib3
 Werkzeug
 wrapt
+scipy

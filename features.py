@@ -5,7 +5,7 @@ Currently the following features are being calculated:
 
 -> mean, variance, standard deviation
 -> median, max, min, rms
--> index(min), index(max), IQR ,signal magnitude area, power, energy, entropy, skewness, kurtosis, mean abs deviation
+-> index(min), index(max), IQR , skewness, kurtosis, signal magnitude area, power, energy, entropy, mean abs deviation
 -> xy, xz, yz
     
 """
@@ -13,6 +13,8 @@ Currently the following features are being calculated:
 # Imports
 import statistics as stat
 import numpy as np
+from scipy.stats import kurtosis, skew
+import pandas as pd
 
 
 class Features:
@@ -43,9 +45,9 @@ class Features:
         # self.power = self.window(self.power)
         # self.energy = self.window(self.energy)
         # self.entropy = self.window(self.entropy)
-        # self.skewness = self.window(self.skewness)
-        # self.kurtosis = self.window(self.kurtosis)
-        # self.mean_abs_deviation = self.window(self.mean_abs_deviation)
+        self.skewness = self.window(self.skewness)
+        self.kurtosis = self.window(self.kurtosis)
+        self.mean_abs_deviation = self.window(self.mean_abs_deviation)
         # self.xy = self.window(self.xy)
         # self.xz = self.window(self.xz)
         # self.yz = self.window(self.yz)
@@ -101,6 +103,18 @@ class Features:
         q75, q25 = np.percentile(data, [75, 25])
         return q75 - q25
 
+    @staticmethod
+    def kurtosis(data):
+        return kurtosis(data)
+
+    @staticmethod
+    def skewness(data):
+        return skew(data)
+
+    @staticmethod
+    def mean_abs_deviation(data):
+        return data.mad()
+
     # This window runs over every @staticmethod and calls every calculation
     def window(self, func):
         ret = []
@@ -134,6 +148,8 @@ class Features:
 
 
 # TODO: change base_data to sensor_type('acc' or 'gyr') and store as x_data, y_data & z_data in the class
+# TODO: Return features as a new DataFrame
+
 # This is the exposed endpoint for usage via import
 def feature_extractor(sub, sensor_pos, base_data):
     """This function returns the features dictionary for the requested data
