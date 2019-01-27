@@ -6,7 +6,7 @@ Currently the following features are being calculated:
 -> mean, variance, standard deviation
 -> median, max, min, rms
 -> index(min), index(max), IQR , skewness, kurtosis, signal magnitude area, energy, entropy, mean abs deviation
--> xy, xz, yz
+-> xy, xz, yz (Correlation between axes)
     
 """
 
@@ -31,27 +31,33 @@ class Features:
         self.window_size = 50
 
         # All the calculated features
-        self.mean = self.window(self.mean)
-        self.variance = self.window(self.variance)
-        self.standard_deviation = self.window(self.standard_deviation)
-        self.median = self.window(self.median)
-        self.value_max = self.window(self.value_max)
-        self.value_min = self.window(self.value_min)
-        self.index_max = self.window(self.index_max)
-        self.index_min = self.window(self.index_min)
-        self.rms = self.window(self.rms)
-        self.iqr = self.window(self.iqr)
-        self.signal_magnitude_area = self.window(self.signal_magnitude_area)
-        self.energy = self.window(self.energy)
-        self.entropy = self.window(self.data_entropy)
-        self.skewness = self.window(self.skewness)
-        self.kurtosis = self.window(self.kurtosis)
-        self.mean_abs_deviation = self.window(self.mean_abs_deviation)
-        # Cross correlations between variables
-        # self.xy = self.window(self.xy)
-        # self.xz = self.window(self.xz)
-        # self.yz = self.window(self.yz)
+        if isinstance(data, pd.Series):
+            print(f'Calculating features for {data.name}')
+            self.mean = self.window(self.mean)
+            self.variance = self.window(self.variance)
+            self.standard_deviation = self.window(self.standard_deviation)
+            self.median = self.window(self.median)
+            self.value_max = self.window(self.value_max)
+            self.value_min = self.window(self.value_min)
+            self.index_max = self.window(self.index_max)
+            self.index_min = self.window(self.index_min)
+            self.rms = self.window(self.rms)
+            self.iqr = self.window(self.iqr)
+            self.signal_magnitude_area = self.window(self.sma)
+            self.energy = self.window(self.energy)
+            self.entropy = self.window(self.data_entropy)
+            self.skewness = self.window(self.skewness)
+            self.kurtosis = self.window(self.kurtosis)
+            self.mean_abs_deviation = self.window(self.mean_abs_deviation)
 
+        else:
+            # Cross correlations between variables
+            print(f'Calculating correlation between {data.columns}')
+            self.corr_xy = 0#self.window(self.xy)
+            self.corr_xz = 0#self.window(self.xz)
+            self.corr_yz = 0#self.window(self.yz)
+
+        print(f'Dimensions of self.data = {data.size}')
         # list of features
         self.features = []
         # List of lengths for all features
@@ -127,9 +133,13 @@ class Features:
         return squares.sum()
 
     @staticmethod
-    def signal_magnitude_area(data):
+    def sma(data):
         absolute = list(map(abs, data))
         return sum(absolute)
+
+    # @staticmethod
+    # def xy(data):
+    #     return pearsonr(x,y)[0]
 
     # This window runs over every @staticmethod and calls every calculation
     def window(self, func):
@@ -167,18 +177,35 @@ class Features:
 # TODO: Return features as a new DataFrame
 
 # This is the exposed endpoint for usage via import
-def feature_extractor(sub, sensor_pos, base_data):
+def feature_extractor(sub, sensor_pos, sensor_type):
     """This function returns the features dictionary for the requested data
 
         :param sub: A Subject class object
         :param sensor_pos: str('center', 'left', 'right')
-        :param base_data: str('Ax', 'Ay', 'Az', 'Gx', 'Gy', 'Gz')
+        :param sensor_type: str('acc', 'gyr')
         :returns features_list, features: list(features_list), dict(features)
     """
+    features = {}
+    features_list = []
+    data = sub.sensor_pos[sensor_pos].label['valid']
+    if sensor_type == "acc":
+        base_data = [col for col in data.columns if col.startswith('A')]
+        base_data.append('all')
+    else:
+        base_data = [col for col in data.columns if col.startswith('G')]
+        base_data.append('all')
 
-    f = Features(sub.sensor_pos[sensor_pos].label['valid'][base_data])
-    features_list = f.features
-    features = {x: getattr(f, x) for x in features_list}
+    for axis in base_data:
+        if axis is not 'all':
+            f = Features(data[axis])
+        else:
+            f = Features(data[base_data[0:3]])
+
+        for item in f.features:
+            if item not in features_list:
+                features_list.append(item)
+        features[axis] = {x: getattr(f, x) for x in f.features}
+
     return features_list, features
 
 

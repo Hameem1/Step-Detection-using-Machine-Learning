@@ -47,19 +47,20 @@ if __name__ == '__main__':
     # Plotting the subject data
     # graph.data_plot(sub, sensor_axis="all")
 
-    features_list, features = feature_extractor(sub, "right", "Ax")
-    print(f'\n--------------------'
-          f'  Calculated Features  '
-          f'--------------------\n')
-    print(f'Base Data = Ax\n'
-          f'Sensor Position = Right\n'
-          f'# of calculated features = {len(features_list)}\n'
-          f'Length of Original Data = {len(sub.sensor_pos["right"].label["valid"]["Ax"])}\n')
-    print(f'--------------------\n')
+    features_list, features = feature_extractor(sub, "right", "acc")
 
-    for feature, value in features.items():
-        print(f"\n{feature} = {value}")
-        print(f"Length of {feature} = {len(value)}")
+    for axis, features_data in features.items():
+        print(f'\n--------------------'
+              f'  Calculated Features  '
+              f'--------------------\n')
+        print(f'Base Data = {axis}\n'
+              f'Sensor Position = Right\n'
+              f'# of calculated features = {len(features_data)}\n')
+        print(f'--------------------\n')
+
+        for feature, value in features_data.items():
+            print(f"\n{feature} = {value}")
+            # print(f"Length of {feature} = {len(value)}")
 
 
 else:
