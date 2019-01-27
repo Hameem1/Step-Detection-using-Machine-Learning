@@ -22,7 +22,7 @@ This is required!
 import dataset_manipulator as dm
 import data_structs as ds
 import graphing as graph
-from features import feature_extractor
+from features import feature_extractor, print_features
 
 # Configuration variables
 # True if the Data set needs to be fixed, otherwise False
@@ -48,23 +48,7 @@ if __name__ == '__main__':
     # graph.data_plot(sub, sensor_axis="all")
 
     features_list, features = feature_extractor(sub, "right", "acc")
-    total_features = 0
-    for axis, features_data in features.items():
-        print(f'\n--------------------'
-              f'  Calculated Features  '
-              f'--------------------\n')
-        print(f'Base Data = {axis}\n'
-              f'Sensor Position = Right\n'
-              f'# of calculated features = {len(features_data)}\n')
-        print(f'--------------------\n')
-        if total_features != len(features_data):
-            total_features += len(features_data)
-
-        for feature, value in features_data.items():
-            print(f"\n{feature} = {value}")
-            # print(f"Length of {feature} = {len(value)}")
-
-    print(f'\nTotal # of unique features calculated = {total_features}')
+    print_features(features_list, features)
 
 
 else:

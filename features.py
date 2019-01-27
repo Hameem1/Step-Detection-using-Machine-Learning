@@ -24,7 +24,6 @@ class Features:
 
     def __init__(self, data):
 
-        # TODO: data should be a dictionary with x_data, y_data & z_data
         # The data to be used
         self.data = data
         # Width of the moving window (in # of samples)
@@ -189,6 +188,28 @@ class Features:
             and f is not "window_size"
             and f is not "feature_length"
             and f is not "data_loss")
+
+
+def print_features(features_list, features):
+    """This function prints the given features dictionary
+
+        :param features_list: list(features_list)
+        :param features: dict(features)
+    """
+    for axis, features_data in features.items():
+        print(f'\n--------------------'
+              f'  Calculated Features  '
+              f'--------------------\n')
+        print(f'Base Data = {axis}\n'
+              f'Sensor Position = Right\n'
+              f'# of calculated features = {len(features_data)}\n')
+        print(f'--------------------\n')
+
+        for feature, value in features_data.items():
+            print(f"\n{feature} = {value}")
+            # print(f"Length of {feature} = {len(value)}")
+
+    print(f'\nTotal # of unique features calculated = {len(features_list)}')
 
 
 # TODO: Return features as a new DataFrame
