@@ -5,7 +5,7 @@ Currently the following features are being calculated:
 
 -> mean, variance, standard deviation
 -> median, max, min, rms
--> index(min), index(max), IQR , skewness, kurtosis, signal magnitude area, power, energy, entropy, mean abs deviation
+-> index(min), index(max), IQR , skewness, kurtosis, signal magnitude area, energy, entropy, mean abs deviation
 -> xy, xz, yz
     
 """
@@ -13,7 +13,7 @@ Currently the following features are being calculated:
 # Imports
 import statistics as stat
 import numpy as np
-from scipy.stats import kurtosis, skew
+from scipy.stats import kurtosis, skew, entropy, pearsonr
 import pandas as pd
 
 
@@ -41,23 +41,24 @@ class Features:
         self.index_min = self.window(self.index_min)
         self.rms = self.window(self.rms)
         self.iqr = self.window(self.iqr)
-        # self.signal_magnitude_area = self.window(self.signal_magnitude_area)
-        # self.power = self.window(self.power)
-        # self.energy = self.window(self.energy)
-        # self.entropy = self.window(self.entropy)
+        self.signal_magnitude_area = self.window(self.signal_magnitude_area)
+        self.energy = self.window(self.energy)
+        self.entropy = self.window(self.data_entropy)
         self.skewness = self.window(self.skewness)
         self.kurtosis = self.window(self.kurtosis)
         self.mean_abs_deviation = self.window(self.mean_abs_deviation)
+        # Cross correlations between variables
         # self.xy = self.window(self.xy)
         # self.xz = self.window(self.xz)
         # self.yz = self.window(self.yz)
 
         # list of features
         self.features = []
-        self.get_features_list()
         # List of lengths for all features
-        self.feature_length = []
-        self.data_loss = 0.0
+        # self.feature_length = []
+        # Data loss due to windowing
+        # self.data_loss = 0.0
+        self.get_features_list()
 
     # Basic Calculations
     @staticmethod
@@ -114,6 +115,21 @@ class Features:
     @staticmethod
     def mean_abs_deviation(data):
         return data.mad()
+
+    @staticmethod
+    def data_entropy(data):
+        value, counts = np.unique(data, return_counts=True)
+        return entropy(counts)
+
+    @staticmethod
+    def energy(data):
+        squares = data**2
+        return squares.sum()
+
+    @staticmethod
+    def signal_magnitude_area(data):
+        absolute = list(map(abs, data))
+        return sum(absolute)
 
     # This window runs over every @staticmethod and calls every calculation
     def window(self, func):
