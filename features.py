@@ -53,9 +53,9 @@ class Features:
         else:
             # Cross correlations between variables
             print(f'Calculating correlation between {data.columns}')
-            self.corr_xy = 0#self.window(self.xy)
-            self.corr_xz = 0#self.window(self.xz)
-            self.corr_yz = 0#self.window(self.yz)
+            self.corr_xy = self.window(self.xy, 'Ax', 'Ay')
+            self.corr_xz = self.window(self.xz, 'Ax', 'Az')
+            self.corr_yz = self.window(self.yz, 'Ay', 'Az')
 
         print(f'Dimensions of self.data = {data.size}')
         # list of features
@@ -137,18 +137,36 @@ class Features:
         absolute = list(map(abs, data))
         return sum(absolute)
 
-    # @staticmethod
-    # def xy(data):
-    #     return pearsonr(x,y)[0]
+    @staticmethod
+    def xy(data):
+        x = data['Ax']
+        y = data['Ay']
+        return pearsonr(x, y)[0]
 
-    # This window runs over every @staticmethod and calls every calculation
-    def window(self, func):
+    @staticmethod
+    def xz(data):
+        x = data['Ax']
+        z = data['Az']
+        return pearsonr(x, z)[0]
+
+    @staticmethod
+    def yz(data):
+        y = data['Ay']
+        z = data['Az']
+        return pearsonr(y, z)[0]
+
+    # This window runs over every @staticmethod and performs the given function
+    def window(self, func, *args):
         ret = []
         window_size = self.window_size
         w_start = 0
         w_stop = w_start + window_size
-        while w_stop < len(self.data):
-            window_data = self.data[w_start:w_stop]
+        if isinstance(self.data, pd.Series):
+            data = self.data
+        else:
+            data = self.data[[args[0], args[1]]]
+        while w_stop < len(data):
+            window_data = data[w_start:w_stop]
             # print(window_data)
             temp = func(window_data)
             # If the data is a float (Store up to 5 decimal places)
@@ -173,7 +191,6 @@ class Features:
             and f is not "data_loss")
 
 
-# TODO: change base_data to sensor_type('acc' or 'gyr') and store as x_data, y_data & z_data in the class
 # TODO: Return features as a new DataFrame
 
 # This is the exposed endpoint for usage via import

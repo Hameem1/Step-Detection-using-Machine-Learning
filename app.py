@@ -48,7 +48,7 @@ if __name__ == '__main__':
     # graph.data_plot(sub, sensor_axis="all")
 
     features_list, features = feature_extractor(sub, "right", "acc")
-
+    total_features = 0
     for axis, features_data in features.items():
         print(f'\n--------------------'
               f'  Calculated Features  '
@@ -57,10 +57,14 @@ if __name__ == '__main__':
               f'Sensor Position = Right\n'
               f'# of calculated features = {len(features_data)}\n')
         print(f'--------------------\n')
+        if total_features != len(features_data):
+            total_features += len(features_data)
 
         for feature, value in features_data.items():
             print(f"\n{feature} = {value}")
             # print(f"Length of {feature} = {len(value)}")
+
+    print(f'\nTotal # of unique features calculated = {total_features}')
 
 
 else:
