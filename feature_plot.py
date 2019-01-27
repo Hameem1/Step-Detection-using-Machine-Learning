@@ -6,12 +6,12 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 import plotly.graph_objs as go
 import numpy as np
-from data_structs import fs
 
 # Global variables
 SENSOR_TYPE = ''
 FEATURES_LIST = {}
 FEATURES = {}
+fs = 100
 
 # Configuring Dash app
 app = dash.Dash(__name__)
@@ -81,9 +81,9 @@ def features_dropdown_callback(value):
     return options_list
 
 
-# @app.callback(Output('feature-plot', 'figure'),
-#               [Input('axis-dropdown', 'value'),
-#                Input('features-dropdown', 'value')])
+@app.callback(Output('feature-plot', 'figure'),
+              [Input('axis-dropdown', 'value'),
+               Input('features-dropdown', 'value')])
 def graph_callback(axis, feature):
     """This function plots a graph for the given parameters
 
@@ -93,43 +93,49 @@ def graph_callback(axis, feature):
         """
 
     # Graph variables
-    t = np.array([num for num in range(0, len(FEATURES[axis][feature]))]) / fs
-    xlabel = 'time (s)'
-    ylabel = 'Feature Value'
-    title = f'{feature.capitalize}  vs Time'
+    print(f'axis({type(axis)}) = {axis}')
+    print(f'feature({type(feature)}) = {feature}')
 
-    # Generating plot traces
-    traces = [go.Scatter(x=t,
-                         y=FEATURES[axis][feature],
-                         mode="lines",
-                         name=feature)]
+    try:
+        t = np.array([num for num in range(len(FEATURES[axis][feature]))]) / fs
+        xlabel = 'time (s)'
+        ylabel = 'Feature Value'
+        title = f'{feature.capitalize()}  vs Time'
 
-    # # Generating x and y step coordinates for all axes
-    # steps_x, steps_y, step_count = step_marker(t, sub, position, sensor, motion)
-    #
-    # # Generating step traces
-    # step_traces = [go.Scatter(x=np.array(steps_x[ax]) / fs,
-    #                           y=steps_y[ax],
-    #                           mode="markers",
-    #                           name=axes[ax][sensor]) for ax in axes]
-    #
-    # # Keeping only one matching step trace visible by default
-    # for step_trace in step_traces:
-    #     if step_trace.name is not str(axes[visible][sensor]):
-    #         step_trace.visible = "legendonly"
-    #
-    # # Combining the traces with step traces
-    # traces.extend(step_traces)
+        # Generating plot traces
+        traces = [go.Scatter(x=t,
+                             y=FEATURES[axis][feature],
+                             mode="lines",
+                             name=feature)]
 
-    # Defining the layout for the plot
-    layout = go.Layout(title=title,
-                       xaxis=dict(title=xlabel),
-                       yaxis=dict(title=ylabel),
-                       font=dict(family='arial', size=18, color='#000000'))
+        # # Generating x and y step coordinates for all axes
+        # steps_x, steps_y, step_count = step_marker(t, sub, position, sensor, motion)
+        #
+        # # Generating step traces
+        # step_traces = [go.Scatter(x=np.array(steps_x[ax]) / fs,
+        #                           y=steps_y[ax],
+        #                           mode="markers",
+        #                           name=axes[ax][sensor]) for ax in axes]
+        #
+        # # Keeping only one matching step trace visible by default
+        # for step_trace in step_traces:
+        #     if step_trace.name is not str(axes[visible][sensor]):
+        #         step_trace.visible = "legendonly"
+        #
+        # # Combining the traces with step traces
+        # traces.extend(step_traces)
 
-    # Plotting the figure
-    fig = dict(data=traces, layout=layout)
-    return fig
+        # Defining the layout for the plot
+        layout = go.Layout(title=title,
+                           xaxis=dict(title=xlabel),
+                           yaxis=dict(title=ylabel),
+                           font=dict(family='arial', size=18, color='#000000'))
+
+        # Plotting the figure
+        fig = dict(data=traces, layout=layout)
+        return fig
+    except KeyError as error:
+        print(f'Error Occurred : {error} - Invalid axis/feature combination selected')
 
 
 # def step_marker(t, subject, pos, sensor, motion_type):
