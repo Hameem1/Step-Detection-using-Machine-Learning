@@ -1,4 +1,4 @@
-"""This module implements the plotting functionality"""
+"""This module implements the plotting functionality for the base data"""
 
 import dash
 import dash_core_components as dcc
@@ -30,7 +30,7 @@ app.layout = html.Div([
                              'margin': '2% 0% 2% 0%',
                              'letter-spacing': 2})], className='row'),
     # Sub-Div (2nd level)
-    # sensor and position selector
+    # motion type, sensor type and position selector
     html.Div([
 
         # Sub-Div (3rd level)
@@ -84,7 +84,7 @@ app.layout = html.Div([
     ], style={'margin': '4% 0% 4% 14%', 'float': 'center'}, className='row'),
 
     # Sub-Div (2nd level)
-    # Stocks Graph
+    # Data Graph
     html.Div([dcc.Graph(id='data-plot')], className='row')
 
 ], className='ten columns offset-by-one')
@@ -192,5 +192,6 @@ def data_plot(subject, sensor_axis="all"):
 
 
 if __name__ == '__main__':
-    # app.run_server(debug=True)
     print(f"In __main__ of graphing.py")
+else:
+    print(f"\nModule imported : {__name__}\n")

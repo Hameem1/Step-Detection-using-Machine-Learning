@@ -12,6 +12,8 @@ FILE_STATUS_MESSAGES = False
 # storage selector for SUBJECTS_REPO (Dict/List)
 STORAGE = "List"
 
+fs = None
+
 
 # Every label in "labels" contains data which belongs to it's 'ClassLabel'
 # and is not null valued (all zeros)
@@ -43,7 +45,9 @@ class Dataset:
     """
 
     def __init__(self, path):
-        self.fs = 100
+        global fs
+
+        fs = self.fs = 100
 
         try:
             # Reading in a Single Dataset file

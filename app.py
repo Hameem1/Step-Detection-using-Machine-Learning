@@ -21,7 +21,8 @@ This is required!
 """
 import dataset_manipulator as dm
 import data_structs as ds
-import graphing as graph
+# import graphing as graph
+from feature_plot import feature_plot as fp
 from features import feature_extractor, print_features
 
 # Configuration variables
@@ -47,8 +48,11 @@ if __name__ == '__main__':
     # Plotting the subject data
     # graph.data_plot(sub, sensor_axis="all")
 
+    # Generating & Printing the features
     features_list, features = feature_extractor(sub, "right", "acc")
-    print_features(features_list, features)
+    # print_features(features)
+    fp(features_list, features)
+
 
 
 else:

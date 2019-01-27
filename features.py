@@ -190,12 +190,12 @@ class Features:
             and f is not "data_loss")
 
 
-def print_features(features_list, features):
+def print_features(features):
     """This function prints the given features dictionary
 
-        :param features_list: list(features_list)
         :param features: dict(features)
     """
+    total_features = 0
     for axis, features_data in features.items():
         print(f'\n--------------------'
               f'  Calculated Features  '
@@ -205,11 +205,14 @@ def print_features(features_list, features):
               f'# of calculated features = {len(features_data)}\n')
         print(f'--------------------\n')
 
+        if total_features != len(features_data):
+            total_features += len(features_data)
+
         for feature, value in features_data.items():
             print(f"\n{feature} = {value}")
             # print(f"Length of {feature} = {len(value)}")
 
-    print(f'\nTotal # of unique features calculated = {len(features_list)}')
+    print(f'\nTotal # of unique features calculated = {total_features}')
 
 
 # TODO: Return features as a new DataFrame
@@ -224,7 +227,7 @@ def feature_extractor(sub, sensor_pos, sensor_type):
         :returns features_list, features: list(features_list), dict(features)
     """
     features = {}
-    features_list = []
+    features_list = {}
     data = sub.sensor_pos[sensor_pos].label['valid']
     if sensor_type == "acc":
         base_data = [col for col in data.columns if col.startswith('A')]
@@ -238,10 +241,7 @@ def feature_extractor(sub, sensor_pos, sensor_type):
             f = Features(data[axis])
         else:
             f = Features(data[base_data[0:3]])
-
-        for item in f.features:
-            if item not in features_list:
-                features_list.append(item)
+        features_list[axis] = f.features
         features[axis] = {x: getattr(f, x) for x in f.features}
 
     return features_list, features
