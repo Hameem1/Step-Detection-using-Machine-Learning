@@ -18,57 +18,58 @@ app = dash.Dash(__name__)
 app.css.config.serve_locally = True
 app.scripts.config.serve_locally = True
 
-# Main Div (1st level)
-app.layout = html.Div([
 
-    # Sub-Div (2nd level)
-    # Heading (Title)
-    html.Div([html.H1(children="Project Dashboard",
-                      className='twelve columns',
-                      style={'text-align': 'center',
-                             'margin': '2% 0% 2% 0%',
-                             'letter-spacing': 2})], className='row'),
-    # Sub-Div (2nd level)
-    # axis and feature selector
-    html.Div([
+def serve_layout():
+    # Main Div (1st level)
+    layout = html.Div([
 
-        # Sub-Div (3rd level)
-        # DropDown
-        html.Div([dcc.Dropdown(id='axis-dropdown',
-                               multi=False,
-                               # TODO: Use a list comprehension to extract from FEATURES_LIST
-                               options=[{'label': "Ax", 'value': "Ax"},
-                                        {'label': "Ay", 'value': "Ay"},
-                                        {'label': "Az", 'value': "Az"},
-                                        {'label': "all", 'value': "all"}],
-                               # options=[{'label': axis, 'value': axis} for axis in FEATURES_LIST],
-                               value='Ax',
-                               placeholder="Select axis",
-                               style={'height': '40px',
-                                      'fontSize': 20,
-                                      'margin': '2% 0% 2% 0%',
-                                      'textAlign': 'center'})
-                  ], style={'text-align': 'center', 'float': 'left'}, className='three columns offset-by-two'),
+        # Sub-Div (2nd level)
+        # Heading (Title)
+        html.Div([html.H1(children="Project Dashboard",
+                          className='twelve columns',
+                          style={'text-align': 'center',
+                                 'margin': '2% 0% 2% 0%',
+                                 'letter-spacing': 2})], className='row'),
+        # Sub-Div (2nd level)
+        # axis and feature selector
+        html.Div([
 
-        # Sub-Div (3rd level)
-        # DropDown
-        html.Div([dcc.Dropdown(id='features-dropdown',
-                               multi=False,
-                               value='mean',
-                               placeholder="Select feature",
-                               style={'height': '40px',
-                                      'fontSize': 20,
-                                      'margin': '2% 0% 2% 0%',
-                                      'textAlign': 'center'})
-                  ], style={'text-align': 'center', 'float': 'left'}, className='three columns offset-by-one')
+            # Sub-Div (3rd level)
+            # DropDown
+            html.Div([dcc.Dropdown(id='axis-dropdown',
+                                   multi=False,
+                                   options=[{'label': axis, 'value': axis} for axis in FEATURES_LIST],
+                                   value='Ax',
+                                   placeholder="Select axis",
+                                   style={'height': '40px',
+                                          'fontSize': 20,
+                                          'margin': '2% 0% 2% 0%',
+                                          'textAlign': 'center'})
+                      ], style={'text-align': 'center', 'float': 'left'}, className='three columns offset-by-two'),
 
-    ], style={'margin': '4% 0% 4% 14%', 'float': 'center'}, className='row'),
+            # Sub-Div (3rd level)
+            # DropDown
+            html.Div([dcc.Dropdown(id='features-dropdown',
+                                   multi=False,
+                                   value='mean',
+                                   placeholder="Select feature",
+                                   style={'height': '40px',
+                                          'fontSize': 20,
+                                          'margin': '2% 0% 2% 0%',
+                                          'textAlign': 'center'})
+                      ], style={'text-align': 'center', 'float': 'left'}, className='three columns offset-by-one')
 
-    # Sub-Div (2nd level)
-    # Features Graph
-    html.Div([dcc.Graph(id='feature-plot')], className='row')
+        ], style={'margin': '4% 0% 4% 14%', 'float': 'center'}, className='row'),
 
-], className='ten columns offset-by-one')
+        # Sub-Div (2nd level)
+        # Features Graph
+        html.Div([dcc.Graph(id='feature-plot')], className='row')
+
+    ], className='ten columns offset-by-one')
+    return layout
+
+
+app.layout = serve_layout
 
 
 @app.callback(Output('features-dropdown', 'options'),
@@ -164,6 +165,7 @@ def feature_plot(features_list, features, sensor_type='acc'):
 
     :param features_list: list(features_list)
     :param features: dict(features)
+    :param sensor_type: optional('acc' or 'gyr')
     """
 
     global FEATURES_LIST, FEATURES, SENSOR_TYPE
