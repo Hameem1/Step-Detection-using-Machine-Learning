@@ -1,5 +1,9 @@
 # TODO: Perform feature ranking on the data (Try to take cues from the visualization)
 
+# TODO: Implement a technique to put together all the data required for the ML model
+#       Hint - processing for segments of the entire Dataset folder would be helpful
+#       Hint - Using threads would be helpful
+
 
 """ This module implements the high level logic
 
@@ -17,6 +21,7 @@ import data_structs as ds
 from data_plot import data_plot as dp
 from feature_plot import feature_plot as fp
 from features import feature_extractor, print_features
+from threading import Thread
 
 # Configuration variables
 # True if the Data set needs to be fixed, otherwise False
@@ -37,15 +42,15 @@ if __name__ == '__main__':
     # Generating the subject list and subject data from the data set
     # subs_list, subs_data = dm.generate_subjects_data(gen_csv=False)
     sub = ds.Subject("Id000104.txt")
-
-    # Plotting the subject data
-    # dp(sub, sensor_axis="all")
-
     # Generating & Printing the features
     features_list, features = feature_extractor(sub, "right", "acc")
     # print_features(features)
+    # Plotting the subject data
+    t1 = Thread(target=dp, args=(sub,), kwargs={'sensor_axis': "all"})
+    t1.start()
     # Plotting the feature data
-    fp(sub, features_list, features)
+    t2 = Thread(target=fp, args=(sub, features_list, features,))
+    t2.start()
 
 
 else:
