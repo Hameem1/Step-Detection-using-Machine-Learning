@@ -192,6 +192,6 @@ def data_plot(subject, sensor_axis="all"):
 
 
 if __name__ == '__main__':
-    print(f"In __main__ of graphing.py")
+    print(f"In __main__ of data_plot.py")
 else:
     print(f"\nModule imported : {__name__}\n")

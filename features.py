@@ -248,6 +248,6 @@ def feature_extractor(sub, sensor_pos, sensor_type):
 
 
 if __name__ == '__main__':
-    print(f'Example Code to be added for {__name__}')
+    print(f"In __main__ of features.py")
 else:
     print(f"\nModule imported : {__name__}\n")

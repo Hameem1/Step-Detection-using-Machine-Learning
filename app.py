@@ -1,10 +1,3 @@
-# TODO: Create a Dashboard which takes in a the base parameter as a string : e.g. "Ay"
-#       It then picks up the relevant features from features.py and plots them by giving
-#       the user a dropdown menu to select which feature is to be plotted
-#       The dashboard should calculate the x-axis for this data by checking the value of
-#       the "feature_length" and then: [feature_length/fs]
-#       Should run on a different port (not the same as graphing.py)
-
 # TODO: Perform feature ranking on the data (Try to take cues from the visualization)
 
 
@@ -21,7 +14,7 @@ This is required!
 """
 import dataset_manipulator as dm
 import data_structs as ds
-import graphing as graph
+from data_plot import data_plot as dp
 from feature_plot import feature_plot as fp
 from features import feature_extractor, print_features
 
@@ -46,11 +39,12 @@ if __name__ == '__main__':
     sub = ds.Subject("Id000104.txt")
 
     # Plotting the subject data
-    graph.data_plot(sub, sensor_axis="all")
+    # dp(sub, sensor_axis="all")
 
     # Generating & Printing the features
     features_list, features = feature_extractor(sub, "right", "acc")
     # print_features(features)
+    # Plotting the feature data
     fp(sub, features_list, features)
 
 

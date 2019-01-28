@@ -93,9 +93,6 @@ def graph_callback(axis, feature):
         """
 
     # Graph variables
-    print(f'axis({type(axis)}) = {axis}')
-    print(f'feature({type(feature)}) = {feature}')
-
     try:
         t = np.array([num for num in range(len(FEATURES[axis][feature]))]) / fs
         xlabel = 'time (s)'
@@ -109,25 +106,15 @@ def graph_callback(axis, feature):
                              name=feature)]
 
         # Generating x and y step coordinates for all axes
-        steps_x, steps_y, step_count = feature_step_marker(dict(feature=FEATURES[axis][feature]),
-                                                           t, SUB, 'right', SENSOR_TYPE)
-
-        print("STEP DATA:")
-        print(steps_x)
-        print(steps_y)
-        print(step_count)
+        steps_x, steps_y, step_count = feature_step_marker(dict(feature=FEATURES[axis][feature]), t, 'right')
 
         # Generating step traces
         step_trace = [go.Scatter(x=np.array(steps_x) / fs,
                                  y=steps_y,
                                  mode="markers",
-                                 name='steps')]
+                                 name="steps")]
 
-        # Step trace not visible by default
-        for trace in step_trace:
-            trace.visible = "legendonly"
-
-        # Combining the traces with step traces
+        # Combining the trace with step trace
         traces.extend(step_trace)
 
         # Defining the layout for the plot
@@ -139,32 +126,30 @@ def graph_callback(axis, feature):
         # Plotting the figure
         fig = dict(data=traces, layout=layout)
         return fig
+
     except KeyError as error:
         print(f'Error Occurred : {error} - Invalid axis/feature combination selected')
 
 
-def feature_step_marker(feature_data, t, subject, pos, sensor):
-    """This function returns the x and y coordinates for steps detected in the given subject data vs t
+def feature_step_marker(feature_data, t, pos):
+    """This function returns the x and y coordinates for steps detected in the given feature data vs t
 
         :param feature_data: dict(feature=[data])
         :param t: numpy array of the time axis
-        :param subject: instance of the Subject class
         :param pos: str ('center', 'left', 'right')
-        :param sensor: str ('acc', 'gyr')
         :returns steps_x, steps_y, step_count: dict(steps_x, steps_y), int(step_count)
         """
 
     steps_x = []
     steps_y = []
 
-    data = subject.sensor_pos[pos].label['valid']
+    data = SUB.sensor_pos[pos].label['valid']
 
     step_count = 0
     for i in range(1, len(t)):
         if data.loc[i, 'StepLabel'] > (data.loc[i - 1, 'StepLabel']):
             steps_x.append(i)
             steps_y.append("{0:.5f}".format(float(next(iter(feature_data.values()))[i])))
-            print("{0:.5f}".format(float(next(iter(feature_data.values()))[i])))
             step_count += 1
     print(f'\nStep Count for {next(iter(feature_data.keys()))} = {step_count}\n')
 
@@ -189,6 +174,6 @@ def feature_plot(sub, features_list, features, sensor_type='acc'):
 
 
 if __name__ == '__main__':
-    print(f"In __main__ of graphing.py")
+    print(f"In __main__ of feature_plot.py")
 else:
     print(f"\nModule imported : {__name__}\n")
