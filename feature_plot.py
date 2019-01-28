@@ -8,9 +8,10 @@ import plotly.graph_objs as go
 import numpy as np
 
 # Global variables
-SENSOR_TYPE = ''
+SUB = None
 FEATURES_LIST = {}
 FEATURES = {}
+SENSOR_TYPE = ''
 fs = 100
 
 # Configuring Dash app
@@ -77,7 +78,6 @@ app.layout = serve_layout
 def features_dropdown_callback(value):
     options_list = [{'label': feature,
                      'value': feature} for feature in FEATURES_LIST[value]]
-
     return options_list
 
 
@@ -108,22 +108,27 @@ def graph_callback(axis, feature):
                              mode="lines",
                              name=feature)]
 
-        # # Generating x and y step coordinates for all axes
-        # steps_x, steps_y, step_count = step_marker(t, sub, position, sensor, motion)
-        #
-        # # Generating step traces
-        # step_traces = [go.Scatter(x=np.array(steps_x[ax]) / fs,
-        #                           y=steps_y[ax],
-        #                           mode="markers",
-        #                           name=axes[ax][sensor]) for ax in axes]
-        #
-        # # Keeping only one matching step trace visible by default
-        # for step_trace in step_traces:
-        #     if step_trace.name is not str(axes[visible][sensor]):
-        #         step_trace.visible = "legendonly"
-        #
-        # # Combining the traces with step traces
-        # traces.extend(step_traces)
+        # Generating x and y step coordinates for all axes
+        steps_x, steps_y, step_count = feature_step_marker(dict(feature=FEATURES[axis][feature]),
+                                                           t, SUB, 'right', SENSOR_TYPE)
+
+        print("STEP DATA:")
+        print(steps_x)
+        print(steps_y)
+        print(step_count)
+
+        # Generating step traces
+        step_trace = [go.Scatter(x=np.array(steps_x) / fs,
+                                 y=steps_y,
+                                 mode="markers",
+                                 name='steps')]
+
+        # Step trace not visible by default
+        for trace in step_trace:
+            trace.visible = "legendonly"
+
+        # Combining the traces with step traces
+        traces.extend(step_trace)
 
         # Defining the layout for the plot
         layout = go.Layout(title=title,
@@ -138,43 +143,45 @@ def graph_callback(axis, feature):
         print(f'Error Occurred : {error} - Invalid axis/feature combination selected')
 
 
-# def step_marker(t, subject, pos, sensor, motion_type):
-#     """This function returns the x and y coordinates for steps detected in the given subject data vs t
-#
-#         :param t: numpy array of the time axis
-#         :param subject: instance of the Subject class
-#         :param pos: str ('center', 'left', 'right')
-#         :param sensor: str ('acc', 'gyr')
-#         :param motion_type: str('complete', 'valid', etc)
-#         :returns steps_x, steps_y, step_count: dict(steps_x, steps_y), int(step_count)
-#         """
-#
-#     steps_x = {'x': [], 'y': [], 'z': []}
-#     steps_y = {'x': [], 'y': [], 'z': []}
-#
-#     for ax in axes:
-#         data = subject.sensor_pos[pos].label[motion_type]
-#
-#         step_count = 0
-#         for i in range(1, len(t)):
-#             if data.loc[i, 'StepLabel'] > (data.loc[i - 1, 'StepLabel']):
-#                 steps_x[ax].append(i)
-#                 steps_y[ax].append(float("{0:.3f}".format(data.loc[i, axes[ax][sensor]])))
-#                 step_count += 1
-#         print(f'\nStep Count for {axes[ax][sensor]} = {step_count}\n')
-#
-#     return steps_x, steps_y, step_count
+def feature_step_marker(feature_data, t, subject, pos, sensor):
+    """This function returns the x and y coordinates for steps detected in the given subject data vs t
+
+        :param feature_data: dict(feature=[data])
+        :param t: numpy array of the time axis
+        :param subject: instance of the Subject class
+        :param pos: str ('center', 'left', 'right')
+        :param sensor: str ('acc', 'gyr')
+        :returns steps_x, steps_y, step_count: dict(steps_x, steps_y), int(step_count)
+        """
+
+    steps_x = []
+    steps_y = []
+
+    data = subject.sensor_pos[pos].label['valid']
+
+    step_count = 0
+    for i in range(1, len(t)):
+        if data.loc[i, 'StepLabel'] > (data.loc[i - 1, 'StepLabel']):
+            steps_x.append(i)
+            steps_y.append("{0:.5f}".format(float(next(iter(feature_data.values()))[i])))
+            print("{0:.5f}".format(float(next(iter(feature_data.values()))[i])))
+            step_count += 1
+    print(f'\nStep Count for {next(iter(feature_data.keys()))} = {step_count}\n')
+
+    return steps_x, steps_y, step_count
 
 
-def feature_plot(features_list, features, sensor_type='acc'):
+def feature_plot(sub, features_list, features, sensor_type='acc'):
     """This function accepts the data values from a function call and makes them global
 
+    :param sub: Subject(the subject for which the features have been provided)
     :param features_list: list(features_list)
     :param features: dict(features)
     :param sensor_type: optional('acc' or 'gyr')
     """
 
-    global FEATURES_LIST, FEATURES, SENSOR_TYPE
+    global FEATURES_LIST, FEATURES, SENSOR_TYPE, SUB
+    SUB = sub
     FEATURES_LIST = features_list
     FEATURES = features
     SENSOR_TYPE = sensor_type
