@@ -14,6 +14,7 @@ Currently the following features are being calculated:
 import statistics as stat
 import numpy as np
 from scipy.stats import kurtosis, skew, entropy, pearsonr
+from scipy.fftpack import fft
 import pandas as pd
 
 
@@ -24,30 +25,44 @@ class Features:
 
     def __init__(self, data):
 
-        # The data to be used
+        # The data to be used (Time domain)
         self.data = data
+        # The data converted to frequency domain
+        if isinstance(data, pd.Series):
+            self.data_freq = pd.Series(fft(self.data))
+        else:
+            self.data_freq = None
+
         # Width of the moving window (in # of samples)
         self.window_size = 50
 
         # All the calculated features
         if isinstance(data, pd.Series):
-            print(f'Calculating features for {data.name}')
-            self.mean = self.window(self.mean)
-            self.variance = self.window(self.variance)
-            self.standard_deviation = self.window(self.standard_deviation)
-            self.median = self.window(self.median)
-            self.value_max = self.window(self.value_max)
-            self.value_min = self.window(self.value_min)
-            self.index_max = self.window(self.index_max)
-            self.index_min = self.window(self.index_min)
-            self.rms = self.window(self.rms)
-            self.iqr = self.window(self.iqr)
-            self.signal_magnitude_area = self.window(self.sma)
-            self.energy = self.window(self.energy)
-            self.entropy = self.window(self.data_entropy)
-            self.skewness = self.window(self.skewness)
-            self.kurtosis = self.window(self.kurtosis)
-            self.mean_abs_deviation = self.window(self.mean_abs_deviation)
+            print(f'Calculating Time domain features for {data.name}')
+            self.mean = self.window(self.calc_mean)
+            self.variance = self.window(self.calc_variance)
+            self.standard_deviation = self.window(self.calc_std)
+            self.median = self.window(self.calc_median)
+            self.value_max = self.window(self.calc_value_max)
+            self.value_min = self.window(self.calc_value_min)
+            self.index_max = self.window(self.calc_index_max)
+            self.index_min = self.window(self.calc_index_min)
+            self.rms = self.window(self.calc_rms)
+            self.iqr = self.window(self.calc_iqr)
+            self.signal_magnitude_area = self.window(self.calc_sma)
+            self.energy = self.window(self.calc_energy)
+            self.entropy = self.window(self.calc_data_entropy)
+            self.skewness = self.window(self.calc_skewness)
+            self.kurtosis = self.window(self.calc_kurtosis)
+            self.mean_abs_deviation = self.window(self.calc_mean_abs_deviation)
+
+            print(f'Calculating Frequency domain features for {data.name}')
+            # TODO: try implementing fft_avg_band_power as well
+            # self.fft_energy = self.window(self.calc_fft_energy)
+            self.fft_magnitude = abs(self.data_freq)
+            self.fft_mean = self.window(self.calc_mean, domain='freq')
+            self.fft_value_max = self.window(self.calc_value_max, domain='freq')
+            self.fft_value_min = self.window(self.calc_value_min, domain='freq')
 
         else:
             # Cross correlations between variables
@@ -66,76 +81,78 @@ class Features:
         self.get_features_list()
 
     # Basic Calculations
+    # Time domain features
     @staticmethod
-    def mean(data):
+    def calc_mean(data):
         return stat.mean(data)
 
     @staticmethod
-    def variance(data):
+    def calc_variance(data):
         return np.var(data)
 
     @staticmethod
-    def standard_deviation(data):
+    def calc_std(data):
         return np.var(data)
 
     @staticmethod
-    def median(data):
+    def calc_median(data):
         return stat.median(data)
 
     @staticmethod
-    def value_max(data):
+    def calc_value_max(data):
         return np.max(data)
 
     @staticmethod
-    def value_min(data):
+    def calc_value_min(data):
         return np.min(data)
 
     @staticmethod
-    def index_max(data):
+    def calc_index_max(data):
         data = list(data)
         return data.index(min(data))
 
     @staticmethod
-    def index_min(data):
+    def calc_index_min(data):
         data = list(data)
         return data.index(max(data))
 
     @staticmethod
-    def rms(data):
+    def calc_rms(data):
         return np.sqrt(np.mean(np.array(data) ** 2))
 
     @staticmethod
-    def iqr(data):
+    def calc_iqr(data):
         q75, q25 = np.percentile(data, [75, 25])
         return q75 - q25
 
     @staticmethod
-    def kurtosis(data):
+    def calc_kurtosis(data):
         return kurtosis(data)
 
     @staticmethod
-    def skewness(data):
+    def calc_skewness(data):
         return skew(data)
 
     @staticmethod
-    def mean_abs_deviation(data):
+    def calc_mean_abs_deviation(data):
         return data.mad()
 
     @staticmethod
-    def data_entropy(data):
+    def calc_data_entropy(data):
         value, counts = np.unique(data, return_counts=True)
         return entropy(counts)
 
     @staticmethod
-    def energy(data):
+    def calc_energy(data):
         squares = data**2
         return squares.sum()
 
     @staticmethod
-    def sma(data):
+    def calc_sma(data):
         absolute = list(map(abs, data))
         return sum(absolute)
 
+    # Correlation Features
     @staticmethod
     def xy(data):
         x = data['Ax']
@@ -154,16 +171,28 @@ class Features:
         z = data['Az']
         return pearsonr(y, z)[0]
 
+    # Frequency Domain Features
+    # @staticmethod
+    # def calc_fft_energy(data):
+    #     return sum(abs(data) ** 2)
+
     # This window runs over every @staticmethod and performs the given function
-    def window(self, func, *args):
+    def window(self, func, *args, domain='time'):
         ret = []
         window_size = self.window_size
         w_start = 0
         w_stop = w_start + window_size
         if isinstance(self.data, pd.Series):
-            data = self.data
+            if domain == 'time':
+                data = self.data
+            else:
+                data = abs(self.data_freq)
         else:
-            data = self.data[[args[0], args[1]]]
+            if domain == 'time':
+                data = self.data[[args[0], args[1]]]
+            else:
+                data = abs(self.data_freq[[args[0], args[1]]])
+
         while w_stop < len(data):
             window_data = data[w_start:w_stop]
             # print(window_data)
@@ -187,7 +216,8 @@ class Features:
             and f is not "data"
             and f is not "window_size"
             and f is not "feature_length"
-            and f is not "data_loss")
+            and f is not "data_loss"
+            and f is not "data_freq")
 
 
 def print_features(features):
