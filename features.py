@@ -38,7 +38,7 @@ class Features:
 
         # All the calculated features
         if isinstance(data, pd.Series):
-            print(f'Calculating Time domain features for {data.name}')
+            # print(f'Calculating Time domain features for {data.name}')
             self.mean = self.window(self.calc_mean)
             self.variance = self.window(self.calc_variance)
             self.standard_deviation = self.window(self.calc_std)
@@ -66,12 +66,12 @@ class Features:
 
         else:
             # Cross correlations between variables
-            print(f'Calculating correlation between {data.columns}')
+            # print(f'Calculating correlation between {data.columns}')
             self.corr_xy = self.window(self.xy, 'Ax', 'Ay')
             self.corr_xz = self.window(self.xz, 'Ax', 'Az')
             self.corr_yz = self.window(self.yz, 'Ay', 'Az')
 
-        print(f'# of Rows in self.data = {data.size}')
+        # print(f'# of Rows in self.data = {data.size}')
         # list of features
         self.features = []
         # List of lengths for all features
@@ -248,13 +248,14 @@ def print_features(features):
 # TODO: Return features as a new DataFrame
 
 # This is the exposed endpoint for usage via import
-def feature_extractor(sub, sensor_pos, sensor_type):
+def feature_extractor(sub, sensor_pos, sensor_type, output_type='dict'):
     """This function returns the features dictionary for the requested data
 
         :param sub: A Subject class object
         :param sensor_pos: str('center', 'left', 'right')
         :param sensor_type: str('acc', 'gyr')
-        :returns features_list, features: list(features_list), dict(features)
+        :param output_type: str('dict', 'df')
+        :returns features_list, features: dict(features_list), dict/df(features)
     """
     features = {}
     features_list = {}
@@ -274,7 +275,25 @@ def feature_extractor(sub, sensor_pos, sensor_type):
         features_list[axis] = f.features
         features[axis] = {x: getattr(f, x) for x in f.features}
 
-    return features_list, features
+    if output_type == 'dict':
+        return features_list, features
+    elif output_type == 'df':
+        columns = {}
+        for axis, feature in features.items():
+            for feature_name, feature_value in feature.items():
+                if axis == 'all':
+                    # print(f'{feature_name} = {feature_value}')
+                    columns[feature_name] = feature_value
+                else:
+                    # print(f'{axis}_{feature_name} = {feature_value}')
+                    columns[f'{axis}_{feature_name}'] = feature_value
+
+        column_names = list(columns.keys())
+        df = pd.DataFrame(columns)
+        return column_names, df
+
+    else:
+        print("Invalid value for parameter 'output_type'! Please run the program again.")
 
 
 if __name__ == '__main__':
