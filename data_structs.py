@@ -119,29 +119,29 @@ class Subject:
 # TODO : this function could get a speed boost if converted to a generator
 
 
-def get_subjects_repo():
+def get_subjects_repo(subs_list, storage='list'):
     """
     Returns a list or dict of Subject class objects for every file in the data set
 
+    :param subs_list: list of subject filenames
+    :param storage: string('list' or 'dict')
     :returns subjects_repo: list or dict (configurable via the global STORAGE variable)
 
     """
-    from dataset_manipulator import get_subjects_list
-    subjects = get_subjects_list()
 
     # SUBJECTS_REPO contains a list (or dict) of Subject objects for every file in the data set
-    if STORAGE == "List":
+    if storage == "list":
         SUBJECTS_REPO = []
     else:
         SUBJECTS_REPO = {}
 
-    for sub in subjects:
-        if STORAGE == "List":
+    for sub in subs_list:
+        if storage == "list":
             SUBJECTS_REPO.append(Subject(sub))
         else:
             SUBJECTS_REPO.update({sub: Subject(sub)})
 
-    print(f"SUBJECTS_REPO returned as a {STORAGE}")
+    print(f"SUBJECTS_REPO returned as a {storage}")
     return SUBJECTS_REPO
 
 
@@ -151,7 +151,7 @@ if __name__ == "__main__":
 
     # Getting the subject list and repo
     subject_list = get_subjects_list()
-    subject_repo = get_subjects_repo()
+    subject_repo = get_subjects_repo(subject_list, storage='list')
 
     s = Subject("Id000000.txt")
     # s = subject_repo[0]   #this would also work

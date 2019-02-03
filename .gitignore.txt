@@ -2,3 +2,4 @@
 __pycache__/
 venv/
 OU-InertGaitAction_wStepAnnotation/
+Step_Detection_Dataset/

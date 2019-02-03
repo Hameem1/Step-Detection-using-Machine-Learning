@@ -18,11 +18,11 @@ This is required!
 """
 import dataset_manipulator as dm
 import data_structs as ds
+# import dataset_generator as dg
 from data_plot import data_plot as dp
 from feature_plot import feature_plot as fp
 from features import feature_extractor, print_features
 from threading import Thread
-# from dataset_generator import create_dataset
 
 # Configuration variables
 # True if the Data set needs to be fixed, otherwise False
@@ -55,7 +55,7 @@ if __name__ == '__main__':
         t2 = Thread(target=fp, args=(sub, features_list, features,))
         t2.start()
 
-    # dg.create_dataset()
+    # dg.create_dataset(subs_list)
 
 else:
     print(f"\nModule imported : {__name__}\n")

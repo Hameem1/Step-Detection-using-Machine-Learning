@@ -56,13 +56,13 @@ class Features:
             self.kurtosis = self.window(self.calc_kurtosis)
             self.mean_abs_deviation = self.window(self.calc_mean_abs_deviation)
 
-            print(f'Calculating Frequency domain features for {data.name}')
-            # TODO: try implementing fft_avg_band_power as well
-            # self.fft_energy = self.window(self.calc_fft_energy)
-            self.fft_magnitude = abs(self.data_freq)
-            self.fft_mean = self.window(self.calc_mean, domain='freq')
-            self.fft_value_max = self.window(self.calc_value_max, domain='freq')
-            self.fft_value_min = self.window(self.calc_value_min, domain='freq')
+            # print(f'Calculating Frequency domain features for {data.name}')
+            # # TODO: try implementing fft_avg_band_power as well
+            # # self.fft_energy = self.window(self.calc_fft_energy)
+            # self.fft_magnitude = abs(self.data_freq)
+            # self.fft_mean = self.window(self.calc_mean, domain='freq')
+            # self.fft_value_max = self.window(self.calc_value_max, domain='freq')
+            # self.fft_value_min = self.window(self.calc_value_min, domain='freq')
 
         else:
             # Cross correlations between variables
@@ -71,7 +71,7 @@ class Features:
             self.corr_xz = self.window(self.xz, 'Ax', 'Az')
             self.corr_yz = self.window(self.yz, 'Ay', 'Az')
 
-        print(f'Dimensions of self.data = {data.size}')
+        print(f'# of Rows in self.data = {data.size}')
         # list of features
         self.features = []
         # List of lengths for all features
