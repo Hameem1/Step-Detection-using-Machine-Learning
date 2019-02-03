@@ -22,11 +22,13 @@ from data_plot import data_plot as dp
 from feature_plot import feature_plot as fp
 from features import feature_extractor, print_features
 from threading import Thread
+# from dataset_generator import create_dataset
 
 # Configuration variables
 # True if the Data set needs to be fixed, otherwise False
-FIX = True
+FIX = False
 DEVELOPER_MODE = True
+DATA_PLOT = False
 
 # Fixing the entire Data set
 if FIX:
@@ -40,18 +42,20 @@ if __name__ == '__main__':
     # Demonstrating the use of the Subject class and data_plot function
 
     # Generating the subject list and subject data from the data set
-    # subs_list, subs_data = dm.generate_subjects_data(gen_csv=False)
+    subs_list, subs_data = dm.generate_subjects_data(gen_csv=False)
     sub = ds.Subject("Id000104.txt")
     # Generating & Printing the features
     features_list, features = feature_extractor(sub, "right", "acc")
     # print_features(features)
     # Plotting the subject data
-    t1 = Thread(target=dp, args=(sub,), kwargs={'sensor_axis': "all"})
-    t1.start()
-    # Plotting the feature data
-    t2 = Thread(target=fp, args=(sub, features_list, features,))
-    t2.start()
+    if DATA_PLOT:
+        t1 = Thread(target=dp, args=(sub,), kwargs={'sensor_axis': "all"})
+        t1.start()
+        # Plotting the feature data
+        t2 = Thread(target=fp, args=(sub, features_list, features,))
+        t2.start()
 
+    # dg.create_dataset()
 
 else:
     print(f"\nModule imported : {__name__}\n")

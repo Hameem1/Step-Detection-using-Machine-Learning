@@ -327,7 +327,7 @@ def generate_subjects_data(gen_csv=None, indexing=True):
     print(f"\nProcess Completed.\n\nTotal searches = {total}\nTotal matches found = {found}\n")
     not_found = total - found
     if not_found > 0:
-        print(f"Data for the following {not_found} files was not found:\n")
+        print(f"Data for the following {not_found} files was not found in IDGenderAgelist.csv:\n")
         for file_na in files_not_found:
             print(file_na)
         ret = str(input(f"Would you like to remove these files from the dataset? (y/n)\n")).lower()
