@@ -3,6 +3,7 @@ from time import time
 from data_structs import Subject
 from features import feature_extractor
 import dataset_manipulator as dm
+from multiprocessing import Process, current_process
 
 NEW_FOLDER_NAME = "Step_Detection_Dataset"
 cwd = os.getcwd()
@@ -37,7 +38,7 @@ def create_dataset(subs_list, indexing=True):
             if not os.path.exists(filePath):
                 features_list, features = feature_extractor(sub, sensors[i].lower(), "acc", output_type='df')
                 features.to_csv(filePath, sep="\t", index=indexing)
-                print(f"File generated - '{sub.subject_id[:-4]}.csv'")
+                print(f"File generated - '{sub.subject_id[:-4]}.csv' by process {current_process().name}")
             else:
                 print(f'File "{sub.subject_id[:-4]}.csv" already exists!')
         name = sub.subject_id[:-4]
@@ -46,34 +47,45 @@ def create_dataset(subs_list, indexing=True):
 
 
 if __name__ == '__main__':
-    from threading import Thread
+    nProcesses = 8
 
     if create_folder_structure():
-        nThreads = 4
         subs_list, subs_data = dm.generate_subjects_data(gen_csv=False)
-        subs_list = subs_list[0:4]  # Testing
-        f = lambda A, n=int(len(subs_list)/nThreads): [A[i:i + n] for i in range(0, len(A), n)]
+        # subs_list = subs_list[0:8]  # Testing
+        f = lambda A, n=int(len(subs_list)/nProcesses): [A[i:i + n] for i in range(0, len(A), n)]
         s_list = f(subs_list)
         os.chdir(cwd)
 
-        t1 = Thread(target=create_dataset, args=(s_list[0],))
-        t2 = Thread(target=create_dataset, args=(s_list[1],))
-        t3 = Thread(target=create_dataset, args=(s_list[2],))
-        t4 = Thread(target=create_dataset, args=(s_list[3],))
-        print(f'Running threaded operation:\n\n'
+        p1 = Process(target=create_dataset, args=(s_list[0],))
+        p2 = Process(target=create_dataset, args=(s_list[1],))
+        p3 = Process(target=create_dataset, args=(s_list[2],))
+        p4 = Process(target=create_dataset, args=(s_list[3],))
+        p5 = Process(target=create_dataset, args=(s_list[4],))
+        p6 = Process(target=create_dataset, args=(s_list[5],))
+        p7 = Process(target=create_dataset, args=(s_list[6],))
+        p8 = Process(target=create_dataset, args=(s_list[7],))
+        print(f'Running multi-processing operation:\n\n'
               f'Total # of subjects = {len(subs_list)}\n'
-              f'Subjects per thread = {len(subs_list)/nThreads}')
+              f'Subjects per process = {len(subs_list)/nProcesses}')
 
         start = time()
 
-        t1.start()
-        t2.start()
-        t3.start()
-        t4.start()
-        t1.join()
-        t2.join()
-        t3.join()
-        t4.join()
+        p1.start()
+        p2.start()
+        p3.start()
+        p4.start()
+        p5.start()
+        p6.start()
+        p7.start()
+        p8.start()
+        p1.join()
+        p2.join()
+        p3.join()
+        p4.join()
+        p5.join()
+        p6.join()
+        p7.join()
+        p8.join()
 
         print(f'\n\nTime taken for all {len(subs_list)} subjects = {time()-start}')
 
