@@ -7,17 +7,22 @@ import dataset.dataset_manipulator as dm
 from multiprocessing import Pool, current_process
 from shutil import copyfile
 
+# Configuration Variables
+# ------------------------
+NEW_DATASET = "Step_Detection_Dataset"
 GENERATE_DATASET = False
-SORT_BY_AGE = False
+SORT_BY_AGE = True
 TESTING = False
-ageGroups = ['(1-7)', '(8-13)', '(14-20)', '(20-25)', '(26-36)']
+ageGroups = ['(1-7)', '(8-13)', '(14-20)', '(21-25)', '(26-36)', '(37-50)', '(51-80)']
+# ------------------------
 
 if not TESTING:
-    NEW_DATASET = "Step_Detection_Dataset"
+    NEW_DATASET = NEW_DATASET
 else:
-    NEW_DATASET = "Step_Detection_Dataset_TEST"
+    NEW_DATASET = NEW_DATASET+"_TEST"
 
 print(f'Current working directory : {os.getcwd()}')
+os.chdir("..")
 project_dir = os.getcwd()
 os.chdir("..")
 datasets_dir = f"{os.getcwd()}\\DATASETS"
