@@ -1,10 +1,5 @@
 # TODO: Perform feature ranking on the data (Try to take cues from the visualization)
 
-# TODO: Implement a technique to put together all the data required for the ML model
-#       Hint - processing for segments of the entire Dataset folder would be helpful
-#       Hint - Using threads would be helpful
-
-
 """ This module implements the high level logic
 
 Before running any of the code, copy the data set folder named
@@ -18,17 +13,16 @@ This is required!
 """
 import dataset_manipulator as dm
 import data_structs as ds
-# import dataset_generator as dg
-from data_plot import data_plot as dp
-from feature_plot import feature_plot as fp
-from features import feature_extractor, print_features
+from graphing.data_plot import data_plot as dp
+from graphing.feature_plot import feature_plot as fp
+from data_generator.features import feature_extractor
 from threading import Thread
 
 # Configuration variables
 # True if the Data set needs to be fixed, otherwise False
 FIX = False
 DEVELOPER_MODE = True
-DATA_PLOT = False
+DATA_PLOT = True
 
 # Fixing the entire Data set
 if FIX:
@@ -55,7 +49,6 @@ if __name__ == '__main__':
         t2 = Thread(target=fp, args=(sub, features_list, features,))
         t2.start()
 
-    # dg.create_dataset(subs_list)
 
 else:
     print(f"\nModule imported : {__name__}\n")
