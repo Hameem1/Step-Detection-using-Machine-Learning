@@ -405,7 +405,7 @@ def read_csv(filename):
     """
     Reads a .csv file in the current working directory and returns it as a DataFrame.
 
-    :param filename:    file name (without extension)
+    :param filename:    path or file name (without extension)
     :return DataFrame:  pandas data frame
     """
 

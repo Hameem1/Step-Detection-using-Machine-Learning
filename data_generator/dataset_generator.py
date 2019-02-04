@@ -1,15 +1,15 @@
 import os
 import re
 from time import time
-from data_structs import Subject
+from dataset.data_structs import Subject
 from data_generator.features import feature_extractor
-import dataset_manipulator as dm
+import dataset.dataset_manipulator as dm
 from multiprocessing import Pool, current_process
 from shutil import copyfile
 
-GENERATE_DATASET = True
+GENERATE_DATASET = False
 SORT_BY_AGE = False
-TESTING = True
+TESTING = False
 ageGroups = ['(1-7)', '(8-13)', '(14-20)', '(20-25)', '(26-36)']
 
 if not TESTING:

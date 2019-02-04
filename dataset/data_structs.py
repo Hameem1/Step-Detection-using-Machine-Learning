@@ -2,7 +2,7 @@
 
 import os
 import pandas as pd
-from dataset_manipulator import get_subjects_list, FOLDER_NAME
+from dataset.dataset_manipulator import get_subjects_list, FOLDER_NAME
 
 # Configuration variables
 # set to "True" for verbose status messages

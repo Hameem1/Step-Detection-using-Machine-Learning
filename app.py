@@ -1,6 +1,6 @@
 # TODO: Perform feature ranking on the data (Try to take cues from the visualization)
 
-""" This module implements the high level logic
+""" This module implements the high level logic for normalizing the dataset and data visualizations
 
 Before running any of the code, copy the data set folder named
 "OU-InertGaitAction_wStepAnnotation" into the project directory (app.py).
@@ -11,8 +11,7 @@ After the first run, set Fix = False.
 This is required!
 
 """
-import dataset_manipulator as dm
-import data_structs as ds
+from dataset import data_structs as ds, dataset_manipulator as dm
 from graphing.data_plot import data_plot as dp
 from graphing.feature_plot import feature_plot as fp
 from data_generator.features import feature_extractor
@@ -37,6 +36,7 @@ if __name__ == '__main__':
 
     # Generating the subject list and subject data from the data set
     subs_list, subs_data = dm.generate_subjects_data(gen_csv=False)
+    # Choosing a subject to get features and visualizations for
     sub = ds.Subject("Id000104.txt")
     # Generating & Printing the features
     features_list, features = feature_extractor(sub, "right", "acc")
