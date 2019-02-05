@@ -245,8 +245,6 @@ def print_features(features):
     print(f'\nTotal # of unique features calculated = {total_features}')
 
 
-# TODO: Return features as a new DataFrame
-
 # This is the exposed endpoint for usage via import
 def feature_extractor(sub, sensor_pos, sensor_type, output_type='dict'):
     """This function returns the features dictionary for the requested data
