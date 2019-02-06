@@ -28,7 +28,7 @@ else:
     NEW_DATASET = NEW_DATASET+"_TEST"
 
 CWD = os.getcwd()
-print(f'CWD in dg = {CWD}')
+# print(f'CWD in dg = {CWD}')
 datasets_dir = f"{CWD}\\..\\DATASETS"
 if not os.path.exists(datasets_dir):
     print(f'\nWARNING: The path does not exist. Creating new directory...\n{datasets_dir}\n')

@@ -15,7 +15,7 @@ FOLDER_NAME = "OU-InertGaitAction_wStepAnnotation"
 SUBJECTS_LIST = []
 
 cwd = os.getcwd()
-print(f'CWD in dg = {cwd}')
+# print(f'CWD in dg = {cwd}')
 sensor_paths = []
 sensors = ["Center", "Left", "Right"]
 for sensor in sensors:
@@ -470,4 +470,4 @@ if __name__ == '__main__':
     # sub_data_csv = read_csv("subject_data")
 
 else:
-    print(f"\nModule imported : {__name__}\n")
+    print(f"\nModule imported : {__name__}")

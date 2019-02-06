@@ -21,7 +21,7 @@ labels = ["invalid", "level", "upstairs", "downstairs", "incline", "decline"]
 labels_extra = ["complete", "valid", "null_data"]
 
 cwd = os.getcwd()
-print(f'CWD in ds = {cwd}')
+# print(f'CWD in ds = {cwd}')
 sensor_paths = []
 sensors = ["Center", "Left", "Right"]
 for sensor in sensors:
@@ -164,4 +164,4 @@ if __name__ == "__main__":
         print(subject_repo[subject_list[0]].sensor_pos[sensor_pos].label[motion_type])
 
 else:
-    print(f"\nModule imported : {__name__}\n")
+    print(f"\nModule imported : {__name__}")

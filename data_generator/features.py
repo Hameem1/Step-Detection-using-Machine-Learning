@@ -297,4 +297,4 @@ def feature_extractor(sub, sensor_pos, sensor_type, output_type='dict'):
 if __name__ == '__main__':
     print(f"In __main__ of features.py")
 else:
-    print(f"\nModule imported : {__name__}\n")
+    print(f"\nModule imported : {__name__}")
