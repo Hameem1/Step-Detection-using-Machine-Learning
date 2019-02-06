@@ -1,11 +1,17 @@
+
+# TODO : Add a step column to the features dataset and calculate again
+
 import os
 import re
+package_dir = os.getcwd()
+os.chdir('..')
 from time import time
 from dataset.data_structs import Subject
 from data_generator.features import feature_extractor
-import dataset.dataset_manipulator as dm
+from dataset.dataset_manipulator import read_csv, generate_subjects_data
 from multiprocessing import Pool, current_process
 from shutil import copyfile
+
 
 # Configuration Variables
 # ------------------------
@@ -21,13 +27,11 @@ if not TESTING:
 else:
     NEW_DATASET = NEW_DATASET+"_TEST"
 
-print(f'Current working directory : {os.getcwd()}')
-os.chdir("..")
-project_dir = os.getcwd()
-os.chdir("..")
-datasets_dir = f"{os.getcwd()}\\DATASETS"
-os.chdir(project_dir)
+CWD = os.getcwd()
+print(f'CWD in dg = {CWD}')
+datasets_dir = f"{CWD}\\..\\DATASETS"
 if not os.path.exists(datasets_dir):
+    print(f'\nWARNING: The path does not exist. Creating new directory...\n{datasets_dir}\n')
     os.mkdir(datasets_dir)
 sensors = ["Center", "Left", "Right"]
 # Paths to C, L and R in the NEW Dataset
@@ -42,12 +46,13 @@ sensor_dirs = {"Age_" + dirName
 def create_dataset_folder_structure():
     path = f'{datasets_dir}\\{NEW_DATASET}'
     if not os.path.exists(path):
+        print(f'\nWARNING: The path does not exist. Creating new directory...\n{path}\n')
         os.mkdir(path)
 
     try:
         for path in new_sensor_paths:
             if not os.path.exists(path):
-                print(f'\nWARNING: The path {path} does not exist. Creating new directory...')
+                print(f'\nWARNING: The path does not exist. Creating new directory...\n{path}\n')
                 os.mkdir(path)
             else:
                 print("\nPath already exists!")
@@ -78,6 +83,7 @@ def create_age_folder_structure():
     try:
         new_dataset_path = f'{datasets_dir}\\{NEW_DATASET}_Age_Sorted'
         if not os.path.exists(new_dataset_path):
+            print(f'\nWARNING: The path does not exist. Creating new directory...\n{new_dataset_path}\n')
             os.mkdir(new_dataset_path)
     except:
         print("ERROR in creating the sorted dataset directory within folder \\DATASETS")
@@ -106,9 +112,9 @@ def create_age_folder_structure():
         return False
 
 
-def get_limits():
+def get_limits(age_groups):
     limits = {}
-    for data in ageGroups:
+    for data in age_groups:
         pattern = re.compile(r'([\d]+)-([\d]+)')
         match = pattern.search(data)
         age_min = int(match.group(1).strip())
@@ -119,30 +125,34 @@ def get_limits():
 
 
 def sort_dataset_by_age():
-
-    data = dm.read_csv('subject_data')
+    data = read_csv(f'{CWD}\\subject_data')
     print()
-    limits = get_limits()
-    subjectCount = 0
+    limits = get_limits(ageGroups)
+    sortedCount = 0
 
     # For every age bin
     for target_folder, limit in limits.items():
         # Get the indexes of all files to be copied to the target folder
         index_list = list(data[(data['Age'] >= limit[0]) & (data['Age'] <= limit[1])].index)
-        subjectCount += len(index_list)
-        print(f'\n# of files in "{target_folder}" = {(len(index_list))}')
+        subjectCount = 0
         # For every file to be copied
         for i in index_list:
             filename = data.iloc[i]['Filename']
+            temp = sortedCount
             # Get the source and destination file paths
             for src, dest in zip(new_sensor_paths, sensor_dirs[target_folder]):
                 # if the file exists in the source directory
                 if os.path.exists(f'{src}\\{filename[:-4]}'+'.csv'):
                     # copy it to the destination directory
                     copyfile(f'{src}\\{filename[:-4]}'+'.csv', f'{dest}\\{filename[:-4]}'+'.csv')
-                    # print(f'src = {src}\ndest = {dest}\n\n')
+                    if temp == sortedCount:
+                        sortedCount += 1
+                        subjectCount += 1
+                        # print(f'src = {src}\ndest = {dest}\n\n')
 
-    print(f'\nTotal subjects sorted = {subjectCount}  ({round((subjectCount/len(data))*100, 2)}% of total data)\n')
+        print(f'\n# of Subjects in "{target_folder}" = {subjectCount}')
+
+    print(f'\nTotal subjects sorted = {sortedCount}  ({round((sortedCount/len(data))*100, 2)}% of total data)\n')
 
 
 if __name__ == '__main__':
@@ -150,7 +160,7 @@ if __name__ == '__main__':
     if create_dataset_folder_structure():
 
         if GENERATE_DATASET:
-            subs_list, subs_data = dm.generate_subjects_data(gen_csv=False)
+            subs_list, subs_data = generate_subjects_data(gen_csv=False)
             if TESTING:
                 subs_list = subs_list[0:4]
             f = lambda A, n=int(len(subs_list)/nProcesses): [A[i:i + n] for i in range(0, len(A), n)]
@@ -161,7 +171,7 @@ if __name__ == '__main__':
                   f'Subjects per process = {len(subs_list)/nProcesses}')
 
             start = time()
-
+            os.chdir(package_dir)
             pool = Pool(processes=nProcesses)
             for output in pool.map(create_dataset, s_list):
                 pass

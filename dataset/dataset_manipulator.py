@@ -15,6 +15,7 @@ FOLDER_NAME = "OU-InertGaitAction_wStepAnnotation"
 SUBJECTS_LIST = []
 
 cwd = os.getcwd()
+print(f'CWD in dg = {cwd}')
 sensor_paths = []
 sensors = ["Center", "Left", "Right"]
 for sensor in sensors:
@@ -412,7 +413,7 @@ def read_csv(filename):
     try:
         data = pd.read_csv(filename + ".csv", sep='\t', index_col=0)
     except FileNotFoundError:
-        print(f"\nError : File not found.\nThis file does not exist in the current working directory.")
+        print(f"\nError : File not found.\nThis file does not exist in the current working directory.\n{filename}")
     else:
         print(f"\nPreview of the .csv file contents:\n\n{data.head()}")
         return data

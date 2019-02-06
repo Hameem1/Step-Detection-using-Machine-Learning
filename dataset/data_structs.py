@@ -21,6 +21,7 @@ labels = ["invalid", "level", "upstairs", "downstairs", "incline", "decline"]
 labels_extra = ["complete", "valid", "null_data"]
 
 cwd = os.getcwd()
+print(f'CWD in ds = {cwd}')
 sensor_paths = []
 sensors = ["Center", "Left", "Right"]
 for sensor in sensors:

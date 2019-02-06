@@ -37,7 +37,7 @@ if __name__ == '__main__':
     # Generating the subject list and subject data from the data set
     subs_list, subs_data = dm.generate_subjects_data(gen_csv=False)
     # Choosing a subject to get features and visualizations for
-    sub = ds.Subject("Id000104.txt")
+    sub = ds.Subject("Id009859.txt")
     # Generating & Printing the features
     features_list, features = feature_extractor(sub, "right", "acc")
     # print_features(features)
