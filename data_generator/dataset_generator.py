@@ -1,5 +1,6 @@
 
 # TODO : Add a step column to the features dataset and calculate again
+#        Remove and replace all os.chdir calls in the entire project (checkout the OS module)
 
 import os
 import re

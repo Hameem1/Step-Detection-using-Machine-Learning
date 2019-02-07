@@ -415,7 +415,7 @@ def read_csv(filename):
     except FileNotFoundError:
         print(f"\nError : File not found.\nThis file does not exist in the current working directory.\n{filename}")
     else:
-        print(f"\nPreview of the .csv file contents:\n\n{data.head()}")
+        # print(f"\nPreview of the .csv file contents:\n\n{data.head()}")
         return data
 
 
