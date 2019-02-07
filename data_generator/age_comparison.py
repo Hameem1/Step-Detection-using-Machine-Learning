@@ -4,7 +4,7 @@ import pandas as pd
 from statistics import mean
 import plotly.offline as pyo
 import plotly.graph_objs as go
-from data_generator.dataset_generator import ROOT, NEW_DATASET, datasets_dir, ageGroups, get_limits
+from data_generator.dataset_generator import ROOT, NEW_DATASET, datasets_dir, get_limits, read_csv, data_files_path
 
 ageGroups = ['(1-13)', '(5-15)']
 
@@ -21,11 +21,7 @@ def get_samples(n):
     """
 
     samples = {}
-
-    try:
-        data = pd.read_csv(f'{ROOT}\\subject_data' + ".csv", sep='\t', index_col=0)
-    except FileNotFoundError:
-        print(f"\nError : File not found.\nThis file does not exist in this directory:\n{ROOT}")
+    data = read_csv(f'{data_files_path}\\subject_data')
 
     for target_folder, limit in LIMITS.items():
         age_bin = data[(data['Age'] >= limit[0]) & (data['Age'] <= limit[1])]['Filename'].reset_index(drop=True)
@@ -85,6 +81,12 @@ def get_feature_stats(samples, sensor_pos='right'):
 
 
 def print_statistics(group_stats):
+    """
+    Pretty prints the contents of the main Groups dictionary
+
+    :param group_stats: dict(returned by get_feature_stats())
+    """
+
     for age_group, stats in group_stats.items():
         print(f'\nFor Group : {age_group} - with a sample size of {n}\n')
         for stat, features in stats.items():
@@ -104,11 +106,14 @@ def sample_average(S):
     pass
 
 
-def gen_box_plot(y):
+def gen_box_plot(y, open_plot=True):
     """
     Generates a box plot for the given data
 
+    :param y: dict('AgeGroup1':'RawData1', 'AgeGroup2':'RawData2', ...)
+    :param open_plot: boolean(default: True)
     """
+
     names = list(y.keys())
     values = list(y.values())
 
@@ -116,8 +121,48 @@ def gen_box_plot(y):
     layout = go.Layout(title='Comparison of Step features between different Age groups',
                        font=dict(family='arial', size=16, color='#000000'))
     fig = go.Figure(data=data, layout=layout)
-    name = str(input("Please enter a name for the Box plot file: ")).lower()
-    pyo.plot(fig, filename=f'{name}.html')
+    filename = str(input("Please enter a name for the Box plot file: ")).lower()
+    path = f'{ROOT}\\data-files'
+    if not os.path.exists(path):
+        print(f'\nWARNING: The path does not exist. Creating new directory...\n{path}\n')
+        os.mkdir(path)
+    pyo.plot(fig, filename=f'{path}\\{filename}.html', auto_open=open_plot)
+    print(f'\nAge comparison Box plot generated.\nLocation: "{path}\\{filename}.html"\n')
+
+
+def gen_age_histogram(open_plot=True):
+    """
+    Generates a histogram representing the distribution of Subject Age by Gender
+
+    :param open_plot: boolean(default: True)
+    """
+
+    df = read_csv(f'{data_files_path}\\subject_data')
+    male = go.Histogram(x=df[df['Gender'] == 'Male']['Age'],
+                        xbins=dict(start=min(df['Age']),
+                                   end=max(df['Age'])),
+                        name='Male',
+                        opacity=0.75)
+
+    female = go.Histogram(x=df[df['Gender'] == 'Female']['Age'],
+                          xbins=dict(start=min(df['Age']),
+                                     end=max(df['Age'])),
+                          name='Female',
+                          opacity=0.75)
+
+    data = [male, female]
+    layout = go.Layout(title='Distribution of Subjects by Age',
+                       barmode='overlay',
+                       font=dict(family='arial', size=18, color='#000000'))
+
+    fig = go.Figure(data=data, layout=layout)
+    filename = 'age_distribution_by_gender'
+    path = f'{ROOT}\\data-files'
+    if not os.path.exists(path):
+        print(f'\nWARNING: The path does not exist. Creating new directory...\n{path}\n')
+        os.mkdir(path)
+    pyo.plot(fig, filename=f'{path}\\{filename}.html', auto_open=open_plot)
+    print(f'\nAge Distribution Histogram generated.\nLocation: "{path}\\{filename}.html"\n')
 
 
 if __name__ == '__main__':
@@ -131,9 +176,4 @@ if __name__ == '__main__':
 
 
 else:
-    n = 10
-    samples = get_samples(n)
-    sensor_pos = 'right'
-    groups, raw_groups = get_feature_stats(samples, sensor_pos=sensor_pos)
-    print_statistics(groups)
-    print(raw_groups)
+    print(f"\nModule imported : {__name__}\n")

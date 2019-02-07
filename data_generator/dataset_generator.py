@@ -1,3 +1,5 @@
+"""Do NOT import this module, Run this directly after adjusting the Configuration variables"""
+
 # TODO : Add a step column to the features dataset and calculate again
 
 import os
@@ -7,7 +9,7 @@ from shutil import copyfile
 from dataset.data_structs import Subject
 from data_generator.features import feature_extractor
 from multiprocessing import Pool, current_process
-from dataset.dataset_manipulator import ROOT, sensors, read_csv, generate_subjects_data
+from dataset.dataset_manipulator import ROOT, sensors, read_csv, generate_subjects_data, data_files_path
 
 
 # Configuration Variables
@@ -121,7 +123,7 @@ def get_limits(age_groups):
 
 
 def sort_dataset_by_age():
-    data = read_csv(f'{ROOT}\\subject_data')
+    data = read_csv(f'{data_files_path}\\subject_data')
     limits = get_limits(ageGroups)
     sortedCount = 0
 

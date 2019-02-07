@@ -11,16 +11,18 @@ After the first run, set Fix = False.
 This is required!
 
 """
-from dataset import data_structs as ds, dataset_manipulator as dm
+from threading import Thread
 from graphing.data_plot import data_plot as dp
 from graphing.feature_plot import feature_plot as fp
 from data_generator.features import feature_extractor
-from threading import Thread
+from data_generator.age_comparison import gen_age_histogram
+from dataset import data_structs as ds, dataset_manipulator as dm
 
 # Configuration variables
 # True if the Data set needs to be fixed, otherwise False
-FIX = True
+FIX = False
 DEVELOPER_MODE = True
+DATA_VISUALIZATION = False
 DATA_PLOT = True
 
 # Fixing the entire Data set
@@ -42,12 +44,15 @@ if __name__ == '__main__':
     features_list, features = feature_extractor(sub, "right", "acc")
     # print_features(features)
     # Plotting the subject data
-    if DATA_PLOT:
+    if DATA_VISUALIZATION:
         t1 = Thread(target=dp, args=(sub,), kwargs={'sensor_axis': "all"})
         t1.start()
         # Plotting the feature data
         t2 = Thread(target=fp, args=(sub, features_list, features,))
         t2.start()
+
+    if DATA_PLOT:
+        gen_age_histogram(open_plot=True)
 
 
 else:

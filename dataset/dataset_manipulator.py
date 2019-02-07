@@ -17,6 +17,7 @@ FOLDER_NAME = "OU-InertGaitAction_wStepAnnotation"
 SUBJECTS_LIST = []
 
 ROOT = str(Path(__file__).parent.parent)
+data_files_path = ROOT+'\\data-files'
 sensor_paths = []
 sensors = ["Center", "Left", "Right"]
 for sensor in sensors:
@@ -287,7 +288,7 @@ def generate_subjects_data(gen_csv=None, indexing=True):
     filename = []
     files_not_found = []
 
-    with open(f"{ROOT}\\IDGenderAgelist.csv", 'r') as myfile:
+    with open(f"{ROOT}\\data-files\\IDGenderAgelist.csv", 'r') as myfile:
         lines = myfile.readlines()
 
     for subject in subject_list:
@@ -365,7 +366,7 @@ def generate_subjects_data(gen_csv=None, indexing=True):
                 print("Process terminated by user!\n")
             elif res == 'y':
                 if FORCE:
-                    name = 'Subject_Data'
+                    name = 'subject_data'
                 else:
                     name = str(input("Please enter a name for the new .csv file: ")).lower()
             else:
@@ -373,7 +374,7 @@ def generate_subjects_data(gen_csv=None, indexing=True):
 
         else:
             if FORCE:
-                name = 'Subject_Data'
+                name = 'subject_data'
             else:
                 name = str(input("Please enter a name for the new .csv file. (y/n)")).lower()
 
@@ -402,7 +403,7 @@ def read_csv(filename):
     try:
         data = pd.read_csv(filename + ".csv", sep='\t', index_col=0)
     except FileNotFoundError:
-        print(f"\nError : File not found.\nThis file does not exist in the current working directory.\n{filename}")
+        print(f"\nError : File not found.\nThis file does not exist at location:\n{filename}.csv")
     else:
         # print(f"\nPreview of the .csv file contents:\n\n{data.head()}")
         return data
@@ -456,7 +457,7 @@ if __name__ == '__main__':
     print(f"-------------------")
 
     # Reading the .csv file
-    sub_data_csv = read_csv("subject_data")
+    sub_data_csv = read_csv(f'{data_files_path}\\subject_data')
 
 else:
     print(f"\nModule imported : {__name__}")

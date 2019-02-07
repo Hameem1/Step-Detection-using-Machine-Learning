@@ -11,11 +11,11 @@ Currently the following features are being calculated:
 """
 
 # Imports
-import statistics as stat
 import numpy as np
-from scipy.stats import kurtosis, skew, entropy, pearsonr
-from scipy.fftpack import fft
 import pandas as pd
+import statistics as stat
+from scipy.fftpack import fft
+from scipy.stats import kurtosis, skew, entropy, pearsonr
 
 
 class Features:
