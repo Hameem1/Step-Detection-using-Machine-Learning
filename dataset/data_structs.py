@@ -2,7 +2,7 @@
 
 import os
 import pandas as pd
-from dataset.dataset_manipulator import get_subjects_list, FOLDER_NAME
+from dataset.dataset_manipulator import get_subjects_list, FOLDER_NAME, sensors, sensor_paths
 
 # Configuration variables
 # set to "True" for verbose status messages
@@ -19,13 +19,6 @@ labels = ["invalid", "level", "upstairs", "downstairs", "incline", "decline"]
 # "valid"     : Consists of data which is not "invalid" or null valued.
 # "null_data" : Consists of only the null values in the Data set.
 labels_extra = ["complete", "valid", "null_data"]
-
-cwd = os.getcwd()
-# print(f'CWD in ds = {cwd}')
-sensor_paths = []
-sensors = ["Center", "Left", "Right"]
-for sensor in sensors:
-    sensor_paths.append(f"{cwd}\\{FOLDER_NAME}\\{sensor}")
 
 
 class Dataset:
@@ -99,7 +92,6 @@ class Subject:
 
     def __init__(self, subject_id):
         try:
-            os.chdir(cwd)
             self.subject_id = subject_id
             self.sensor_pos = {"center": Dataset(f"{sensor_paths[0]}\\{subject_id}"),
                                "left": Dataset(f"{sensor_paths[1]}\\{subject_id}"),

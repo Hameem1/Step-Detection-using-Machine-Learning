@@ -19,7 +19,7 @@ from threading import Thread
 
 # Configuration variables
 # True if the Data set needs to be fixed, otherwise False
-FIX = False
+FIX = True
 DEVELOPER_MODE = True
 DATA_PLOT = True
 

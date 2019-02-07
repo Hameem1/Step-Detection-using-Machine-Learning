@@ -4,7 +4,7 @@ import pandas as pd
 from statistics import mean
 import plotly.offline as pyo
 import plotly.graph_objs as go
-from data_generator.dataset_generator import NEW_DATASET, datasets_dir, ageGroups, get_limits
+from data_generator.dataset_generator import ROOT, NEW_DATASET, datasets_dir, ageGroups, get_limits
 
 ageGroups = ['(1-13)', '(5-15)']
 
@@ -23,9 +23,9 @@ def get_samples(n):
     samples = {}
 
     try:
-        data = pd.read_csv('subject_data' + ".csv", sep='\t', index_col=0)
+        data = pd.read_csv(f'{ROOT}\\subject_data' + ".csv", sep='\t', index_col=0)
     except FileNotFoundError:
-        print(f"\nError : File not found.\nThis file does not exist in the current working directory.\n{os.getcwd()}")
+        print(f"\nError : File not found.\nThis file does not exist in this directory:\n{ROOT}")
 
     for target_folder, limit in LIMITS.items():
         age_bin = data[(data['Age'] >= limit[0]) & (data['Age'] <= limit[1])]['Filename'].reset_index(drop=True)
@@ -59,7 +59,7 @@ def get_feature_stats(samples, sensor_pos='right'):
                 df = pd.read_csv(path + f'\\{file[:-4]}' + ".csv", sep='\t', index_col=0)
             except FileNotFoundError:
                 print(f"\nError : File not found.\nThis file does not exist in the current working directory."
-                      f"\n{os.getcwd()}")
+                      f"\n{path}")
 
             for feature in FEATURES_USED:
                 stats['avg'][feature].append([mean(df['Ax_' + feature]),
@@ -116,7 +116,8 @@ def gen_box_plot(y):
     layout = go.Layout(title='Comparison of Step features between different Age groups',
                        font=dict(family='arial', size=16, color='#000000'))
     fig = go.Figure(data=data, layout=layout)
-    pyo.plot(fig, filename='age_comparison.html')
+    name = str(input("Please enter a name for the Box plot file: ")).lower()
+    pyo.plot(fig, filename=f'{name}.html')
 
 
 if __name__ == '__main__':
@@ -125,7 +126,7 @@ if __name__ == '__main__':
     sensor_pos = 'right'
     groups, raw_groups = get_feature_stats(samples, sensor_pos=sensor_pos)
     print_statistics(groups)
-    print(raw_groups)
+    # print(raw_groups)
     gen_box_plot({f'Age_{name}': raw_groups[f'Age_{name}'][0] for name in ageGroups})
 
 

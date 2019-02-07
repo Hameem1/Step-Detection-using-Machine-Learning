@@ -1,26 +1,23 @@
-
 # TODO : Add a step column to the features dataset and calculate again
-#        Remove and replace all os.chdir calls in the entire project (checkout the OS module)
 
 import os
 import re
-package_dir = os.getcwd()
-os.chdir('..')
 from time import time
+from shutil import copyfile
 from dataset.data_structs import Subject
 from data_generator.features import feature_extractor
-from dataset.dataset_manipulator import read_csv, generate_subjects_data
 from multiprocessing import Pool, current_process
-from shutil import copyfile
+from dataset.dataset_manipulator import ROOT, sensors, read_csv, generate_subjects_data
 
 
 # Configuration Variables
 # ------------------------
 NEW_DATASET = "Step_Detection_Dataset"
 GENERATE_DATASET = False
-SORT_BY_AGE = True
+SORT_BY_AGE = False
 TESTING = False
-ageGroups = ['(1-7)', '(8-13)', '(14-20)', '(21-25)', '(26-36)', '(37-50)', '(51-80)']
+TEST_COUNT = 6  # Should be >= 4
+ageGroups = ['(1-7)', '(8-13)', '(14-20)']
 # ------------------------
 
 if not TESTING:
@@ -28,13 +25,11 @@ if not TESTING:
 else:
     NEW_DATASET = NEW_DATASET+"_TEST"
 
-CWD = os.getcwd()
-# print(f'CWD in dg = {CWD}')
-datasets_dir = f"{CWD}\\..\\DATASETS"
+datasets_dir = f"{ROOT}\\..\\DATASETS"
 if not os.path.exists(datasets_dir):
     print(f'\nWARNING: The path does not exist. Creating new directory...\n{datasets_dir}\n')
     os.mkdir(datasets_dir)
-sensors = ["Center", "Left", "Right"]
+
 # Paths to C, L and R in the NEW Dataset
 new_sensor_paths = [f"{datasets_dir}\\{NEW_DATASET}\\{sensor}" for sensor in sensors]
 age_dirs = {"Age_" + dirName: f'{datasets_dir}\\{NEW_DATASET}_Age_Sorted\\Age_{dirName}' for dirName in ageGroups}
@@ -77,7 +72,7 @@ def create_dataset(subs_list, indexing=True):
             else:
                 print(f'File "{sub.subject_id[:-4]}.csv" already exists!')
 
-    print(f'\nTime taken by - {current_process().name} : {time()-start} secs')
+    print(f'\nTime taken by - {current_process().name} : {time()-start:.2f} secs')
 
 
 def create_age_folder_structure():
@@ -126,8 +121,7 @@ def get_limits(age_groups):
 
 
 def sort_dataset_by_age():
-    data = read_csv(f'{CWD}\\subject_data')
-    print()
+    data = read_csv(f'{ROOT}\\subject_data')
     limits = get_limits(ageGroups)
     sortedCount = 0
 
@@ -159,11 +153,10 @@ def sort_dataset_by_age():
 if __name__ == '__main__':
     nProcesses = os.cpu_count()
     if create_dataset_folder_structure():
-
         if GENERATE_DATASET:
             subs_list, subs_data = generate_subjects_data(gen_csv=False)
             if TESTING:
-                subs_list = subs_list[0:4]
+                subs_list = subs_list[0:TEST_COUNT]
             f = lambda A, n=int(len(subs_list)/nProcesses): [A[i:i + n] for i in range(0, len(A), n)]
             s_list = f(subs_list)
 
@@ -172,13 +165,12 @@ if __name__ == '__main__':
                   f'Subjects per process = {len(subs_list)/nProcesses}')
 
             start = time()
-            os.chdir(package_dir)
             pool = Pool(processes=nProcesses)
             for output in pool.map(create_dataset, s_list):
                 pass
 
-            print(f'\n\nTime taken for all {len(subs_list)} subjects = {time()-start}')
-            print(f'\nTime required per Subject = {(time()-start)/len(subs_list)}')
+            print(f'\n\nTime taken for all {len(subs_list)} subjects = {time()-start:.2f} secs')
+            print(f'\nTime required per Subject = {(time()-start)/len(subs_list):.2f} secs')
 
     else:
         print("\nERROR occurred while creating the new Dataset's directory structure!")
@@ -188,4 +180,4 @@ if __name__ == '__main__':
             print("\nFolder structure successfully created!\n")
             start = time()
             sort_dataset_by_age()
-            print(f'Dataset "{NEW_DATASET}" sorted by Age. Operation took {time()-start} seconds.')
+            print(f'Dataset "{NEW_DATASET}" sorted by Age. Operation took {time()-start:.2f} secs.')

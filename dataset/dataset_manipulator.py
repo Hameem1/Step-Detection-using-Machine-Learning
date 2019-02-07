@@ -1,8 +1,10 @@
 """This module provides functions to manipulate the entire data set"""
 
 import os
-import pandas as pd
 import re
+import pandas as pd
+from pathlib import Path
+
 
 # Configuration variables
 # Allows forcing user input to 'y'
@@ -14,12 +16,11 @@ FOLDER_NAME = "OU-InertGaitAction_wStepAnnotation"
 # contains the subject list for the data set (available after dataset_analysis() or get_subjects_list())
 SUBJECTS_LIST = []
 
-cwd = os.getcwd()
-# print(f'CWD in dg = {cwd}')
+ROOT = str(Path(__file__).parent.parent)
 sensor_paths = []
 sensors = ["Center", "Left", "Right"]
 for sensor in sensors:
-    sensor_paths.append(f"{cwd}\\{FOLDER_NAME}\\{sensor}")
+    sensor_paths.append(f"{ROOT}\\{FOLDER_NAME}\\{sensor}")
 
 
 def dataset_rename():
@@ -37,18 +38,17 @@ def dataset_rename():
 
     for path in sensor_paths:
         unchanged = 0
-        try:
-            os.chdir(path)
+        if os.path.exists(path):
             print(f"\n-------------------")
             print(f"Entering directory : {path}")
             print(f"-------------------\n")
-        except:
+        else:
             print(f"\nError: The directory \"{path}\" does not exist.\n")
             print("Please make sure the path/name for the data set directory is correct.")
             print("Note: The data set folder should be in the same directory as the program's .py files.")
             break
 
-        for f in os.listdir():
+        for f in os.listdir(path):
             f_name, f_ext = os.path.splitext(f)
             try:
                 pre_text, name, post_text = f_name.split("_")
@@ -74,7 +74,7 @@ def dataset_rename():
                         rename_count += 1
                 if rename_count != -1:
                     name = name.strip()
-                    os.rename(f, f"{name}{f_ext}")
+                    os.rename(f'{path}\\{f}', f"{path}\\{name}{f_ext}")
                     if FILE_STATUS_MESSAGES:
                         print(f"File \"{f}\" renamed to :\"{name}{f_ext}\"")
                     rename_count += 1
@@ -102,8 +102,6 @@ def dataset_rename():
     for i in unchanged_list:
         print(i)
 
-    os.chdir(cwd)
-
 
 def dataset_analysis():
     """
@@ -126,15 +124,12 @@ def dataset_analysis():
         f_list = []
         try:
             for path in sensor_paths:
-                os.chdir(path)
-                f_list.append(os.listdir())
+                f_list.append(os.listdir(path))
         except:
-            print(f"\nError: The directory \"{cwd}\\{FOLDER_NAME}\" does not exist.\n")
+            print(f"\nError: The directory \"{ROOT}\\{FOLDER_NAME}\" does not exist.\n")
             print("Please make sure the path for the data set directory is correct.")
             print("Note: The data set folder should be in the same directory as the program's .py files.")
             break
-        else:
-            os.chdir(cwd)
 
         if loop == 1:
             print(f"-------------------")
@@ -177,10 +172,9 @@ def dataset_analysis():
 
                 print("\ndeleting extra files...\n")
                 for i in range(len(to_del_list)):
-                    os.chdir(sensor_paths[i])
                     for j in to_del_list[i]:
                         try:
-                            os.unlink(j)
+                            os.unlink(f'{sensor_paths[i]}\\{j}')
                         except:
                             if FILE_STATUS_MESSAGES:
                                 print(f"file \"{j}\" does not exist in folder \"{sensors[i]}\"")
@@ -228,18 +222,14 @@ def get_subjects_list():
 
     def is_normalized():
         temp_list.clear()
-        os.chdir(cwd)
         for path in sensor_paths:
-            try:
-                os.chdir(path)
-            except:
+            if not os.path.exists(path):
                 print(f"\nError: The directory \"{path}\" does not exist.\n")
                 print("Please make sure the path/name for the data set directory is correct.")
                 print("Note: The data set folder should be in the same directory as the program's .py files.")
                 break
             else:
-                temp_list.append(os.listdir())
-        os.chdir(cwd)
+                temp_list.append(os.listdir(path))
         if temp_list[0] == temp_list[1] == temp_list[2]:
             return 1
         else:
@@ -259,7 +249,7 @@ def get_subjects_list():
             res = str(input("Would you like to proceed with normalizing the data set? (y/n)\n")).lower()
         if res == "y":
             # normalizing the data set
-            dataset_analysis(FOLDER_NAME)
+            dataset_analysis()
             if is_normalized():
                 print("\nThe data set has been normalized.")
                 SUBJECTS_LIST = list(temp_list[0])
@@ -297,7 +287,7 @@ def generate_subjects_data(gen_csv=None, indexing=True):
     filename = []
     files_not_found = []
 
-    with open("IDGenderAgelist.csv", 'r') as myfile:
+    with open(f"{ROOT}\\IDGenderAgelist.csv", 'r') as myfile:
         lines = myfile.readlines()
 
     for subject in subject_list:
@@ -338,18 +328,17 @@ def generate_subjects_data(gen_csv=None, indexing=True):
             del_count = 0
             for file_na in files_not_found:
                 for sensor in sensor_paths:
-                    os.chdir(sensor)
                     print(f"\n-------------------")
                     print(f"Entering directory : {sensor}")
                     print(f"-------------------\n")
                     try:
-                        os.unlink(file_na)
+                        os.unlink(f'{sensor}\\{file_na}')
                     except:
                         print(f"file \"{file_na}\" does not exist in folder \"{sensor}\"")
                     else:
                         print(f"file \"{file_na}\" deleted successfully from folder \"{sensor}\"!")
                         del_count += 1
-            os.chdir(cwd)
+
             print(f'\nTotal files deleted from all folders = {del_count}\n')
             print(f'Removing the deleted entries from the global SUBJECTS_LIST')
             try:
@@ -467,7 +456,7 @@ if __name__ == '__main__':
     print(f"-------------------")
 
     # Reading the .csv file
-    # sub_data_csv = read_csv("subject_data")
+    sub_data_csv = read_csv("subject_data")
 
 else:
     print(f"\nModule imported : {__name__}")
