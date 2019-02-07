@@ -1,5 +1,3 @@
-# TODO: Perform feature ranking on the data (Try to take cues from the visualization)
-
 """ This module implements the high level logic for normalizing the dataset and data visualizations
 
 Before running any of the code, copy the data set folder named
@@ -9,8 +7,8 @@ Then set FIX = True.
 After the first run, set Fix = False.
 
 This is required!
-
 """
+
 from threading import Thread
 from graphing.data_plot import data_plot as dp
 from graphing.feature_plot import feature_plot as fp

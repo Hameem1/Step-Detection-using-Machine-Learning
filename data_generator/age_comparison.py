@@ -1,3 +1,5 @@
+"""This module provides functions to analyze data for different age groups"""
+
 import os
 import numpy as np
 import pandas as pd

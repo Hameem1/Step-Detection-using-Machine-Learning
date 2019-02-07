@@ -1,8 +1,7 @@
 """This module implements the data structures used to store the dataset"""
 
-import os
 import pandas as pd
-from dataset.dataset_manipulator import get_subjects_list, FOLDER_NAME, sensors, sensor_paths
+from dataset.dataset_manipulator import get_subjects_list, sensor_paths
 
 # Configuration variables
 # set to "True" for verbose status messages
@@ -105,9 +104,6 @@ class Subject:
 
     def __str__(self):
         return f"Subject # {self.subject_id[0:8]}"
-
-
-# TODO : this function could get a speed boost if converted to a generator
 
 
 def get_subjects_repo(subs_list, storage='list'):

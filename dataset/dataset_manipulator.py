@@ -1,10 +1,9 @@
-"""This module provides functions to manipulate the entire data set"""
+"""This module provides functions and variables to manipulate the entire data set"""
 
 import os
 import re
 import pandas as pd
 from pathlib import Path
-
 
 # Configuration variables
 # Allows forcing user input to 'y'
@@ -441,6 +440,7 @@ def end_tab_remover(subs_list):
 
 
 if __name__ == '__main__':
+    # This example code demonstrates the use of this module's functions
 
     # Renaming the data set files to fix the naming scheme
     dataset_rename()
