@@ -74,10 +74,10 @@ class Features:
         # print(f'# of Rows in self.data = {data.size}')
         # list of features
         self.features = []
-        # List of lengths for all features
-        # self.feature_length = []
+        # length of a calculated feature
+        self.feature_length = len(self.mean)
         # Data loss due to windowing
-        # self.data_loss = 0.0
+        self.data_loss = (len(self.data)-self.feature_length)/len(self.data)*100
         self.get_features_list()
 
     # Basic Calculations
