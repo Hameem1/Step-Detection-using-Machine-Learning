@@ -16,8 +16,8 @@ from dataset.dataset_manipulator import ROOT, sensors, read_csv, generate_subjec
 
 # Configuration Variables
 # ------------------------
-NEW_DATASET = "Step_Detection_Dataset"
-GENERATE_DATASET = False
+NEW_DATASET = "Step_Detection_Dataset (w=20, hopping)"
+GENERATE_DATASET = True
 SORT_BY_AGE = False
 TESTING = False
 TEST_COUNT = 4  # Should be >= 4

@@ -23,6 +23,8 @@ DEVELOPER_MODE = True
 DATA_VISUALIZATION = True
 DATA_PLOT = False
 
+WINDOW_TYPE = 'hopping'
+
 # Fixing the entire Data set
 if FIX:
     # Renaming the data set files to fix the naming scheme
@@ -37,16 +39,16 @@ if __name__ == '__main__':
     # Generating the subject list and subject data from the data set
     subs_list, subs_data = dm.generate_subjects_data(gen_csv=False)
     # Choosing a subject to get features and visualizations for
-    sub = ds.Subject("Id009859.txt")
+    sub = ds.Subject("Id319344.txt")
     # Generating & Printing the features
-    features_list, features = feature_extractor(sub, "right", "acc")
+    features_list, features = feature_extractor(sub, "right", "acc", WINDOW_TYPE)
     # print_features(features)
     # Plotting the subject data
     if DATA_VISUALIZATION:
         t1 = Thread(target=dp, args=(sub,), kwargs={'sensor_axis': "all"})
         t1.start()
         # Plotting the feature data
-        t2 = Thread(target=fp, args=(sub, features_list, features,))
+        t2 = Thread(target=fp, args=(sub, features_list, features, WINDOW_TYPE,))
         t2.start()
 
     if DATA_PLOT:
@@ -88,7 +90,7 @@ else:
         # Generating the subject list (Global variable) for the data set
         subs_list, subs_data = dm.generate_subjects_data()
         # Generating a sample 'Subject' class object
-        sub = ds.Subject("Id000104.txt")
+        sub = ds.Subject("Id319344.txt")
         print(f'\nThe "Subject" class object "sub" has been created for testing.\n')
 
     else:

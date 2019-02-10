@@ -12,6 +12,7 @@ SUB = None
 FEATURES_LIST = {}
 FEATURES = {}
 SENSOR_TYPE = ''
+WINDOW_TYPE = ''
 fs = 100
 
 # Configuring Dash app
@@ -144,29 +145,38 @@ def feature_step_marker(feature_data, t, pos):
     steps_y = []
 
     data = SUB.sensor_pos[pos].label['valid']
-
     step_count = 0
-    for i in range(1, len(t)):
-        if data.loc[i, 'StepLabel'] > (data.loc[i - 1, 'StepLabel']):
-            steps_x.append(i)
-            steps_y.append("{0:.5f}".format(float(next(iter(feature_data.values()))[i])))
+
+    if WINDOW_TYPE == 'sliding':
+        for i in range(1, len(t)):
+            if data.loc[i, 'StepLabel'] > (data.loc[i - 1, 'StepLabel']):
+                steps_x.append(i)
+                steps_y.append("{0:.5f}".format(float(next(iter(feature_data.values()))[i])))
+                step_count += 1
+    elif WINDOW_TYPE == 'hopping':
+        for mark in range(len(feature_data['feature'])):
+            steps_x.append(mark)
+            steps_y.append("{0:.5f}".format(float(next(iter(feature_data.values()))[mark])))
             step_count += 1
+
     print(f'\nStep Count for {next(iter(feature_data.keys()))} = {step_count}\n')
 
     return steps_x, steps_y, step_count
 
 
-def feature_plot(sub, features_list, features, sensor_type='acc'):
+def feature_plot(sub, features_list, features, window_type, sensor_type='acc'):
     """This function accepts the data values from a function call and makes them global
 
+    :param window_type: str('sliding' or 'hopping')
     :param sub: Subject(the subject for which the features have been provided)
     :param features_list: list(features_list)
     :param features: dict(features)
     :param sensor_type: optional('acc' or 'gyr')
     """
 
-    global FEATURES_LIST, FEATURES, SENSOR_TYPE, SUB
+    global FEATURES_LIST, FEATURES, SENSOR_TYPE, SUB, WINDOW_TYPE
     SUB = sub
+    WINDOW_TYPE = window_type
     FEATURES_LIST = features_list
     FEATURES = features
     SENSOR_TYPE = sensor_type

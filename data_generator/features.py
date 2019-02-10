@@ -23,7 +23,7 @@ class Features:
         dataset and provides the functions to calculate them
     """
 
-    def __init__(self, data):
+    def __init__(self, data, window_size, window_type, step_indices):
 
         # The data to be used (Time domain)
         self.data = data
@@ -33,8 +33,12 @@ class Features:
         else:
             self.data_freq = None
 
+        self.step_indices = step_indices
+
         # Width of the moving window (in # of samples)
-        self.window_size = 50
+        self.window_size = window_size
+        # Type of moving window (sliding/hopping)
+        self.window_type = window_type
 
         # All the calculated features
         if isinstance(data, pd.Series):
@@ -74,10 +78,10 @@ class Features:
         # print(f'# of Rows in self.data = {data.size}')
         # list of features
         self.features = []
-        # length of a calculated feature
-        self.feature_length = len(self.mean)
-        # Data loss due to windowing
-        self.data_loss = (len(self.data)-self.feature_length)/len(self.data)*100
+        # # length of a calculated feature
+        # self.feature_length = len(self.data)
+        # # Data loss due to windowing
+        # self.data_loss = (len(self.data)-self.feature_length)/len(self.data)*100
         self.get_features_list()
 
     # Basic Calculations
@@ -179,9 +183,9 @@ class Features:
     # This window runs over every @staticmethod and performs the given function
     def window(self, func, *args, domain='time'):
         ret = []
-        window_size = self.window_size
         w_start = 0
-        w_stop = w_start + window_size
+        w_stop = w_start + self.window_size
+        
         if isinstance(self.data, pd.Series):
             if domain == 'time':
                 data = self.data
@@ -193,18 +197,42 @@ class Features:
             else:
                 data = abs(self.data_freq[[args[0], args[1]]])
 
-        while w_stop < len(data):
-            window_data = data[w_start:w_stop]
-            # print(window_data)
-            temp = func(window_data)
-            # If the data is a float (Store up to 5 decimal places)
-            if not float(temp).is_integer():
-                ret.append("{0:.5f}".format(temp))
-            # if the data is an int
+        if self.window_type == 'sliding':
+            while w_stop < len(data):
+                window_data = data[w_start:w_stop+1]
+                temp = func(window_data)
+                # If the data is a float (Store up to 5 decimal places)
+                if not float(temp).is_integer():
+                    ret.append("{0:.5f}".format(temp))
+                # if the data is an int
+                else:
+                    ret.append(temp)
+                w_start += 1
+                w_stop = w_start + self.window_size
+
+        elif self.window_type == 'hopping':
+            if self.window_size % 2 == 0:
+                half_len = int(self.window_size/2)
             else:
-                ret.append(temp)
-            w_start += 1
-            w_stop = w_start + window_size
+                half_len = int((self.window_size - 1)/2)
+
+            for i in self.step_indices:
+                # ignoring a step if it doesn't have enough data on both sides to form a window
+                if (i >= half_len) & (i <= len(data)-half_len):
+                    span = [int(i-half_len), int(i+half_len)]
+                else:
+                    continue
+                window_data = data[span[0]:span[1]+1]
+                temp = func(window_data)
+                # If the data is a float (Store up to 5 decimal places)
+                if not float(temp).is_integer():
+                    ret.append("{0:.5f}".format(temp))
+                # if the data is an int
+                else:
+                    ret.append(temp)
+        else:
+            raise Exception(f'No such window function exists: {self.window_type}')
+
         return ret
 
     # Generates a list of available features from what has been calculated in the class
@@ -246,9 +274,10 @@ def print_features(features):
 
 
 # This is the exposed endpoint for usage via import
-def feature_extractor(sub, sensor_pos, sensor_type, output_type='dict'):
+def feature_extractor(sub, sensor_pos, sensor_type, window_type, output_type='dict'):
     """This function returns the features dictionary for the requested data
 
+        :param window_type: str('sliding' or 'hopping')
         :param sub: A Subject class object
         :param sensor_pos: str('center', 'left', 'right')
         :param sensor_type: str('acc', 'gyr')
@@ -257,7 +286,14 @@ def feature_extractor(sub, sensor_pos, sensor_type, output_type='dict'):
     """
     features = {}
     features_list = {}
+    step_indices = []
+    window_size = 20
     data = sub.sensor_pos[sensor_pos].label['valid']
+
+    for i in range(1, len(data['StepLabel'])):
+        if (data.loc[i, 'StepLabel']) > (data.loc[i - 1, 'StepLabel']):
+            step_indices.append(i)
+
     if sensor_type == "acc":
         base_data = [col for col in data.columns if col.startswith('A')]
         base_data.append('all')
@@ -267,9 +303,9 @@ def feature_extractor(sub, sensor_pos, sensor_type, output_type='dict'):
 
     for axis in base_data:
         if axis is not 'all':
-            f = Features(data[axis])
+            f = Features(data[axis], window_size, window_type, step_indices)
         else:
-            f = Features(data[base_data[0:3]])
+            f = Features(data[base_data[0:3]], window_size, window_type, step_indices)
         features_list[axis] = f.features
         features[axis] = {x: getattr(f, x) for x in f.features}
 
