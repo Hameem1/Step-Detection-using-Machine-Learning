@@ -24,6 +24,7 @@ DATA_VISUALIZATION = True
 DATA_PLOT = False
 
 WINDOW_TYPE = 'hopping'
+WINDOW_SIZE = 20
 
 # Fixing the entire Data set
 if FIX:
@@ -41,7 +42,7 @@ if __name__ == '__main__':
     # Choosing a subject to get features and visualizations for
     sub = ds.Subject("Id319344.txt")
     # Generating & Printing the features
-    features_list, features = feature_extractor(sub, "right", "acc", WINDOW_TYPE)
+    features_list, features = feature_extractor(sub, "right", "acc", WINDOW_TYPE, WINDOW_SIZE)
     # print_features(features)
     # Plotting the subject data
     if DATA_VISUALIZATION:

@@ -11,6 +11,7 @@ from shutil import copyfile
 from dataset.data_structs import Subject
 from data_generator.features import feature_extractor
 from multiprocessing import Pool, current_process
+from app import WINDOW_SIZE, WINDOW_TYPE
 from dataset.dataset_manipulator import ROOT, sensors, read_csv, generate_subjects_data, data_files_path
 
 
@@ -165,7 +166,9 @@ def create_dataset(subs_list, indexing=True):
             filePath = f'{new_sensor_paths[i]}\\' + sub.subject_id[:-4] + ".csv"
             if not os.path.exists(filePath):
                 # Most expensive line of code in the module (Takes hours)
-                features_list, features = feature_extractor(sub, sensors[i].lower(), "acc", output_type='df')
+                features_list, features = feature_extractor(sub, sensors[i].lower(), "acc",
+                                                            WINDOW_TYPE, WINDOW_SIZE, output_type='df')
+
                 features.to_csv(filePath, sep="\t", index=indexing)
                 print(f"File generated - '{sub.subject_id[:-4]}.csv' by process : {current_process().name}")
             else:

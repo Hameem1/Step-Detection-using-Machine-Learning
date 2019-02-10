@@ -274,20 +274,20 @@ def print_features(features):
 
 
 # This is the exposed endpoint for usage via import
-def feature_extractor(sub, sensor_pos, sensor_type, window_type, output_type='dict'):
+def feature_extractor(sub, sensor_pos, sensor_type, window_type, window_size, output_type='dict'):
     """This function returns the features dictionary for the requested data
 
-        :param window_type: str('sliding' or 'hopping')
         :param sub: A Subject class object
         :param sensor_pos: str('center', 'left', 'right')
         :param sensor_type: str('acc', 'gyr')
+        :param window_type: str('sliding' or 'hopping')
+        :param window_size: int
         :param output_type: str('dict', 'df')
         :returns features_list, features: dict(features_list), dict/df(features)
     """
     features = {}
     features_list = {}
     step_indices = []
-    window_size = 20
     data = sub.sensor_pos[sensor_pos].label['valid']
 
     for i in range(1, len(data['StepLabel'])):
