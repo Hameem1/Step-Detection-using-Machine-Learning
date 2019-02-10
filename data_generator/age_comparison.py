@@ -7,8 +7,8 @@ from statistics import mean
 import plotly.offline as pyo
 import plotly.graph_objs as go
 from data_generator.dataset_generator import ROOT, NEW_DATASET, datasets_dir, get_limits, read_csv, data_files_path
+from config import ageGroups
 
-ageGroups = ['(1-13)', '(5-15)']
 
 FEATURES_USED = ['mean']
 LIMITS = get_limits(ageGroups)

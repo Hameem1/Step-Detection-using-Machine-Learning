@@ -11,7 +11,7 @@ from shutil import copyfile
 from dataset.data_structs import Subject
 from data_generator.features import feature_extractor
 from multiprocessing import Pool, current_process
-from app import WINDOW_SIZE, WINDOW_TYPE
+from config import WINDOW_SIZE, WINDOW_TYPE, ageGroups
 from dataset.dataset_manipulator import ROOT, sensors, read_csv, generate_subjects_data, data_files_path
 
 
@@ -22,7 +22,6 @@ GENERATE_DATASET = True
 SORT_BY_AGE = False
 TESTING = False
 TEST_COUNT = 4  # Should be >= 4
-ageGroups = ['(1-7)', '(8-13)', '(14-20)']
 # ------------------------
 
 if not TESTING:

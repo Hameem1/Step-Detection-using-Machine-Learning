@@ -10,6 +10,7 @@ This is required!
 """
 
 from threading import Thread
+from config import WINDOW_SIZE, WINDOW_TYPE
 from graphing.data_plot import data_plot as dp
 from graphing.feature_plot import feature_plot as fp
 from data_generator.features import feature_extractor
@@ -22,9 +23,6 @@ FIX = False
 DEVELOPER_MODE = True
 DATA_VISUALIZATION = True
 DATA_PLOT = False
-
-WINDOW_TYPE = 'hopping'
-WINDOW_SIZE = 20
 
 # Fixing the entire Data set
 if FIX:
