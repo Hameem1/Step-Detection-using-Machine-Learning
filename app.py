@@ -40,14 +40,14 @@ if __name__ == '__main__':
     # Choosing a subject to get features and visualizations for
     sub = ds.Subject("Id319344.txt")
     # Generating & Printing the features
-    features_list, features = feature_extractor(sub, "right", "acc", WINDOW_TYPE, WINDOW_SIZE)
+    features_list, features, step_positions = feature_extractor(sub, "right", "acc", WINDOW_TYPE, WINDOW_SIZE)
     # print_features(features)
     # Plotting the subject data
     if DATA_VISUALIZATION:
         t1 = Thread(target=dp, args=(sub,), kwargs={'sensor_axis': "all"})
         t1.start()
         # Plotting the feature data
-        t2 = Thread(target=fp, args=(sub, features_list, features, WINDOW_TYPE,))
+        t2 = Thread(target=fp, args=(sub, features_list, features, step_positions, WINDOW_TYPE,))
         t2.start()
 
     if DATA_PLOT:

@@ -11,6 +11,7 @@ import numpy as np
 SUB = None
 FEATURES_LIST = {}
 FEATURES = {}
+STEP_POSITIONS = []
 SENSOR_TYPE = ''
 WINDOW_TYPE = ''
 fs = 100
@@ -106,8 +107,8 @@ def graph_callback(axis, feature):
                              mode="lines",
                              name=feature)]
 
-        # Generating x and y step coordinates for all axes
-        steps_x, steps_y, step_count = feature_step_marker(dict(feature=FEATURES[axis][feature]), t, 'right')
+        # Generating x and y step coordinates for x and y axis
+        steps_x, steps_y, step_count = feature_step_marker(dict(feature=FEATURES[axis][feature]), STEP_POSITIONS[axis])
 
         # Generating step traces
         step_trace = [go.Scatter(x=np.array(steps_x) / fs,
@@ -132,41 +133,33 @@ def graph_callback(axis, feature):
         print(f'Error Occurred : {error} - Invalid axis/feature combination selected')
 
 
-def feature_step_marker(feature_data, t, pos):
+def feature_step_marker(feature_data, step_pos):
     """This function returns the x and y coordinates for steps detected in the given feature data vs t
 
         :param feature_data: dict(feature=[data])
-        :param t: numpy array of the time axis
-        :param pos: str ('center', 'left', 'right')
+        :param step_pos: list containing x_axis values for steps
         :returns steps_x, steps_y, step_count: dict(steps_x, steps_y), int(step_count)
         """
 
     steps_x = []
     steps_y = []
 
-    data = SUB.sensor_pos[pos].label['valid']
     step_count = 0
 
-    if WINDOW_TYPE == 'sliding':
-        for i in range(1, len(t)):
-            if data.loc[i, 'StepLabel'] > (data.loc[i - 1, 'StepLabel']):
-                steps_x.append(i)
-                steps_y.append("{0:.5f}".format(float(next(iter(feature_data.values()))[i])))
-                step_count += 1
-    elif WINDOW_TYPE == 'hopping':
-        for mark in range(len(feature_data['feature'])):
-            steps_x.append(mark)
-            steps_y.append("{0:.5f}".format(float(next(iter(feature_data.values()))[mark])))
-            step_count += 1
+    for i in step_pos:
+        steps_x.append(i)
+        steps_y.append("{0:.5f}".format(float(next(iter(feature_data.values()))[i])))
+        step_count += 1
 
     print(f'\nStep Count for {next(iter(feature_data.keys()))} = {step_count}\n')
 
     return steps_x, steps_y, step_count
 
 
-def feature_plot(sub, features_list, features, window_type, sensor_type='acc'):
+def feature_plot(sub, features_list, features, step_positions, window_type, sensor_type='acc'):
     """This function accepts the data values from a function call and makes them global
 
+    :param step_positions: dict of lists containing x_axis values for steps
     :param window_type: str('sliding' or 'hopping')
     :param sub: Subject(the subject for which the features have been provided)
     :param features_list: list(features_list)
@@ -174,11 +167,12 @@ def feature_plot(sub, features_list, features, window_type, sensor_type='acc'):
     :param sensor_type: optional('acc' or 'gyr')
     """
 
-    global FEATURES_LIST, FEATURES, SENSOR_TYPE, SUB, WINDOW_TYPE
+    global FEATURES_LIST, FEATURES, SENSOR_TYPE, SUB, WINDOW_TYPE, STEP_POSITIONS
     SUB = sub
     WINDOW_TYPE = window_type
     FEATURES_LIST = features_list
     FEATURES = features
+    STEP_POSITIONS = step_positions
     SENSOR_TYPE = sensor_type
     app.run_server(debug=False, port=5001)
 

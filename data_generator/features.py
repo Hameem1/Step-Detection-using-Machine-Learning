@@ -33,12 +33,17 @@ class Features:
         else:
             self.data_freq = None
 
-        self.step_indices = step_indices
-
         # Width of the moving window (in # of samples)
         self.window_size = window_size
         # Type of moving window (sliding/hopping)
         self.window_type = window_type
+
+        self.step_indices = np.array(step_indices)
+        if self.window_type == 'sliding':
+            self.step_positions = self.step_indices - int(self.window_size/2)
+            self.step_positions = [x for x in self.step_positions if x >= 0]
+        else:
+            self.step_positions = range(len(self.step_indices))
 
         # All the calculated features
         if isinstance(data, pd.Series):
@@ -245,7 +250,8 @@ class Features:
             and f is not "window_size"
             and f is not "feature_length"
             and f is not "data_loss"
-            and f is not "data_freq")
+            and f is not "data_freq"
+            and f is not "step_indices")
 
 
 def print_features(features):
@@ -283,11 +289,12 @@ def feature_extractor(sub, sensor_pos, sensor_type, window_type, window_size, ou
         :param window_type: str('sliding' or 'hopping')
         :param window_size: int
         :param output_type: str('dict', 'df')
-        :returns features_list, features: dict(features_list), dict/df(features)
+        :returns features_list, features, step_positions: dict(features_list), dict/df(features), dict(step x_values)
     """
     features = {}
     features_list = {}
     step_indices = []
+    step_positions = {}
     data = sub.sensor_pos[sensor_pos].label['valid']
 
     for i in range(1, len(data['StepLabel'])):
@@ -308,9 +315,10 @@ def feature_extractor(sub, sensor_pos, sensor_type, window_type, window_size, ou
             f = Features(data[base_data[0:3]], window_size, window_type, step_indices)
         features_list[axis] = f.features
         features[axis] = {x: getattr(f, x) for x in f.features}
+        step_positions[axis] = f.step_positions
 
     if output_type == 'dict':
-        return features_list, features
+        return features_list, features, step_positions
     elif output_type == 'df':
         columns = {}
         for axis, feature in features.items():
@@ -324,7 +332,7 @@ def feature_extractor(sub, sensor_pos, sensor_type, window_type, window_size, ou
 
         column_names = list(columns.keys())
         df = pd.DataFrame(columns)
-        return column_names, df
+        return column_names, df, step_positions
 
     else:
         print("Invalid value for parameter 'output_type'! Please run the program again.")
