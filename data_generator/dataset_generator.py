@@ -14,7 +14,6 @@ from multiprocessing import Pool, current_process
 from config import WINDOW_SIZE, WINDOW_TYPE, ageGroups
 from dataset.dataset_manipulator import ROOT, sensors, read_csv, generate_subjects_data, data_files_path
 
-
 # Configuration Variables
 # ------------------------
 NEW_DATASET = "Step_Detection_Dataset (w=20, hopping)"
@@ -27,7 +26,7 @@ TEST_COUNT = 4  # Should be >= 4
 if not TESTING:
     NEW_DATASET = NEW_DATASET
 else:
-    NEW_DATASET = NEW_DATASET+"_TEST"
+    NEW_DATASET = NEW_DATASET + "_TEST"
 
 datasets_dir = f"{ROOT}\\..\\DATASETS"
 if not os.path.exists(datasets_dir):
@@ -137,9 +136,9 @@ def sort_dataset_by_age():
             # Get the source and destination file paths
             for src, dest in zip(new_sensor_paths, sensor_dirs[target_folder]):
                 # if the file exists in the source directory
-                if os.path.exists(f'{src}\\{filename[:-4]}'+'.csv'):
+                if os.path.exists(f'{src}\\{filename[:-4]}' + '.csv'):
                     # copy it to the destination directory
-                    copyfile(f'{src}\\{filename[:-4]}'+'.csv', f'{dest}\\{filename[:-4]}'+'.csv')
+                    copyfile(f'{src}\\{filename[:-4]}' + '.csv', f'{dest}\\{filename[:-4]}' + '.csv')
                     if temp == sortedCount:
                         sortedCount += 1
                         subjectCount += 1
@@ -147,7 +146,7 @@ def sort_dataset_by_age():
 
         print(f'\n# of Subjects in "{target_folder}" = {subjectCount}')
 
-    print(f'\nTotal subjects sorted = {sortedCount}  ({round((sortedCount/len(data))*100, 2)}% of total data)\n')
+    print(f'\nTotal subjects sorted = {sortedCount}  ({round((sortedCount / len(data)) * 100, 2)}% of total data)\n')
 
 
 def create_dataset(subs_list, indexing=True):
@@ -165,15 +164,15 @@ def create_dataset(subs_list, indexing=True):
             filePath = f'{new_sensor_paths[i]}\\' + sub.subject_id[:-4] + ".csv"
             if not os.path.exists(filePath):
                 # Most expensive line of code in the module (Takes hours)
-                features_list, features = feature_extractor(sub, sensors[i].lower(), "acc",
-                                                            WINDOW_TYPE, WINDOW_SIZE, output_type='df')
+                features_list, features, _ = feature_extractor(sub, sensors[i].lower(), "acc",
+                                                               WINDOW_TYPE, WINDOW_SIZE, output_type='df')
 
                 features.to_csv(filePath, sep="\t", index=indexing)
                 print(f"File generated - '{sub.subject_id[:-4]}.csv' by process : {current_process().name}")
             else:
                 print(f'File "{sub.subject_id[:-4]}.csv" already exists!')
 
-    print(f'\nTime taken by - {current_process().name} : {time()-start:.2f} secs')
+    print(f'\nTime taken by - {current_process().name} : {time() - start:.2f} secs')
 
 
 if __name__ == '__main__':
@@ -186,12 +185,12 @@ if __name__ == '__main__':
             if TESTING:
                 subs_list = subs_list[0:TEST_COUNT]
             # Dividing up the subject list for each available process
-            f = lambda A, n=int(len(subs_list)/nProcesses): [A[i:i + n] for i in range(0, len(A), n)]
+            f = lambda A, n=int(len(subs_list) / nProcesses): [A[i:i + n] for i in range(0, len(A), n)]
             s_list = f(subs_list)
 
             print(f'Running multi-processing operation:\n\n'
                   f'Total # of subjects = {len(subs_list)}\n'
-                  f'Subjects per process = {len(subs_list)/nProcesses}')
+                  f'Subjects per process = {len(subs_list) / nProcesses}')
 
             start = time()
             # Generating processes from a pool
@@ -200,8 +199,8 @@ if __name__ == '__main__':
             for output in pool.map(create_dataset, s_list):
                 pass
 
-            print(f'\n\nTime taken for all {len(subs_list)} subjects = {time()-start:.2f} secs')
-            print(f'\nTime required per Subject = {(time()-start)/len(subs_list):.2f} secs')
+            print(f'\n\nTime taken for all {len(subs_list)} subjects = {time() - start:.2f} secs')
+            print(f'\nTime required per Subject = {(time() - start) / len(subs_list):.2f} secs')
 
     else:
         print("\nERROR occurred while creating the new Dataset's directory structure!")
@@ -213,4 +212,4 @@ if __name__ == '__main__':
             start = time()
             # Sorting the dataset
             sort_dataset_by_age()
-            print(f'Dataset "{NEW_DATASET}" sorted by Age. Operation took {time()-start:.2f} secs.')
+            print(f'Dataset "{NEW_DATASET}" sorted by Age. Operation took {time() - start:.2f} secs.')

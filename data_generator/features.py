@@ -43,8 +43,10 @@ class Features:
             self.step_positions = self.step_indices - int(self.window_size/2)
             self.step_positions = [x for x in self.step_positions if x >= 0]
         else:
-            self.step_positions = range(len(self.step_indices))
+            # self.step_positions = list(range(len(self.step_indices)))
+            self.step_positions = range(len([x for x in self.step_indices if x-(self.window_size/2) >= 0]))
 
+        # print(f'step-positions length = {len(self.step_positions)}')
         # All the calculated features
         if isinstance(data, pd.Series):
             # print(f'Calculating Time domain features for {data.name}')
@@ -248,9 +250,11 @@ class Features:
             and f is not "features"
             and f is not "data"
             and f is not "window_size"
+            and f is not "window_type"
             and f is not "feature_length"
             and f is not "data_loss"
             and f is not "data_freq"
+            and f is not "step_positions"
             and f is not "step_indices")
 
 
@@ -326,9 +330,26 @@ def feature_extractor(sub, sensor_pos, sensor_type, window_type, window_size, ou
                 if axis == 'all':
                     # print(f'{feature_name} = {feature_value}')
                     columns[feature_name] = feature_value
+                    # print(f'Feature Length = {len(feature_value)}')
                 else:
                     # print(f'{axis}_{feature_name} = {feature_value}')
                     columns[f'{axis}_{feature_name}'] = feature_value
+                # print(f'Feature Length = {len(feature_value)}')
+
+        if window_type == 'hopping':
+            columns['StepLabel'] = [1 for _ in range(len(step_positions['all']))]
+            # print(f'STEP Length_H = {len(columns["StepLabel"])}')
+
+        else:
+            temp_list = []
+            assert step_positions['all'] == step_positions['Ax'], "all step_positions lists are not equal"
+            for i in range(len(data['StepLabel'][int(window_size/2):-int(window_size/2)])):
+                if i in step_positions['all']:
+                    temp_list.append(1)
+                else:
+                    temp_list.append(0)
+            columns['StepLabel'] = list(temp_list)
+            # print(f'STEP Length_S = {len(columns["StepLabel"])}')
 
         column_names = list(columns.keys())
         df = pd.DataFrame(columns)

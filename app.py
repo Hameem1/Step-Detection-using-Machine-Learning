@@ -21,7 +21,7 @@ from dataset import data_structs as ds, dataset_manipulator as dm
 # True if the Data set needs to be fixed, otherwise False
 FIX = False
 DEVELOPER_MODE = True
-DATA_VISUALIZATION = True
+DATA_VISUALIZATION = False
 DATA_PLOT = False
 
 # Fixing the entire Data set
@@ -41,7 +41,13 @@ if __name__ == '__main__':
     sub = ds.Subject("Id319344.txt")
     # Generating & Printing the features
     features_list, features, step_positions = feature_extractor(sub, "right", "acc", WINDOW_TYPE, WINDOW_SIZE)
+
+    # from data_generator.features import print_features
     # print_features(features)
+    # import pandas as pd
+    # with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+    #     print(features)
+
     # Plotting the subject data
     if DATA_VISUALIZATION:
         t1 = Thread(target=dp, args=(sub,), kwargs={'sensor_axis': "all"})

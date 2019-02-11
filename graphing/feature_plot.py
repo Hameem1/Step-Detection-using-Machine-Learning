@@ -146,7 +146,8 @@ def feature_step_marker(feature_data, step_pos):
 
     step_count = 0
 
-    for i in step_pos:
+    switch = step_pos if WINDOW_TYPE == 'sliding' else list(range(len(step_pos)))
+    for i in switch:
         steps_x.append(i)
         steps_y.append("{0:.5f}".format(float(next(iter(feature_data.values()))[i])))
         step_count += 1
