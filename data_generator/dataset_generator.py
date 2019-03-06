@@ -1,7 +1,5 @@
 """Do NOT import this module, Run this directly after adjusting the Configuration variables"""
 
-# TODO : Add a step column to the features dataset and calculate again
-# TODO : Change the window size for the data and calculate again
 # TODO: Perform feature ranking on the data (Pearson's method)
 
 import os
@@ -16,7 +14,7 @@ from dataset.dataset_manipulator import ROOT, sensors, read_csv, generate_subjec
 
 # Configuration Variables
 # ------------------------
-NEW_DATASET = "Step_Detection_Dataset (w=20, hopping)"
+NEW_DATASET = "Step_Detection_Dataset (w=40, sliding)"
 GENERATE_DATASET = True
 SORT_BY_AGE = False
 TESTING = False

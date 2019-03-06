@@ -21,7 +21,7 @@ from dataset import data_structs as ds, dataset_manipulator as dm
 # True if the Data set needs to be fixed, otherwise False
 FIX = False
 DEVELOPER_MODE = True
-DATA_VISUALIZATION = False
+DATA_VISUALIZATION = True
 DATA_PLOT = False
 
 # Fixing the entire Data set

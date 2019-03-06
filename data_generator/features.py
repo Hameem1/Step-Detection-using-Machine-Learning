@@ -39,9 +39,12 @@ class Features:
         self.window_type = window_type
 
         self.step_indices = np.array(step_indices)
+        # For a "sliding" window
         if self.window_type == 'sliding':
             self.step_positions = self.step_indices - int(self.window_size/2)
+            # Eliminating step indices which don't have enough data around them for the window
             self.step_positions = [x for x in self.step_positions if x >= 0]
+        # For a "hopping" window
         else:
             # self.step_positions = list(range(len(self.step_indices)))
             self.step_positions = range(len([x for x in self.step_indices if x-(self.window_size/2) >= 0]))
@@ -68,7 +71,7 @@ class Features:
             self.mean_abs_deviation = self.window(self.calc_mean_abs_deviation)
 
             # print(f'Calculating Frequency domain features for {data.name}')
-            # # TODO: try implementing fft_avg_band_power as well
+            # TODO: try implementing fft_avg_band_power as well
             # # self.fft_energy = self.window(self.calc_fft_energy)
             # self.fft_magnitude = abs(self.data_freq)
             # self.fft_mean = self.window(self.calc_mean, domain='freq')
