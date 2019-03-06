@@ -408,12 +408,14 @@ def read_csv(filename):
         return data
 
 
-def dataframe_concatenator():
+def dataframe_concatenator(single_file=False):
     """
     Generates the 'Features_Dataset' within the project directory which will be used for the classifier.
     Three separate files for each sensor will be generated, with each file containing the data for every subject.
 
+    :param single_file: Merges the three files into a single data file if 'True'
     """
+
     DATASET_FOLDER = "Step_Detection_Dataset (w=40, sliding)"
     DATASET_ROOT = f"{ROOT}\\..\\DATASETS"
     sensor_paths = [f"{DATASET_ROOT}\\{DATASET_FOLDER}\\{sensor}" for sensor in sensors]
@@ -439,9 +441,13 @@ def dataframe_concatenator():
     print(f'Length of ds_left = {len(datasets[1])}')
     print(f'Length of ds_right = {len(datasets[2])}')
 
-    datasets[0].to_csv(f'{NEW_DATASET_PATH}\\ds_center.csv', sep="\t", index=True, float_format='%g')
-    datasets[1].to_csv(f'{NEW_DATASET_PATH}\\ds_left.csv', sep="\t", index=True, float_format='%g')
-    datasets[2].to_csv(f'{NEW_DATASET_PATH}\\ds_right.csv', sep="\t", index=True, float_format='%g')
+    if not single_file:
+        datasets[0].to_csv(f'{NEW_DATASET_PATH}\\ds_center.csv', sep="\t", index=True, float_format='%g')
+        datasets[1].to_csv(f'{NEW_DATASET_PATH}\\ds_left.csv', sep="\t", index=True, float_format='%g')
+        datasets[2].to_csv(f'{NEW_DATASET_PATH}\\ds_right.csv', sep="\t", index=True, float_format='%g')
+    else:
+        data_file = pd.concat(datasets, ignore_index=True)
+        data_file.to_csv(f'{NEW_DATASET_PATH}\\ds_all.csv', sep="\t", index=True, float_format='%g')
 
 
 def end_tab_remover(subs_list):
