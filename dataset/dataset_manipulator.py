@@ -408,6 +408,42 @@ def read_csv(filename):
         return data
 
 
+def dataframe_concatenator():
+    """
+    Generates the 'Features_Dataset' within the project directory which will be used for the classifier.
+    Three separate files for each sensor will be generated, with each file containing the data for every subject.
+
+    """
+    DATASET_FOLDER = "Step_Detection_Dataset (w=40, sliding)"
+    DATASET_ROOT = f"{ROOT}\\..\\DATASETS"
+    sensor_paths = [f"{DATASET_ROOT}\\{DATASET_FOLDER}\\{sensor}" for sensor in sensors]
+    NEW_DATASET = "Features_Dataset"
+    NEW_DATASET_PATH = f'{ROOT}\\{NEW_DATASET}'
+    datasets = []
+
+    if not os.path.exists(NEW_DATASET_PATH):
+        print(f'\nWARNING: The path does not exist. Creating new directory...\n{NEW_DATASET_PATH}\n')
+        os.mkdir(f"{NEW_DATASET_PATH}")
+
+    for path in sensor_paths:
+        dfs = []
+        print(f'Folder => {path}\n')
+        for file_name in os.listdir(path):
+            # print(f'File name = {path}\{file_name}')
+            df = pd.read_csv(f'{path}\\{file_name}', sep='\t', index_col=0)
+            dfs.append(df)
+        datasets.append(pd.concat(dfs, ignore_index=True))
+
+    print()
+    print(f'Length of ds_center = {len(datasets[0])}')
+    print(f'Length of ds_left = {len(datasets[1])}')
+    print(f'Length of ds_right = {len(datasets[2])}')
+
+    datasets[0].to_csv(f'{NEW_DATASET_PATH}\\ds_center.csv', sep="\t", index=True, float_format='%g')
+    datasets[1].to_csv(f'{NEW_DATASET_PATH}\\ds_left.csv', sep="\t", index=True, float_format='%g')
+    datasets[2].to_csv(f'{NEW_DATASET_PATH}\\ds_right.csv', sep="\t", index=True, float_format='%g')
+
+
 def end_tab_remover(subs_list):
     """
     WARNING : This function has been deprecated (Avoid this if using "index_col=False" in data_structs.py)
