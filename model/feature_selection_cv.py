@@ -35,14 +35,15 @@ DATA = pd.read_csv(DATA_PATH, sep='\t', index_col=0)
 DATA = DATA.iloc[0:row_count, :]
 print('>> Dataset loaded\n')
 data_matrix = DATA.values
-X = data_matrix[:, 0:len(DATA.columns)-1]
-y = data_matrix[:, len(DATA.columns)-1]
+X = data_matrix[:, 0:-1]
+y = data_matrix[:, -1]
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=10)
 # Feature selection
 # Recursive Feature Elimination/Model Based Feature Selection (with cross-validated selection of best # of features)
 model = RandomForestClassifier(n_estimators=100)
 rfecv = RFECV(estimator=model, cv=StratifiedKFold(2), scoring='accuracy', n_jobs=-1)
+print('>> Training model\n')
 fit = rfecv.fit(X_train, y_train)
 
 # summarize ranking
@@ -60,7 +61,8 @@ plt.ylabel("Cross validation score (nb of correct classifications)")
 plt.plot(range(1, len(rfecv.grid_scores_) + 1), rfecv.grid_scores_)
 plt.show()
 
-print(f'Score of the classifier on test data = {rfecv.score(X_test, y_test):.3f}%\n')
+print('>> Testing model\n')
+print(f'Score of the classifier on test data = {rfecv.score(X_test, y_test)*100:.3f}%\n')
 
 duration = time() - start
 print('Operation took:', f'{duration:.2f} seconds.' if duration < 60 else f'{duration/60:.2f} minutes.')
