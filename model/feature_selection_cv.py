@@ -5,9 +5,11 @@ import pandas as pd
 from time import time
 import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split, StratifiedKFold
 from dataset.dataset_manipulator import ROOT, sensors
 from sklearn.feature_selection import chi2, SelectKBest, RFECV
+from sklearn.model_selection import train_test_split, StratifiedKFold
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, f1_score, recall_score
+
 
 # Globals
 # Directory paths
@@ -41,8 +43,8 @@ y = data_matrix[:, -1]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=10)
 # Feature selection
 # Recursive Feature Elimination/Model Based Feature Selection (with cross-validated selection of best # of features)
-model = RandomForestClassifier(n_estimators=100)
-rfecv = RFECV(estimator=model, cv=StratifiedKFold(2), scoring='accuracy', n_jobs=-1)
+model = RandomForestClassifier(n_estimators=100, class_weight={0: 1, 1: 100})
+rfecv = RFECV(estimator=model, cv=StratifiedKFold(2), scoring='f1_weighted', n_jobs=-1)
 print('>> Training model\n')
 fit = rfecv.fit(X_train, y_train)
 
@@ -63,6 +65,17 @@ plt.show()
 
 print('>> Testing model\n')
 print(f'Score of the classifier on test data = {rfecv.score(X_test, y_test)*100:.3f}%\n')
+y_pred = rfecv.predict(X_test)
+print(f'Confusion Matrix:\n{confusion_matrix(y_test, y_pred)}\n')
+print(f'Score of the classifier on test data:\n'
+      f'Accuracy  = {accuracy_score(y_test, y_pred)*100:.3f}%\n'
+      f'Precision = {precision_score(y_test, y_pred)*100:.3f}%\n'
+      f'Recall    = {recall_score(y_test, y_pred)*100:.3f}%\n'
+      f'F1 score  = {f1_score(y_test, y_pred)*100:.3f}%\n\n')
 
 duration = time() - start
 print('Operation took:', f'{duration:.2f} seconds.' if duration < 60 else f'{duration/60:.2f} minutes.')
+
+# Todo: Make the steps to be a window of ones around the current 1 (super-sampling)
+# Todo: Normalize the data before feeding it to the model (Train+Test)
+# Todo: Adjust the parameters and test feature_selection_cv
