@@ -73,7 +73,8 @@ for k, v in sorted_nth_rank[0:n_features]:
     count += 1
 
 print(f'Feature selection for "{n_files} files"" with "{r}" separate Random Forest Classifiers complete')
-print(f'Operation took {time() - start:.2f} secs.')
+duration = time() - start
+print('Operation took:', f'{duration:.2f} seconds.' if duration < 60 else f'{duration/60:.2f} minutes.')
 
 # Uni-variate Selection (Unable to perform this because the data needs to be non-negative for this to work)
 # test = SelectKBest(score_func=chi2, k=n_features)
