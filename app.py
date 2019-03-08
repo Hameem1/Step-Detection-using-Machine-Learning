@@ -7,6 +7,8 @@ Then set FIX = True.
 After the first run, set Fix = False.
 
 This is required!
+
+INFO: This module can also be used for testing the entire code. Import as: >>from app import *
 """
 
 from threading import Thread
@@ -20,9 +22,10 @@ from dataset import data_structs as ds, dataset_manipulator as dm
 # Configuration variables
 # True if the Data set needs to be fixed, otherwise False
 FIX = False
+DATA_PLOT = False
 DEVELOPER_MODE = True
 DATA_VISUALIZATION = True
-DATA_PLOT = False
+TEST_SUBJECT_ID = 1
 
 
 if __name__ == '__main__':
@@ -38,7 +41,7 @@ if __name__ == '__main__':
     # Generating the subject list and subject data from the data set
     subs_list, subs_data = dm.generate_subjects_data(gen_csv=False)
     # Choosing a subject to get features and visualizations for
-    sub = ds.Subject("Id319344.txt")
+    sub = ds.Subject(subs_list[TEST_SUBJECT_ID])
     # Generating & Printing the features
     features_list, features, step_positions = feature_extractor(sub, "right", "acc", WINDOW_TYPE, WINDOW_SIZE)
 
@@ -62,7 +65,7 @@ if __name__ == '__main__':
 
 else:
     print(f"\nModule imported : {__name__}\n")
-
+    import pandas as pd
     res = str(input(f"Would you like to FIX the data set? (y/n)")).lower()
     if res == 'y':
         if DEVELOPER_MODE:
@@ -87,7 +90,7 @@ else:
             # Generating the subject list (Global variable) for the data set
             subs_list, subs_data = dm.generate_subjects_data()
             # Generating a sample 'Subject' class object
-            sub = ds.Subject(subs_list[0])
+            sub = ds.Subject(subs_list[TEST_SUBJECT_ID])
         else:
             print("Invalid input! Please run the program again.")
 
@@ -95,7 +98,7 @@ else:
         # Generating the subject list (Global variable) for the data set
         subs_list, subs_data = dm.generate_subjects_data(gen_csv=False)
         # Generating a sample 'Subject' class object
-        sub = ds.Subject(subs_list[0])
+        sub = ds.Subject(subs_list[TEST_SUBJECT_ID])
         print(f'\nThe "Subject" class object "sub" has been created for testing.\n')
         sensor_pos = 'right'
         sensor_type = 'acc'
