@@ -108,10 +108,10 @@ def graph_callback(axis, feature):
                              name=feature)]
 
         # Generating x and y step coordinates for x and y axis
-        steps_y = feature_step_marker(dict(feature=FEATURES[axis][feature], name=feature))
+        steps_x, steps_y = feature_step_marker(dict(feature=FEATURES[axis][feature], name=feature))
 
         # Generating step traces
-        step_trace = [go.Scatter(x=np.array(STEP_POSITIONS) / Fs,
+        step_trace = [go.Scatter(x=np.array(steps_x) / Fs,
                                  y=steps_y,
                                  mode="markers",
                                  name="steps")]
@@ -134,30 +134,19 @@ def graph_callback(axis, feature):
 
 
 def feature_step_marker(feature_data, bool_mask=True):
-    """This function returns the y coordinates for steps detected in the given feature data vs t
+    """This function returns the x and y coordinates for steps detected in the given feature data vs t
 
         :param feature_data: dict(feature=[data])
         :param bool_mask: bool(Uses boolean mask for step marking if True)
-        :returns steps_y: dict(steps_y)
+        :returns steps_x, steps_y: list(steps_x), list(steps_y)
         """
 
     steps_y = []
     indices = list(range(len(feature_data['feature'])))
-    steps = list(compress(indices, STEP_POSITIONS_BOOL)) if bool_mask else list(STEP_POSITIONS)
-
-    # UNDER PROGRESS
-    # for i in steps:
-    #     steps_y.append("{0:.5f}".format(float(next(iter(feature_data.values()))[i])))
-
-    # WORKS
-    for i in STEP_POSITIONS:
-        steps_y.append("{0:.5f}".format(float(next(iter(feature_data.values()))[i])))
-
-    print(f'STEP INDICES SPAN      = {steps}\n')
-    print(f"Length of feature_data = {len(feature_data['feature'])}\n")
-    print(f'steps_y = {steps_y}\n')
-    print(f'\nStep Count for "{list(feature_data.values())[1]}" = {len(STEP_POSITIONS)}\n')
-    return steps_y
+    steps_x = list(compress(indices, STEP_POSITIONS_BOOL)) if bool_mask else list(STEP_POSITIONS)
+    for i in steps_x:
+        steps_y.append("{0:.5f}".format(float(feature_data['feature'][i])))
+    return steps_x, steps_y
 
 
 def feature_plot(sub, features_list, features, updated_step_positions, updated_step_positions_bool):
