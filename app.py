@@ -12,12 +12,12 @@ INFO: This module can also be used for testing the entire code. Import as: >>fro
 """
 
 from threading import Thread
-from config import WINDOW_SIZE, WINDOW_TYPE
 from graphing.data_plot import data_plot as dp
 from graphing.feature_plot import feature_plot as fp
 from data_generator.features import feature_extractor
 from data_generator.age_comparison import gen_age_histogram
 from dataset import data_structs as ds, dataset_manipulator as dm
+from config import WINDOW_SIZE, WINDOW_TYPE, USED_CLASS_LABEL, SENSOR
 
 # Configuration variables
 # True if the Data set needs to be fixed, otherwise False
@@ -43,7 +43,8 @@ if __name__ == '__main__':
     # Choosing a subject to get features and visualizations for
     sub = ds.Subject(subs_list[TEST_SUBJECT_ID])
     # Generating & Printing the features
-    features_list, features, step_positions = feature_extractor(sub, "right", "acc", WINDOW_TYPE, WINDOW_SIZE)
+    features_list, features, step_positions_actual, step_positions_updated = \
+        feature_extractor(sub, "right", SENSOR)
 
     # from data_generator.features import print_features
     # print_features(features)
@@ -53,10 +54,10 @@ if __name__ == '__main__':
 
     # Plotting the subject data
     if DATA_VISUALIZATION:
-        t1 = Thread(target=dp, args=(sub,), kwargs={'sensor_axis': "all"})
+        t1 = Thread(target=dp, args=(sub, step_positions_actual), kwargs={'sensor_axis': "all"})
         t1.start()
         # Plotting the feature data
-        t2 = Thread(target=fp, args=(sub, features_list, features, step_positions, WINDOW_TYPE,))
+        t2 = Thread(target=fp, args=(sub, features_list, features, step_positions_updated,))
         t2.start()
 
     if DATA_PLOT:
@@ -101,8 +102,8 @@ else:
         sub = ds.Subject(subs_list[TEST_SUBJECT_ID])
         print(f'\nThe "Subject" class object "sub" has been created for testing.\n')
         sensor_pos = 'right'
-        sensor_type = 'acc'
-        data = sub.sensor_pos[sensor_pos].label['valid']
+        sensor_type = SENSOR
+        data = sub.sensor_pos[sensor_pos].label[USED_CLASS_LABEL]
         col_names, df, steps_dict = feature_extractor(sub, sensor_pos, sensor_type, WINDOW_TYPE,
                                                       WINDOW_SIZE, output_type='df')
         print(f'\n"col_names", "df" and "steps_dict" have been returned after a call to feature_extractor()\n')
