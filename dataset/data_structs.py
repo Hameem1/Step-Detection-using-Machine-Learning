@@ -51,21 +51,23 @@ class Dataset:
             self.label = {}
             for label in labels:
                 self.label.update({label: data_table[(data_table.ClassLabel == labels.index(label) - 1) &
-                                                     (data_table.Gx != 0) & (data_table.Ax != 0) &
-                                                     (data_table.Gy != 0) & (data_table.Ay != 0) &
-                                                     (data_table.Gz != 0) & (data_table.Az != 0)]
+                                                     ((data_table.Gx != 0) | (data_table.Ax != 0) |
+                                                      (data_table.Gy != 0) | (data_table.Ay != 0) |
+                                                      (data_table.Gz != 0) | (data_table.Az != 0))]
                                   .reset_index(drop=True)})
 
             self.label.update({labels_extra[0]: data_table})
 
-            df1 = data_table[(data_table.ClassLabel != -1) & (data_table.Gx != 0) & (data_table.Gy != 0) &
-                             (data_table.Gz != 0) & (data_table.Ax != 0) & (data_table.Ay != 0) &
-                             (data_table.Az != 0)].reset_index(drop=True)
+            df1 = data_table[(data_table.ClassLabel != -1) & ((data_table.Gx != 0) | (data_table.Gy != 0) |
+                                                              (data_table.Gz != 0) | (data_table.Ax != 0) |
+                                                              (data_table.Ay != 0) | (data_table.Az != 0))]\
+                .reset_index(drop=True)
 
             self.label.update({labels_extra[1]: df1})
 
             df2 = data_table[(data_table.Gx == 0) & (data_table.Gy == 0) & (data_table.Gz == 0) &
-                             (data_table.Ax == 0) & (data_table.Ay == 0) & (data_table.Az == 0)].reset_index(drop=True)
+                             (data_table.Ax == 0) & (data_table.Ay == 0) & (data_table.Az == 0)]\
+                .reset_index(drop=True)
 
             self.label.update({labels_extra[2]: df2})
 
