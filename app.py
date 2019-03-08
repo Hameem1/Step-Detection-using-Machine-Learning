@@ -105,9 +105,20 @@ else:
         sensor_pos = 'right'
         sensor_type = SENSOR
         data = sub.sensor_pos[sensor_pos].label[USED_CLASS_LABEL]
-        col_names, df, step_positions_actual, step_positions_updated, step_positions_updated_bool\
-            = feature_extractor(sub, sensor_pos, sensor_type, output_type='df')
-        print(f'\n"col_names", "df" and "steps_dict" have been returned after a call to feature_extractor()\n')
+
+        res = str(input(f"Which output type for feature_extractor()? (df/dict)")).lower()
+        if res == 'df':
+            col_names, df, step_positions_actual, step_positions_updated, step_positions_updated_bool \
+                = feature_extractor(sub, sensor_pos, sensor_type, output_type='df')
+            print(f'\n"col_names", "df", "step_positions_actual", "step_positions_updated" and '
+                  f'"step_positions_updated_bool" have been returned after a call to feature_extractor()\n')
+        elif res == 'dict':
+            features_list, features, step_positions_actual, step_positions_updated, step_positions_updated_bool = \
+                feature_extractor(sub, "right", SENSOR)
+            print(f'\n"features_list", "features", "step_positions_actual", "step_positions_updated" and '
+                  f'"step_positions_updated_bool" have been returned after a call to feature_extractor()\n')
+        else:
+            print("Invalid input! Please run the program again.")
 
     else:
         print("Invalid input! Please run the program again.")
