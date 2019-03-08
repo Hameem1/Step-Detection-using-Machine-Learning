@@ -43,7 +43,7 @@ if __name__ == '__main__':
     # Choosing a subject to get features and visualizations for
     sub = ds.Subject(subs_list[TEST_SUBJECT_ID])
     # Generating & Printing the features
-    features_list, features, step_positions_actual, step_positions_updated = \
+    features_list, features, step_positions_actual, step_positions_updated, step_positions_updated_bool = \
         feature_extractor(sub, "right", SENSOR)
 
     # from data_generator.features import print_features
@@ -57,7 +57,8 @@ if __name__ == '__main__':
         t1 = Thread(target=dp, args=(sub, step_positions_actual), kwargs={'sensor_axis': "all"})
         t1.start()
         # Plotting the feature data
-        t2 = Thread(target=fp, args=(sub, features_list, features, step_positions_updated,))
+        t2 = Thread(target=fp, args=(sub, features_list, features,
+                                     step_positions_updated, step_positions_updated_bool,))
         t2.start()
 
     if DATA_PLOT:
@@ -104,8 +105,8 @@ else:
         sensor_pos = 'right'
         sensor_type = SENSOR
         data = sub.sensor_pos[sensor_pos].label[USED_CLASS_LABEL]
-        col_names, df, steps_dict = feature_extractor(sub, sensor_pos, sensor_type, WINDOW_TYPE,
-                                                      WINDOW_SIZE, output_type='df')
+        col_names, df, step_positions_actual, step_positions_updated, step_positions_updated_bool\
+            = feature_extractor(sub, sensor_pos, sensor_type, output_type='df')
         print(f'\n"col_names", "df" and "steps_dict" have been returned after a call to feature_extractor()\n')
 
     else:
