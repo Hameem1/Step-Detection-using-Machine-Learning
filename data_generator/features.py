@@ -284,11 +284,11 @@ def update_step_positions(data):
         # Eliminating step indices which don't have enough data around them for the window
         step_positions_updated = [x for x in step_positions_updated if (x >= 0) and (x < (len(data) - WINDOW_SIZE))]
         # Creating a boolean step list with 1s representing the step size (step duration)
-        step_positions_updated_bool = [0]*len(data['StepLabel'][int(WINDOW_SIZE / 2):-int(WINDOW_SIZE / 2)])
+        step_positions_updated_bool = [False]*len(data['StepLabel'][int(WINDOW_SIZE / 2):-int(WINDOW_SIZE / 2)])
         for x in range(len(step_positions_updated_bool)):
             if x in step_positions_updated:
                 for i in range(int(STEP_SIZE/2) + 1):
-                    step_positions_updated_bool[x + i] = step_positions_updated_bool[x - i] = 1
+                    step_positions_updated_bool[x + i] = step_positions_updated_bool[x - i] = True
 
     # For a "hopping" window
     else:
@@ -334,11 +334,11 @@ def feature_extractor(sub, sensor_pos, sensor_type, output_type='dict'):
 
     # print(f'ACTUAL STEP POSITIONS  = {step_positions_actual}\n')
     # print(f'UPDATED STEP POSITIONS = {step_positions_updated}\n')
-    # print(f'Boolean Step Mask      = {step_positions_updated_bool}\n')
+    print(f'Boolean Step Mask      = {step_positions_updated_bool}\n')
 
     # For output_type = dictionary
     if output_type == 'dict':
-        return features_list, features, step_positions_actual, step_positions_updated
+        return features_list, features, step_positions_actual, step_positions_updated, step_positions_updated_bool
 
     # For output_type = data frame
     elif output_type == 'df':
@@ -354,7 +354,7 @@ def feature_extractor(sub, sensor_pos, sensor_type, output_type='dict'):
         columns['StepLabel'] = list(step_positions_updated_bool)
         column_names = list(columns.keys())
         df = pd.DataFrame(columns)
-        return column_names, df, step_positions_actual, step_positions_updated
+        return column_names, df, step_positions_actual, step_positions_updated, step_positions_updated_bool
 
     else:
         print("Invalid value for parameter 'output_type'! Please run the program again.")
