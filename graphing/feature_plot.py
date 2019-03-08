@@ -6,15 +6,13 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 import plotly.graph_objs as go
 import numpy as np
+from config import Fs
 
 # Global variables
 SUB = None
 FEATURES_LIST = {}
 FEATURES = {}
 STEP_POSITIONS = []
-SENSOR_TYPE = ''
-WINDOW_TYPE = ''
-fs = 100
 
 # Configuring Dash app
 app = dash.Dash(__name__)
@@ -96,7 +94,7 @@ def graph_callback(axis, feature):
 
     # Graph variables
     try:
-        t = np.array([num for num in range(len(FEATURES[axis][feature]))]) / fs
+        t = np.array([num for num in range(len(FEATURES[axis][feature]))]) / Fs
         xlabel = 'time (s)'
         ylabel = 'Feature Value'
         title = f'{feature.capitalize()}  vs Time'
@@ -108,10 +106,10 @@ def graph_callback(axis, feature):
                              name=feature)]
 
         # Generating x and y step coordinates for x and y axis
-        steps_x, steps_y, step_count = feature_step_marker(dict(feature=FEATURES[axis][feature]), STEP_POSITIONS[axis])
+        steps_y = feature_step_marker(dict(feature=FEATURES[axis][feature], name=feature))
 
         # Generating step traces
-        step_trace = [go.Scatter(x=np.array(steps_x) / fs,
+        step_trace = [go.Scatter(x=np.array(STEP_POSITIONS) / Fs,
                                  y=steps_y,
                                  mode="markers",
                                  name="steps")]
@@ -133,48 +131,37 @@ def graph_callback(axis, feature):
         print(f'Error Occurred : {error} - Invalid axis/feature combination selected')
 
 
-def feature_step_marker(feature_data, step_pos):
-    """This function returns the x and y coordinates for steps detected in the given feature data vs t
+def feature_step_marker(feature_data):
+    """This function returns the y coordinates for steps detected in the given feature data vs t
 
         :param feature_data: dict(feature=[data])
-        :param step_pos: list containing x_axis values for steps
-        :returns steps_x, steps_y, step_count: dict(steps_x, steps_y), int(step_count)
+        :returns steps_y: dict(steps_y)
         """
 
-    steps_x = []
     steps_y = []
-
-    step_count = 0
-
-    switch = step_pos if WINDOW_TYPE == 'sliding' else list(range(len(step_pos)))
-    for i in switch:
-        steps_x.append(i)
+    for i in STEP_POSITIONS:
         steps_y.append("{0:.5f}".format(float(next(iter(feature_data.values()))[i])))
-        step_count += 1
 
-    print(f'\nStep Count for {next(iter(feature_data.keys()))} = {step_count}\n')
-
-    return steps_x, steps_y, step_count
+    print(f'\nStep Count for "{list(feature_data.values())[1]}" = {len(STEP_POSITIONS)}\n')
+    return steps_y
 
 
-def feature_plot(sub, features_list, features, step_positions, window_type, sensor_type='acc'):
-    """This function accepts the data values from a function call and makes them global
+def feature_plot(sub, features_list, features, updated_step_positions):
+    """
+    This function accepts the data values from a function call and makes them global.
+    It also acts as the feature plotting endpoint and starts the Dash server
 
-    :param step_positions: dict of lists containing x_axis values for steps
-    :param window_type: str('sliding' or 'hopping')
     :param sub: Subject(the subject for which the features have been provided)
     :param features_list: list(features_list)
     :param features: dict(features)
-    :param sensor_type: optional('acc' or 'gyr')
+    :param updated_step_positions: dict of lists containing x_axis values for steps
     """
 
-    global FEATURES_LIST, FEATURES, SENSOR_TYPE, SUB, WINDOW_TYPE, STEP_POSITIONS
+    global SUB, FEATURES_LIST, FEATURES, STEP_POSITIONS
     SUB = sub
-    WINDOW_TYPE = window_type
     FEATURES_LIST = features_list
     FEATURES = features
-    STEP_POSITIONS = step_positions
-    SENSOR_TYPE = sensor_type
+    STEP_POSITIONS = updated_step_positions
     app.run_server(debug=False, port=5001)
 
 

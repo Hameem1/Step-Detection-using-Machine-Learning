@@ -6,6 +6,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 import plotly.graph_objs as go
 import numpy as np
+from config import USED_CLASS_LABEL, SENSOR, Fs
 
 # Global variables
 axes = {"x": {"acc": "Ax", "gyr": "Gx"},
@@ -14,6 +15,7 @@ axes = {"x": {"acc": "Ax", "gyr": "Gx"},
 
 sub = None
 axis = None
+STEP_POSITIONS = []
 
 app = dash.Dash(__name__)
 app.css.config.serve_locally = True
@@ -44,7 +46,7 @@ app.layout = html.Div([
                                         {'label': 'Downstairs', 'value': 'downstairs'},
                                         {'label': 'Incline', 'value': 'incline'},
                                         {'label': 'Decline', 'value': 'decline'}],
-                               value='valid',
+                               value=USED_CLASS_LABEL,
                                placeholder="Select motion type",
                                style={'height': '40px',
                                       'fontSize': 20,
@@ -58,7 +60,7 @@ app.layout = html.Div([
                                multi=False,
                                options=[{'label': 'Accelerometer', 'value': 'acc'},
                                         {'label': 'Gyroscope', 'value': 'gyr'}],
-                               value='acc',
+                               value=SENSOR,
                                placeholder="Select sensor type",
                                style={'height': '40px',
                                       'fontSize': 20,
@@ -104,8 +106,7 @@ def graph_callback(sensor, position, motion):
         """
 
     # Graph variables
-    fs = sub.sensor_pos[position].fs
-    t = np.array([num for num in range(0, len(sub.sensor_pos[position].label[motion]))]) / fs
+    t = np.array([num for num in range(0, len(sub.sensor_pos[position].label[motion]))]) / Fs
     visible = "x" if axis == "all" else axis
     xlabel = 'time (s)'
     ylabel = 'Acceleration (g)' if sensor == "acc" else 'Angular Velocity (rad/s)'
@@ -123,10 +124,10 @@ def graph_callback(sensor, position, motion):
             trace.visible = "legendonly"
 
     # Generating x and y step coordinates for all axes
-    steps_x, steps_y, step_count = step_marker(t, sub, position, sensor, motion)
+    steps_y = step_marker(position)
 
     # Generating step traces
-    step_traces = [go.Scatter(x=np.array(steps_x[ax]) / fs,
+    step_traces = [go.Scatter(x=np.array(STEP_POSITIONS) / Fs,
                               y=steps_y[ax],
                               mode="markers",
                               name=axes[ax][sensor]) for ax in axes]
@@ -150,44 +151,40 @@ def graph_callback(sensor, position, motion):
     return fig
 
 
-def step_marker(t, subject, pos, sensor, motion_type):
-    """This function returns the x and y coordinates for steps detected in the given subject data vs t
+def step_marker(pos, sensor=SENSOR, motion_type=USED_CLASS_LABEL):
+    """This function returns the y coordinates for steps detected in the given subject data vs t
 
-        :param t: numpy array of the time axis
-        :param subject: instance of the Subject class
         :param pos: str ('center', 'left', 'right')
         :param sensor: str ('acc', 'gyr')
         :param motion_type: str('complete', 'valid', etc)
-        :returns steps_x, steps_y, step_count: dict(steps_x, steps_y), int(step_count)
+        :returns steps_y: dict(steps_y)
         """
 
-    steps_x = {'x': [], 'y': [], 'z': []}
     steps_y = {'x': [], 'y': [], 'z': []}
+    data = sub.sensor_pos[pos].label[motion_type]
 
     for ax in axes:
-        data = subject.sensor_pos[pos].label[motion_type]
+        for i in STEP_POSITIONS:
+            steps_y[ax].append(float("{0:.3f}".format(data.loc[i, axes[ax][sensor]])))
 
-        step_count = 0
-        for i in range(1, len(t)):
-            if data.loc[i, 'StepLabel'] > (data.loc[i - 1, 'StepLabel']):
-                steps_x[ax].append(i)
-                steps_y[ax].append(float("{0:.3f}".format(data.loc[i, axes[ax][sensor]])))
-                step_count += 1
-        print(f'\nStep Count for {axes[ax][sensor]} = {step_count}\n')
-
-    return steps_x, steps_y, step_count
+    print(f'\nStep Count for Subject - {sub.subject_id[:-4]} = {len(STEP_POSITIONS)}\n')
+    return steps_y
 
 
-def data_plot(subject, sensor_axis="all"):
-    """This function accepts the data values from a function call and makes them global
+def data_plot(subject, actual_step_positions, sensor_axis="all"):
+    """
+    This function accepts the data values from a function call and makes them global.
+    It also acts as the feature plotting endpoint and starts the Dash server.
 
     :param subject: A Subject class object
+    :param actual_step_positions: dict of lists containing x_axis values for steps
     :param sensor_axis: str ('x', 'y', 'z', 'all')
     """
 
-    global sub, axis
+    global sub, axis, STEP_POSITIONS
     sub = subject
     axis = sensor_axis
+    STEP_POSITIONS = actual_step_positions
     app.run_server(debug=False, port=5000)
 
 
