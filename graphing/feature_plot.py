@@ -7,12 +7,14 @@ from dash.dependencies import Input, Output
 import plotly.graph_objs as go
 import numpy as np
 from config import Fs
+from itertools import compress
 
 # Global variables
 SUB = None
 FEATURES_LIST = {}
 FEATURES = {}
 STEP_POSITIONS = []
+STEP_POSITIONS_BOOL = []
 
 # Configuring Dash app
 app = dash.Dash(__name__)
@@ -131,22 +133,34 @@ def graph_callback(axis, feature):
         print(f'Error Occurred : {error} - Invalid axis/feature combination selected')
 
 
-def feature_step_marker(feature_data):
+def feature_step_marker(feature_data, bool_mask=True):
     """This function returns the y coordinates for steps detected in the given feature data vs t
 
         :param feature_data: dict(feature=[data])
+        :param bool_mask: bool(Uses boolean mask for step marking if True)
         :returns steps_y: dict(steps_y)
         """
 
     steps_y = []
+    indices = list(range(len(feature_data['feature'])))
+    steps = list(compress(indices, STEP_POSITIONS_BOOL)) if bool_mask else list(STEP_POSITIONS)
+
+    # UNDER PROGRESS
+    # for i in steps:
+    #     steps_y.append("{0:.5f}".format(float(next(iter(feature_data.values()))[i])))
+
+    # WORKS
     for i in STEP_POSITIONS:
         steps_y.append("{0:.5f}".format(float(next(iter(feature_data.values()))[i])))
 
+    print(f'STEP INDICES SPAN      = {steps}\n')
+    print(f"Length of feature_data = {len(feature_data['feature'])}\n")
+    print(f'steps_y = {steps_y}\n')
     print(f'\nStep Count for "{list(feature_data.values())[1]}" = {len(STEP_POSITIONS)}\n')
     return steps_y
 
 
-def feature_plot(sub, features_list, features, updated_step_positions):
+def feature_plot(sub, features_list, features, updated_step_positions, updated_step_positions_bool):
     """
     This function accepts the data values from a function call and makes them global.
     It also acts as the feature plotting endpoint and starts the Dash server
@@ -154,14 +168,16 @@ def feature_plot(sub, features_list, features, updated_step_positions):
     :param sub: Subject(the subject for which the features have been provided)
     :param features_list: list(features_list)
     :param features: dict(features)
-    :param updated_step_positions: dict of lists containing x_axis values for steps
+    :param updated_step_positions: list containing updated x_axis values for steps
+    :param updated_step_positions_bool: list containing a boolean mask representing step width
     """
 
-    global SUB, FEATURES_LIST, FEATURES, STEP_POSITIONS
+    global SUB, FEATURES_LIST, FEATURES, STEP_POSITIONS, STEP_POSITIONS_BOOL
     SUB = sub
     FEATURES_LIST = features_list
     FEATURES = features
     STEP_POSITIONS = updated_step_positions
+    STEP_POSITIONS_BOOL = updated_step_positions_bool
     app.run_server(debug=False, port=5001)
 
 
