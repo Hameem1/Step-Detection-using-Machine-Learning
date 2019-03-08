@@ -18,6 +18,7 @@ import pandas as pd
 import statistics as stat
 from scipy.fftpack import fft
 from scipy.stats import kurtosis, skew, entropy, pearsonr
+from config import WINDOW_SIZE, WINDOW_TYPE, USED_CLASS_LABEL, STEP_SIZE
 
 
 class Features:
@@ -25,7 +26,7 @@ class Features:
         dataset and provides the functions to calculate them
     """
 
-    def __init__(self, data, window_size, window_type, step_indices):
+    def __init__(self, data, step_positions_actual, window_size=WINDOW_SIZE, window_type=WINDOW_TYPE):
         # -------
         # WARNING
         # -------
@@ -43,18 +44,8 @@ class Features:
         self.window_size = window_size
         # Type of moving window (sliding/hopping)
         self.window_type = window_type
-
-        self.step_indices = np.array(step_indices)
-
-        # For a "sliding" window
-        if self.window_type == 'sliding':
-            self.step_positions = self.step_indices - int(self.window_size/2)
-            # Eliminating step indices which don't have enough data around them for the window
-            self.step_positions = [x for x in self.step_positions if x >= 0]
-
-        # For a "hopping" window
-        else:
-            self.step_positions = range(len([x for x in self.step_indices if x-(self.window_size/2) >= 0]))
+        # Actual step positions
+        self.step_positions_actual = step_positions_actual
 
         # All the calculated features
         if isinstance(data, pd.Series):
@@ -157,7 +148,7 @@ class Features:
 
     @staticmethod
     def calc_energy(data):
-        squares = data**2
+        squares = data ** 2
         return squares.sum()
 
     @staticmethod
@@ -194,7 +185,7 @@ class Features:
         ret = []
         w_start = 0
         w_stop = w_start + self.window_size
-        
+
         if isinstance(self.data, pd.Series):
             if domain == 'time':
                 data = self.data
@@ -208,7 +199,7 @@ class Features:
 
         if self.window_type == 'sliding':
             while w_stop < len(data):
-                window_data = data[w_start:w_stop+1]
+                window_data = data[w_start:w_stop + 1]
                 temp = func(window_data)
                 # If the data is a float (Store up to 5 decimal places)
                 if not float(temp).is_integer():
@@ -220,18 +211,9 @@ class Features:
                 w_stop = w_start + self.window_size
 
         elif self.window_type == 'hopping':
-            if self.window_size % 2 == 0:
-                half_len = int(self.window_size/2)
-            else:
-                half_len = int((self.window_size - 1)/2)
-
-            for i in self.step_indices:
-                # ignoring a step if it doesn't have enough data on both sides to form a window
-                if (i >= half_len) & (i <= len(data)-half_len):
-                    span = [int(i-half_len), int(i+half_len)]
-                else:
-                    continue
-                window_data = data[span[0]:span[1]+1]
+            for i in self.step_positions_actual:
+                span = [int(i - WINDOW_SIZE / 2), int(i + WINDOW_SIZE / 2)]
+                window_data = data[span[0]:span[1] + 1]
                 temp = func(window_data)
                 # If the data is a float (Store up to 5 decimal places)
                 if not float(temp).is_integer():
@@ -254,8 +236,7 @@ class Features:
             and f is not "window_size"
             and f is not "window_type"
             and f is not "data_freq"
-            and f is not "step_positions"
-            and f is not "step_indices")
+            and f is not "step_positions_actual")
 
 
 def print_features(features):
@@ -283,27 +264,58 @@ def print_features(features):
     print(f'\nTotal # of unique features calculated = {total_features}')
 
 
+def update_step_positions(data):
+    """This function returns lists of actual and updated step position indices according to the window type being used
+
+        :param data: DataFrame(subject data)
+        :returns list(step_positions_actual), list(step_positions_updated), list(step_positions_updated_bool)
+    """
+
+    step_positions_actual = []
+
+    for i in range(1, len(data['StepLabel'])):
+        if (data.loc[i, 'StepLabel']) > (data.loc[i - 1, 'StepLabel']):
+            step_positions_actual.append(i)
+
+    # For a "sliding" window
+    if WINDOW_TYPE == 'sliding':
+        # Shifting the step indices
+        step_positions_updated = np.array(step_positions_actual) - int(WINDOW_SIZE / 2)
+        # Eliminating step indices which don't have enough data around them for the window
+        step_positions_updated = [x for x in step_positions_updated if (x >= 0) and (x < (len(data) - WINDOW_SIZE))]
+        # Creating a boolean step list with 1s representing the step size (step duration)
+        step_positions_updated_bool = [0]*len(data['StepLabel'][int(WINDOW_SIZE / 2):-int(WINDOW_SIZE / 2)])
+        for x in range(len(step_positions_updated_bool)):
+            if x in step_positions_updated:
+                for i in range(int(STEP_SIZE/2) + 1):
+                    step_positions_updated_bool[x + i] = step_positions_updated_bool[x - i] = 1
+
+    # For a "hopping" window
+    else:
+        step_positions_updated = range(len([x for x in np.array(step_positions_actual)
+                                            if
+                                            (x - int(WINDOW_SIZE / 2) >= 0) and (x < (len(data) - WINDOW_SIZE / 2))]))
+
+        step_positions_updated_bool = [1 for _ in range(len(step_positions_updated))]
+
+    return step_positions_actual, step_positions_updated, step_positions_updated_bool
+
+
 # This is the exposed endpoint for usage via import
-def feature_extractor(sub, sensor_pos, sensor_type, window_type, window_size, output_type='dict'):
+def feature_extractor(sub, sensor_pos, sensor_type, output_type='dict'):
     """This function returns the features dictionary for the requested data
 
         :param sub: A Subject class object
         :param sensor_pos: str('center', 'left', 'right')
         :param sensor_type: str('acc', 'gyr')
-        :param window_type: str('sliding' or 'hopping')
-        :param window_size: int
         :param output_type: str('dict', 'df')
-        :returns features_list, features, step_positions: dict(features_list), dict/df(features), dict(step x_values)
+        :returns features_list, features, step_positions_updated: dict(features_list), dict/df(features), dict(step x_values)
     """
     features = {}
     features_list = {}
-    step_indices = []
-    step_positions = {}
-    data = sub.sensor_pos[sensor_pos].label['valid']
+    data = sub.sensor_pos[sensor_pos].label[USED_CLASS_LABEL]
 
-    for i in range(1, len(data['StepLabel'])):
-        if (data.loc[i, 'StepLabel']) > (data.loc[i - 1, 'StepLabel']):
-            step_indices.append(i)
+    step_positions_actual, step_positions_updated, step_positions_updated_bool = update_step_positions(data)
 
     if sensor_type == "acc":
         base_data = [col for col in data.columns if col.startswith('A')]
@@ -314,16 +326,19 @@ def feature_extractor(sub, sensor_pos, sensor_type, window_type, window_size, ou
 
     for axis in base_data:
         if axis is not 'all':
-            f = Features(data[axis], window_size, window_type, step_indices)
+            f = Features(data[axis], step_positions_actual)
         else:
-            f = Features(data[base_data[0:3]], window_size, window_type, step_indices)
+            f = Features(data[base_data[0:3]], step_positions_actual)
         features_list[axis] = f.features
         features[axis] = {x: getattr(f, x) for x in f.features}
-        step_positions[axis] = f.step_positions
+
+    # print(f'ACTUAL STEP POSITIONS  = {step_positions_actual}\n')
+    # print(f'UPDATED STEP POSITIONS = {step_positions_updated}\n')
+    # print(f'Boolean Step Mask      = {step_positions_updated_bool}\n')
 
     # For output_type = dictionary
     if output_type == 'dict':
-        return features_list, features, step_positions
+        return features_list, features, step_positions_actual, step_positions_updated
 
     # For output_type = data frame
     elif output_type == 'df':
@@ -335,19 +350,11 @@ def feature_extractor(sub, sensor_pos, sensor_type, window_type, window_size, ou
                 else:
                     columns[f'{axis}_{feature_name}'] = feature_value
 
-        if window_type == 'hopping':
-            columns['StepLabel'] = [1 for _ in range(len(step_positions['all']))]
-
-        else:
-            temp_list = []
-            assert step_positions['all'] == step_positions['Ax'], "all step_positions lists are not equal"
-            for i in range(len(data['StepLabel'][int(window_size/2):-int(window_size/2)])):
-                temp_list.append(1) if i in step_positions['all'] else temp_list.append(0)
-            columns['StepLabel'] = list(temp_list)
-
+        # Adding the StepLabel to the dataframe
+        columns['StepLabel'] = list(step_positions_updated_bool)
         column_names = list(columns.keys())
         df = pd.DataFrame(columns)
-        return column_names, df, step_positions
+        return column_names, df, step_positions_actual, step_positions_updated
 
     else:
         print("Invalid value for parameter 'output_type'! Please run the program again.")
