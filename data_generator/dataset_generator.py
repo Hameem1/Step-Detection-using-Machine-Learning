@@ -5,10 +5,10 @@ import os
 import re
 from time import time
 from shutil import copyfile
+from config import ageGroups, SENSOR
 from dataset.data_structs import Subject
-from data_generator.features import feature_extractor
 from multiprocessing import Pool, current_process
-from config import WINDOW_SIZE, WINDOW_TYPE, ageGroups
+from data_generator.features import feature_extractor
 from dataset.dataset_manipulator import ROOT, sensors, read_csv, generate_subjects_data, data_files_path
 
 # Configuration Variables
@@ -161,9 +161,7 @@ def create_dataset(subs_list, indexing=True):
             filePath = f'{new_sensor_paths[i]}\\' + sub.subject_id[:-4] + ".csv"
             if not os.path.exists(filePath):
                 # Most expensive line of code in the module (Takes hours)
-                col_names, df, _ = feature_extractor(sub, sensors[i].lower(), "acc",
-                                                     WINDOW_TYPE, WINDOW_SIZE, output_type='df')
-
+                col_names, df, _, _ = feature_extractor(sub, sensors[i].lower(), SENSOR, output_type='df')
                 df.to_csv(filePath, sep="\t", index=indexing)
                 print(f"File generated - '{sub.subject_id[:-4]}.csv' by process : {current_process().name}")
             else:
