@@ -1,4 +1,5 @@
-# IMPORTS
+
+# Imports
 import os
 import numpy as np
 import pandas as pd
@@ -79,3 +80,4 @@ print('Operation took:', f'{duration:.2f} seconds.' if duration < 60 else f'{dur
 # Todo: Make the steps to be a window of ones around the current 1 (super-sampling)
 # Todo: Normalize the data before feeding it to the model (Train+Test)
 # Todo: Adjust the parameters and test feature_selection_cv
+# Todo: Add SENSOR = 'acc', USED_CLASS_LABEL = 'valid' and STEP_SIZE = '20' to the global config.py file

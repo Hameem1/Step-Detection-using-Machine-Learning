@@ -1,7 +1,6 @@
-"""Do NOT import this module, Run this directly after adjusting the Configuration variables"""
+"""This module should not be imported, it is meant to be run directly after adjusting the Configuration variables"""
 
-# TODO: Perform feature ranking on the data (Pearson's method)
-
+# Imports
 import os
 import re
 from time import time
@@ -162,10 +161,10 @@ def create_dataset(subs_list, indexing=True):
             filePath = f'{new_sensor_paths[i]}\\' + sub.subject_id[:-4] + ".csv"
             if not os.path.exists(filePath):
                 # Most expensive line of code in the module (Takes hours)
-                features_list, features, _ = feature_extractor(sub, sensors[i].lower(), "acc",
-                                                               WINDOW_TYPE, WINDOW_SIZE, output_type='df')
+                col_names, df, _ = feature_extractor(sub, sensors[i].lower(), "acc",
+                                                     WINDOW_TYPE, WINDOW_SIZE, output_type='df')
 
-                features.to_csv(filePath, sep="\t", index=indexing)
+                df.to_csv(filePath, sep="\t", index=indexing)
                 print(f"File generated - '{sub.subject_id[:-4]}.csv' by process : {current_process().name}")
             else:
                 print(f'File "{sub.subject_id[:-4]}.csv" already exists!')
@@ -197,8 +196,12 @@ if __name__ == '__main__':
             for output in pool.map(create_dataset, s_list):
                 pass
 
-            print(f'\n\nTime taken for all {len(subs_list)} subjects = {time() - start:.2f} secs')
-            print(f'\nTime required per Subject = {(time() - start) / len(subs_list):.2f} secs')
+            duration = time() - start
+            print(f'\n\nTime taken for all {len(subs_list)} subjects = ',
+                  f'{duration:.2f} seconds.'if duration < 60 else f'{duration/60:.2f} minutes.')
+            per_sub = duration / len(subs_list)
+            print(f'\nTime required per Subject = ',
+                  f'{per_sub:.2f} seconds.' if per_sub < 60 else f'{per_sub/60:.2f} minutes.')
 
     else:
         print("\nERROR occurred while creating the new Dataset's directory structure!")
@@ -210,4 +213,6 @@ if __name__ == '__main__':
             start = time()
             # Sorting the dataset
             sort_dataset_by_age()
-            print(f'Dataset "{NEW_DATASET}" sorted by Age. Operation took {time() - start:.2f} secs.')
+            duration = time() - start
+            print(f'Dataset "{NEW_DATASET}" sorted by Age.\n',
+                  'Operation took:', f'{duration:.2f} seconds.' if duration < 60 else f'{duration/60:.2f} minutes.')

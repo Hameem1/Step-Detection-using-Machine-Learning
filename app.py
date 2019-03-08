@@ -24,15 +24,15 @@ DEVELOPER_MODE = True
 DATA_VISUALIZATION = True
 DATA_PLOT = False
 
-# Fixing the entire Data set
-if FIX:
-    # Renaming the data set files to fix the naming scheme
-    dm.dataset_rename()
-    # Verifying that every subject has a data set in each sub-directory (Center, Right, Left)
-    dm.dataset_analysis()
-
 
 if __name__ == '__main__':
+    # Fixing the entire Data set
+    if FIX:
+        # Renaming the data set files to fix the naming scheme
+        dm.dataset_rename()
+        # Verifying that every subject has a data set in each sub-directory (Center, Right, Left)
+        dm.dataset_analysis()
+
     # Demonstrating the use of the Subject class and data_plot function
 
     # Generating the subject list and subject data from the data set
@@ -87,16 +87,22 @@ else:
             # Generating the subject list (Global variable) for the data set
             subs_list, subs_data = dm.generate_subjects_data()
             # Generating a sample 'Subject' class object
-            sub = ds.Subject("Id000104.txt")
+            sub = ds.Subject(subs_list[0])
         else:
             print("Invalid input! Please run the program again.")
 
     elif res == 'n':
         # Generating the subject list (Global variable) for the data set
-        subs_list, subs_data = dm.generate_subjects_data()
+        subs_list, subs_data = dm.generate_subjects_data(gen_csv=False)
         # Generating a sample 'Subject' class object
-        sub = ds.Subject("Id319344.txt")
+        sub = ds.Subject(subs_list[0])
         print(f'\nThe "Subject" class object "sub" has been created for testing.\n')
+        sensor_pos = 'right'
+        sensor_type = 'acc'
+        data = sub.sensor_pos[sensor_pos].label['valid']
+        col_names, df, steps_dict = feature_extractor(sub, sensor_pos, sensor_type, WINDOW_TYPE,
+                                                      WINDOW_SIZE, output_type='df')
+        print(f'\n"col_names", "df" and "steps_dict" have been returned after a call to feature_extractor()\n')
 
     else:
         print("Invalid input! Please run the program again.")

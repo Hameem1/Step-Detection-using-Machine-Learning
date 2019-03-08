@@ -8,6 +8,8 @@ Currently the following features are being calculated:
 -> index(min), index(max), IQR , skewness, kurtosis, signal magnitude area, energy, entropy, mean abs deviation
 -> xy, xz, yz (Correlation between axes)
     
+Total = 19
+
 """
 
 # Imports
@@ -24,6 +26,10 @@ class Features:
     """
 
     def __init__(self, data, window_size, window_type, step_indices):
+        # -------
+        # WARNING
+        # -------
+        # When adding a new class member (which is not a new feature), add its exception to get_features_list()
 
         # The data to be used (Time domain)
         self.data = data
@@ -39,20 +45,19 @@ class Features:
         self.window_type = window_type
 
         self.step_indices = np.array(step_indices)
+
         # For a "sliding" window
         if self.window_type == 'sliding':
             self.step_positions = self.step_indices - int(self.window_size/2)
             # Eliminating step indices which don't have enough data around them for the window
             self.step_positions = [x for x in self.step_positions if x >= 0]
+
         # For a "hopping" window
         else:
-            # self.step_positions = list(range(len(self.step_indices)))
             self.step_positions = range(len([x for x in self.step_indices if x-(self.window_size/2) >= 0]))
 
-        # print(f'step-positions length = {len(self.step_positions)}')
         # All the calculated features
         if isinstance(data, pd.Series):
-            # print(f'Calculating Time domain features for {data.name}')
             self.mean = self.window(self.calc_mean)
             self.variance = self.window(self.calc_variance)
             self.standard_deviation = self.window(self.calc_std)
@@ -70,9 +75,8 @@ class Features:
             self.kurtosis = self.window(self.calc_kurtosis)
             self.mean_abs_deviation = self.window(self.calc_mean_abs_deviation)
 
-            # print(f'Calculating Frequency domain features for {data.name}')
             # TODO: try implementing fft_avg_band_power as well
-            # # self.fft_energy = self.window(self.calc_fft_energy)
+            # self.fft_energy = self.window(self.calc_fft_energy)
             # self.fft_magnitude = abs(self.data_freq)
             # self.fft_mean = self.window(self.calc_mean, domain='freq')
             # self.fft_value_max = self.window(self.calc_value_max, domain='freq')
@@ -80,18 +84,13 @@ class Features:
 
         else:
             # Cross correlations between variables
-            # print(f'Calculating correlation between {data.columns}')
             self.corr_xy = self.window(self.xy, 'Ax', 'Ay')
             self.corr_xz = self.window(self.xz, 'Ax', 'Az')
             self.corr_yz = self.window(self.yz, 'Ay', 'Az')
 
-        # print(f'# of Rows in self.data = {data.size}')
         # list of features
         self.features = []
-        # # length of a calculated feature
-        # self.feature_length = len(self.data)
-        # # Data loss due to windowing
-        # self.data_loss = (len(self.data)-self.feature_length)/len(self.data)*100
+        # Populating features
         self.get_features_list()
 
     # Basic Calculations
@@ -254,8 +253,6 @@ class Features:
             and f is not "data"
             and f is not "window_size"
             and f is not "window_type"
-            and f is not "feature_length"
-            and f is not "data_loss"
             and f is not "data_freq"
             and f is not "step_positions"
             and f is not "step_indices")
@@ -324,35 +321,29 @@ def feature_extractor(sub, sensor_pos, sensor_type, window_type, window_size, ou
         features[axis] = {x: getattr(f, x) for x in f.features}
         step_positions[axis] = f.step_positions
 
+    # For output_type = dictionary
     if output_type == 'dict':
         return features_list, features, step_positions
+
+    # For output_type = data frame
     elif output_type == 'df':
         columns = {}
         for axis, feature in features.items():
             for feature_name, feature_value in feature.items():
                 if axis == 'all':
-                    # print(f'{feature_name} = {feature_value}')
                     columns[feature_name] = feature_value
-                    # print(f'Feature Length = {len(feature_value)}')
                 else:
-                    # print(f'{axis}_{feature_name} = {feature_value}')
                     columns[f'{axis}_{feature_name}'] = feature_value
-                # print(f'Feature Length = {len(feature_value)}')
 
         if window_type == 'hopping':
             columns['StepLabel'] = [1 for _ in range(len(step_positions['all']))]
-            # print(f'STEP Length_H = {len(columns["StepLabel"])}')
 
         else:
             temp_list = []
             assert step_positions['all'] == step_positions['Ax'], "all step_positions lists are not equal"
             for i in range(len(data['StepLabel'][int(window_size/2):-int(window_size/2)])):
-                if i in step_positions['all']:
-                    temp_list.append(1)
-                else:
-                    temp_list.append(0)
+                temp_list.append(1) if i in step_positions['all'] else temp_list.append(0)
             columns['StepLabel'] = list(temp_list)
-            # print(f'STEP Length_S = {len(columns["StepLabel"])}')
 
         column_names = list(columns.keys())
         df = pd.DataFrame(columns)
