@@ -9,14 +9,13 @@ from dataset.data_structs import Subject
 from multiprocessing import Pool, current_process
 from data_generator.features import feature_extractor
 from dataset.dataset_manipulator import read_csv, generate_subjects_data
-from config import ageGroups, DATASET_FOLDER, DATASET_ROOT, new_sensor_paths,\
-                   age_dirs, sensor_dirs, data_files_path, sensors
+from config import ageGroups, DATASET_FOLDER, DATASET_ROOT, age_dirs, sensor_dirs, data_files_path, sensors
 
 # Configuration Variables
 # ------------------------
 GENERATE_DATASET = True
 SORT_BY_AGE = False
-TESTING = False
+TESTING = True
 TEST_COUNT = 4  # Should be >= 4
 # ------------------------
 
@@ -24,6 +23,8 @@ if not TESTING:
     DATASET_FOLDER = DATASET_FOLDER
 else:
     DATASET_FOLDER = DATASET_FOLDER + "_TEST"
+
+new_sensor_paths = [f"{DATASET_ROOT}\\{DATASET_FOLDER}\\{sensor}" for sensor in sensors]
 
 if not os.path.exists(DATASET_ROOT):
     print(f'\nWARNING: The path does not exist. Creating new directory...\n{DATASET_ROOT}\n')

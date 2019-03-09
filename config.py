@@ -31,7 +31,7 @@ ROOT = str(Path(__file__).parent)
 # Raw Dataset directory name
 FOLDER_NAME = "OU-InertGaitAction_wStepAnnotation"
 # Feature Dataset directory name
-DATASET_FOLDER = "Step_Detection_Dataset (w=40, sliding)"
+DATASET_FOLDER = "Step_Detection_Dataset (w=40, s=20, sliding)"
 # Sensor paths in original dataset
 sensors = ["Center", "Left", "Right"]
 sensor_paths = [f"{ROOT}\\{FOLDER_NAME}\\{sensor}" for sensor in sensors]
