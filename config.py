@@ -49,3 +49,7 @@ sensor_dirs = {"Age_" + dirName: [f'{DATASET_ROOT}\\{DATASET_FOLDER}_Age_Sorted\
                for dirName in ageGroups}
 # loading in the actual dataset for one sensor (Data under test)
 DATA_PATH = f"{ROOT}\\Features_Dataset\\ds_right.csv"
+# Directory name for new data set which contains the training/testing data for the classifier
+NEW_DATASET = "Features_Dataset"
+# Directory path for new data set which contains the training/testing data for the classifier
+NEW_DATASET_PATH = f'{ROOT}\\{NEW_DATASET}'
