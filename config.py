@@ -26,16 +26,26 @@ FORCE = False
 STORAGE = "List"
 
 # Paths and directories
+# Root path (project directory)
+ROOT = str(Path(__file__).parent)
 # Raw Dataset directory name
 FOLDER_NAME = "OU-InertGaitAction_wStepAnnotation"
 # Feature Dataset directory name
 DATASET_FOLDER = "Step_Detection_Dataset (w=40, sliding)"
-# Root path (project directory)
-ROOT = str(Path(__file__).parent)
-# DATASETS directory path (Generated data sets)
-DATASET_ROOT = f"{ROOT}\\..\\DATASETS"
-# Data-files directory path
-data_files_path = ROOT+'\\data-files'
-# Sensor paths
+# Sensor paths in original dataset
 sensors = ["Center", "Left", "Right"]
 sensor_paths = [f"{ROOT}\\{FOLDER_NAME}\\{sensor}" for sensor in sensors]
+# DATASETS directory path (Generated data sets)
+DATASET_ROOT = f"{ROOT}\\..\\DATASETS"
+# Paths to sensor directories in the NEW Dataset
+new_sensor_paths = [f"{DATASET_ROOT}\\{DATASET_FOLDER}\\{sensor}" for sensor in sensors]
+# Data-files directory path
+data_files_path = ROOT + '\\data-files'
+# Age sorted dataset directories
+age_dirs = {"Age_" + dirName: f'{DATASET_ROOT}\\{DATASET_FOLDER}_Age_Sorted\\Age_{dirName}' for dirName in ageGroups}
+# Paths to C, L and R in the age folders
+sensor_dirs = {"Age_" + dirName: [f'{DATASET_ROOT}\\{DATASET_FOLDER}_Age_Sorted\\Age_{dirName}\\{sensor}'
+                                  for sensor in sensors]
+               for dirName in ageGroups}
+# loading in the actual dataset for one sensor (Data under test)
+DATA_PATH = f"{ROOT}\\Features_Dataset\\ds_right.csv"
