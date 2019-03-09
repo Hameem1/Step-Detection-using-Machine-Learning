@@ -15,7 +15,7 @@ from config import ageGroups, DATASET_FOLDER, DATASET_ROOT, age_dirs, sensor_dir
 # ------------------------
 GENERATE_DATASET = True
 SORT_BY_AGE = False
-TESTING = True
+TESTING = False
 TEST_COUNT = 4  # Should be >= 4
 # ------------------------
 
@@ -145,21 +145,52 @@ def create_dataset(subs_list, indexing=True):
     :param subs_list: list of subjects to create the new dataset for
     :param indexing: dataset index column (default:True)
     """
+    S = None
+    print(f'\nProcess - {current_process().name} has {len(subs_list)} files to work on.\n')
 
-    start = time()
-    repo = (Subject(sub) for sub in subs_list)
-    for sub in repo:
+    try:
+        start = time()
+        repo = (Subject(sub) for sub in subs_list)
+        for sub in repo:
+            S = sub
+            for i in range(3):
+                filePath = f'{new_sensor_paths[i]}\\' + sub.subject_id[:-4] + ".csv"
+                if not os.path.exists(filePath):
+                    # Most expensive line of code in the module (Takes hours)
+                    col_names, df, _, _, _ = feature_extractor(sub, sensors[i].lower(), output_type='df')
+                    df.to_csv(filePath, sep="\t", index=indexing)
+                    print(f"File generated - '{sub.subject_id[:-4]}.csv' by process : {current_process().name}")
+                else:
+                    print(f'File "{sub.subject_id[:-4]}.csv" already exists!')
+
+        print(f'\nTime taken by - {current_process().name} : {time() - start:.2f} secs')
+    except Exception as e:
+        print(f"Exception occurred in {current_process().name}\n")
+        print(f'While working on this portion of the subs_list:\n'
+              f'{subs_list}')
+        print(f'Error occurred in FILE # {S.subject_id}\n')
+        raise e
+
+
+def file_exists(subs_list):
+    updated_subs = []
+    print(f'Checking for existing files in directories:\n')
+    for dir in new_sensor_paths:
+        print(f'{dir}')
+        updated_subs += subs_list
+    print()
+
+    for sub in subs_list:
         for i in range(3):
-            filePath = f'{new_sensor_paths[i]}\\' + sub.subject_id[:-4] + ".csv"
+            filePath = f'{new_sensor_paths[i]}\\' + sub[:-4] + ".csv"
             if not os.path.exists(filePath):
-                # Most expensive line of code in the module (Takes hours)
-                col_names, df, _, _, _ = feature_extractor(sub, sensors[i].lower(), output_type='df')
-                df.to_csv(filePath, sep="\t", index=indexing)
-                print(f"File generated - '{sub.subject_id[:-4]}.csv' by process : {current_process().name}")
+                pass
             else:
-                print(f'File "{sub.subject_id[:-4]}.csv" already exists!')
-
-    print(f'\nTime taken by - {current_process().name} : {time() - start:.2f} secs')
+                updated_subs.pop(updated_subs.index(sub))
+    updated_subs = list(sorted(set(updated_subs)))
+    print(f'There were {len(subs_list) - len(updated_subs)} existing files!\n')
+    print(f'The updated subjects list now contains {len(updated_subs)} entries.\n')
+    return updated_subs
 
 
 if __name__ == '__main__':
@@ -169,6 +200,7 @@ if __name__ == '__main__':
     if create_dataset_folder_structure():
         if GENERATE_DATASET:
             subs_list, subs_data = generate_subjects_data(gen_csv=False)
+            subs_list = list(file_exists(subs_list))
             if TESTING:
                 subs_list = subs_list[0:TEST_COUNT]
             # Dividing up the subject list for each available process
