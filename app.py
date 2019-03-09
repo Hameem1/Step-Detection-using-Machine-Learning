@@ -42,6 +42,7 @@ if __name__ == '__main__':
     # Choosing a subject to get features and visualizations for
     sub = ds.Subject(subs_list[TEST_SUBJECT_ID])
     # Generating & Printing the features
+    print(f'Generating features for file - {sub.subject_id}\n')
     features_list, features, step_positions_actual, step_positions_updated, step_positions_updated_bool = \
         feature_extractor(sub, "right")
 
