@@ -17,7 +17,7 @@ from graphing.feature_plot import feature_plot as fp
 from data_generator.features import feature_extractor
 from data_generator.age_comparison import gen_age_histogram
 from dataset import data_structs as ds, dataset_manipulator as dm
-from config import WINDOW_SIZE, WINDOW_TYPE, USED_CLASS_LABEL, SENSOR
+from config import USED_CLASS_LABEL, SENSOR
 
 # Configuration variables
 # True if the Data set needs to be fixed, otherwise False
@@ -26,7 +26,6 @@ DATA_PLOT = False
 DEVELOPER_MODE = True
 DATA_VISUALIZATION = True
 TEST_SUBJECT_ID = 1
-
 
 if __name__ == '__main__':
     # Fixing the entire Data set
@@ -68,6 +67,8 @@ if __name__ == '__main__':
 else:
     print(f"\nModule imported : {__name__}\n")
     import pandas as pd
+    from config import WINDOW_SIZE, WINDOW_TYPE
+
     res = str(input(f"Would you like to FIX the data set? (y/n)")).lower()
     if res == 'y':
         if DEVELOPER_MODE:
@@ -122,4 +123,3 @@ else:
 
     else:
         print("Invalid input! Please run the program again.")
-
