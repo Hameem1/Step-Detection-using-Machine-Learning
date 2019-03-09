@@ -282,7 +282,8 @@ def update_step_positions(data):
         # Shifting the step indices
         step_positions_updated = np.array(step_positions_actual) - int(WINDOW_SIZE / 2)
         # Eliminating step indices which don't have enough data around them for the window
-        step_positions_updated = [x for x in step_positions_updated if (x >= 0) and (x < (len(data) - WINDOW_SIZE))]
+        step_positions_updated = [x for x in step_positions_updated if (x >= 0) and
+                                  (x < (len(data['StepLabel'][int(WINDOW_SIZE/2):-int(WINDOW_SIZE/2)]) - STEP_SIZE))]
         # Creating a boolean step list with 1s representing the step size (step duration)
         step_positions_updated_bool = [False] * len(data['StepLabel'][int(WINDOW_SIZE / 2):-int(WINDOW_SIZE / 2)])
         for x in range(len(step_positions_updated_bool)):
