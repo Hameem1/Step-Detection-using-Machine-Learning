@@ -2,7 +2,7 @@
 
 import pandas as pd
 from dataset.dataset_manipulator import get_subjects_list, sensor_paths
-from config import FILE_STATUS_MESSAGES, STORAGE
+from config import FILE_STATUS_MESSAGES, STORAGE, Fs
 
 # Every label in "labels" contains data which belongs to it's 'ClassLabel'
 # and is not null valued (all zeros)
@@ -29,7 +29,7 @@ class Dataset:
 
     def __init__(self, path):
 
-        self.fs = 100
+        self.fs = Fs
 
         try:
             # Reading in a Single Dataset file
@@ -130,7 +130,6 @@ def get_subjects_repo(subs_list, storage='list'):
 
 
 if __name__ == "__main__":
-
     # This example code shows how to interact with the classes
 
     # Getting the subject list and repo

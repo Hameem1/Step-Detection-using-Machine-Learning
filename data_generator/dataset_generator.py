@@ -5,15 +5,15 @@ import os
 import re
 from time import time
 from shutil import copyfile
-from config import ageGroups
 from dataset.data_structs import Subject
 from multiprocessing import Pool, current_process
 from data_generator.features import feature_extractor
-from dataset.dataset_manipulator import ROOT, sensors, read_csv, generate_subjects_data, data_files_path
+from dataset.dataset_manipulator import read_csv, generate_subjects_data
+from config import ageGroups, DATASET_FOLDER, DATASET_ROOT, new_sensor_paths,\
+                   age_dirs, sensor_dirs, data_files_path, sensors
 
 # Configuration Variables
 # ------------------------
-NEW_DATASET = "Step_Detection_Dataset (w=40, sliding)"
 GENERATE_DATASET = True
 SORT_BY_AGE = False
 TESTING = False
@@ -21,28 +21,19 @@ TEST_COUNT = 4  # Should be >= 4
 # ------------------------
 
 if not TESTING:
-    NEW_DATASET = NEW_DATASET
+    DATASET_FOLDER = DATASET_FOLDER
 else:
-    NEW_DATASET = NEW_DATASET + "_TEST"
+    DATASET_FOLDER = DATASET_FOLDER + "_TEST"
 
-datasets_dir = f"{ROOT}\\..\\DATASETS"
-if not os.path.exists(datasets_dir):
-    print(f'\nWARNING: The path does not exist. Creating new directory...\n{datasets_dir}\n')
-    os.mkdir(datasets_dir)
-
-# Paths to C, L and R in the NEW Dataset
-new_sensor_paths = [f"{datasets_dir}\\{NEW_DATASET}\\{sensor}" for sensor in sensors]
-age_dirs = {"Age_" + dirName: f'{datasets_dir}\\{NEW_DATASET}_Age_Sorted\\Age_{dirName}' for dirName in ageGroups}
-# Paths to C, L and R in the age folders
-sensor_dirs = {"Age_" + dirName
-               : [f'{datasets_dir}\\{NEW_DATASET}_Age_Sorted\\Age_{dirName}\\{sensor}' for sensor in sensors]
-               for dirName in ageGroups}
+if not os.path.exists(DATASET_ROOT):
+    print(f'\nWARNING: The path does not exist. Creating new directory...\n{DATASET_ROOT}\n')
+    os.mkdir(DATASET_ROOT)
 
 
 def create_dataset_folder_structure():
     """Creates the folder structure for the new dataset"""
 
-    path = f'{datasets_dir}\\{NEW_DATASET}'
+    path = f'{DATASET_ROOT}\\{DATASET_FOLDER}'
     if not os.path.exists(path):
         print(f'\nWARNING: The path does not exist. Creating new directory...\n{path}\n')
         os.mkdir(path)
@@ -64,7 +55,7 @@ def create_age_folder_structure():
     """Creates the folder structure for the Age Sorted Dataset"""
 
     try:
-        new_dataset_path = f'{datasets_dir}\\{NEW_DATASET}_Age_Sorted'
+        new_dataset_path = f'{DATASET_ROOT}\\{DATASET_FOLDER}_Age_Sorted'
         if not os.path.exists(new_dataset_path):
             print(f'\nWARNING: The path does not exist. Creating new directory...\n{new_dataset_path}\n')
             os.mkdir(new_dataset_path)
@@ -212,5 +203,5 @@ if __name__ == '__main__':
             # Sorting the dataset
             sort_dataset_by_age()
             duration = time() - start
-            print(f'Dataset "{NEW_DATASET}" sorted by Age.\n',
+            print(f'Dataset "{DATASET_FOLDER}" sorted by Age.\n',
                   'Operation took:', f'{duration:.2f} seconds.' if duration < 60 else f'{duration/60:.2f} minutes.')

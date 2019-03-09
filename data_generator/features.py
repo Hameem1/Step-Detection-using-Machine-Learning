@@ -1,5 +1,13 @@
 """This module calculates the features from the base data using a moving window and stores them"""
 
+# Imports
+import numpy as np
+import pandas as pd
+import statistics as stat
+from scipy.fftpack import fft
+from scipy.stats import kurtosis, skew, entropy, pearsonr
+from config import WINDOW_SIZE, WINDOW_TYPE, USED_CLASS_LABEL, STEP_SIZE, SENSOR
+
 """
 Currently the following features are being calculated:
 
@@ -11,14 +19,6 @@ Currently the following features are being calculated:
 Total = 19
 
 """
-
-# Imports
-import numpy as np
-import pandas as pd
-import statistics as stat
-from scipy.fftpack import fft
-from scipy.stats import kurtosis, skew, entropy, pearsonr
-from config import WINDOW_SIZE, WINDOW_TYPE, USED_CLASS_LABEL, STEP_SIZE, SENSOR
 
 
 class Features:
@@ -331,10 +331,6 @@ def feature_extractor(sub, sensor_pos, sensor_type=SENSOR, output_type='dict'):
             f = Features(data[base_data[0:3]], step_positions_actual)
         features_list[axis] = f.features
         features[axis] = {x: getattr(f, x) for x in f.features}
-
-    # print(f'ACTUAL STEP POSITIONS  = {step_positions_actual}\n')
-    # print(f'UPDATED STEP POSITIONS = {step_positions_updated}\n')
-    print(f'Boolean Step Mask      = {step_positions_updated_bool}\n')
 
     # For output_type = dictionary
     if output_type == 'dict':

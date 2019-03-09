@@ -3,24 +3,10 @@
 import os
 import re
 import pandas as pd
-from pathlib import Path
+from config import FORCE, FILE_STATUS_MESSAGES, FOLDER_NAME, ROOT, data_files_path, sensor_paths, sensors
 
-# Configuration variables
-# Allows forcing user input to 'y'
-FORCE = False
-# set to "True" for verbose status messages
-FILE_STATUS_MESSAGES = False
-# folder which contains the entire Data set
-FOLDER_NAME = "OU-InertGaitAction_wStepAnnotation"
 # contains the subject list for the data set (available after dataset_analysis() or get_subjects_list())
 SUBJECTS_LIST = []
-
-ROOT = str(Path(__file__).parent.parent)
-data_files_path = ROOT+'\\data-files'
-sensor_paths = []
-sensors = ["Center", "Left", "Right"]
-for sensor in sensors:
-    sensor_paths.append(f"{ROOT}\\{FOLDER_NAME}\\{sensor}")
 
 
 def dataset_rename():

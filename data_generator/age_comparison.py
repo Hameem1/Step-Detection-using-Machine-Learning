@@ -6,8 +6,8 @@ import pandas as pd
 from statistics import mean
 import plotly.offline as pyo
 import plotly.graph_objs as go
-from data_generator.dataset_generator import ROOT, NEW_DATASET, datasets_dir, get_limits, read_csv, data_files_path
-from config import ageGroups
+from data_generator.dataset_generator import get_limits, read_csv
+from config import ageGroups, ROOT, DATASET_FOLDER, DATASET_ROOT, data_files_path
 
 
 FEATURES_USED = ['mean']
@@ -42,7 +42,7 @@ def get_feature_stats(samples, sensor_pos='right'):
                                 dict(raw_data)
     """
 
-    path = f'{datasets_dir}\\{NEW_DATASET}\\{sensor_pos.capitalize()}'
+    path = f'{DATASET_ROOT}\\{DATASET_FOLDER}\\{sensor_pos.capitalize()}'
     groups = {}
     raw_groups = {}
 
