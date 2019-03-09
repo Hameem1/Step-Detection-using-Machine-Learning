@@ -3,7 +3,8 @@
 import os
 import re
 import pandas as pd
-from config import FORCE, FILE_STATUS_MESSAGES, FOLDER_NAME, ROOT, data_files_path, sensor_paths, sensors
+from config import FORCE, FILE_STATUS_MESSAGES, FOLDER_NAME, ROOT, data_files_path,\
+    sensor_paths, sensors, new_sensor_paths, NEW_DATASET_PATH
 
 # contains the subject list for the data set (available after dataset_analysis() or get_subjects_list())
 SUBJECTS_LIST = []
@@ -402,31 +403,26 @@ def dataframe_concatenator(single_file=False):
     :param single_file: Merges the three files into a single data file if 'True'
     """
 
-    DATASET_FOLDER = "Step_Detection_Dataset (w=40, sliding)"
-    DATASET_ROOT = f"{ROOT}\\..\\DATASETS"
-    sensor_paths = [f"{DATASET_ROOT}\\{DATASET_FOLDER}\\{sensor}" for sensor in sensors]
-    NEW_DATASET = "Features_Dataset"
-    NEW_DATASET_PATH = f'{ROOT}\\{NEW_DATASET}'
     datasets = []
 
     if not os.path.exists(NEW_DATASET_PATH):
         print(f'\nWARNING: The path does not exist. Creating new directory...\n{NEW_DATASET_PATH}\n')
         os.mkdir(f"{NEW_DATASET_PATH}")
 
-    for path in sensor_paths:
+    for path in new_sensor_paths:
         dfs = []
         print(f'Folder => {path}\n')
         for file_name in os.listdir(path):
-            # print(f'File name = {path}\{file_name}')
             df = pd.read_csv(f'{path}\\{file_name}', sep='\t', index_col=0)
             dfs.append(df)
         datasets.append(pd.concat(dfs, ignore_index=True))
 
     print()
-    print(f'Length of ds_center = {len(datasets[0])}')
-    print(f'Length of ds_left = {len(datasets[1])}')
-    print(f'Length of ds_right = {len(datasets[2])}')
-
+    print(f'Length of ds_center = {len(datasets[0])} rows')
+    print(f'Length of ds_left = {len(datasets[1])} rows')
+    print(f'Length of ds_right = {len(datasets[2])} rows')
+    print()
+    print(f'Generating 3 separate .csv files...\n') if not single_file else print(f'Generating 1 main .csv file...\n')
     if not single_file:
         datasets[0].to_csv(f'{NEW_DATASET_PATH}\\ds_center.csv', sep="\t", index=True, float_format='%g')
         datasets[1].to_csv(f'{NEW_DATASET_PATH}\\ds_left.csv', sep="\t", index=True, float_format='%g')
