@@ -1,22 +1,25 @@
-# IMPORTS
+"""
+This module implements Model Based Feature Selection using Random Forest classifiers.
+Multiple random forests are independently trained and perform voting based feature selection.
+After feature selection, a model is trained with the best features and tested with test data.
+
+"""
+
+# Imports
 import os
 import operator
 import numpy as np
 import pandas as pd
 from time import time
+from config import new_sensor_paths, DATA_PATH
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-from dataset.dataset_manipulator import ROOT, sensors
 from sklearn.feature_selection import chi2, SelectKBest, RFE
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, f1_score, recall_score
 
 # Globals
-# Directory paths
-DATASET_FOLDER = "Step_Detection_Dataset (w=40, sliding)"
-DATASET_ROOT = f"{ROOT}\\..\\DATASETS"
-sensor_paths = [f"{DATASET_ROOT}\\{DATASET_FOLDER}\\{sensor}" for sensor in sensors]
 # list of all feature labels + StepLabel
-cols = pd.read_csv(f'{sensor_paths[0]}\\{os.listdir(sensor_paths[0])[0]}', sep='\t', index_col=0).columns
+cols = pd.read_csv(f'{new_sensor_paths[0]}\\{os.listdir(new_sensor_paths[0])[0]}', sep='\t', index_col=0).columns
 # Setting numpy print precision
 np.set_printoptions(precision=5)
 # no. of best features to select
@@ -33,7 +36,6 @@ row_count = 50000
 # starting timer
 start = time()
 # loading in the actual dataset for one sensor
-DATA_PATH = f"{ROOT}\\Features_Dataset\\ds_right.csv"
 print(DATA_PATH)
 DATA = pd.read_csv(DATA_PATH, sep='\t', index_col=0)
 # Loading the relevant data

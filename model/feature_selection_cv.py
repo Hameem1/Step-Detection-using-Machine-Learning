@@ -1,3 +1,11 @@
+"""
+This module implements Model Based Feature Selection (with cross-validated selection of best # of features).
+The model used is a Random Forest classifier.
+The model is trained during the feature selection phase and is tested at the end on test data from the best features.
+
+"""
+# Todo: Normalize the data before feeding it to the model (Train+Test)
+# Todo: Adjust the parameters and test feature_selection_cv
 
 # Imports
 import os
@@ -5,20 +13,15 @@ import numpy as np
 import pandas as pd
 from time import time
 import matplotlib.pyplot as plt
+from config import new_sensor_paths, DATA_PATH
 from sklearn.ensemble import RandomForestClassifier
-from dataset.dataset_manipulator import ROOT, sensors
 from sklearn.feature_selection import chi2, SelectKBest, RFECV
 from sklearn.model_selection import train_test_split, StratifiedKFold
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, f1_score, recall_score
 
-
 # Globals
-# Directory paths
-DATASET_FOLDER = "Step_Detection_Dataset (w=40, sliding)"
-DATASET_ROOT = f"{ROOT}\\..\\DATASETS"
-sensor_paths = [f"{DATASET_ROOT}\\{DATASET_FOLDER}\\{sensor}" for sensor in sensors]
 # list of all feature labels + StepLabel
-cols = pd.read_csv(f'{sensor_paths[0]}\\{os.listdir(sensor_paths[0])[0]}', sep='\t', index_col=0).columns
+cols = pd.read_csv(f'{new_sensor_paths[0]}\\{os.listdir(new_sensor_paths[0])[0]}', sep='\t', index_col=0).columns
 # Setting numpy print precision
 np.set_printoptions(precision=5)
 # Voting Box
@@ -31,7 +34,6 @@ row_count = 50000
 # starting timer
 start = time()
 # loading in the actual dataset for one sensor
-DATA_PATH = f"{ROOT}\\Features_Dataset\\ds_right.csv"
 print(DATA_PATH)
 DATA = pd.read_csv(DATA_PATH, sep='\t', index_col=0)
 # Loading the relevant data
@@ -77,5 +79,3 @@ print(f'Score of the classifier on test data:\n'
 duration = time() - start
 print('Operation took:', f'{duration:.2f} seconds.' if duration < 60 else f'{duration/60:.2f} minutes.')
 
-# Todo: Normalize the data before feeding it to the model (Train+Test)
-# Todo: Adjust the parameters and test feature_selection_cv
