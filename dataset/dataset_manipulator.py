@@ -6,9 +6,6 @@ import pandas as pd
 from config import FORCE, FILE_STATUS_MESSAGES, FOLDER_NAME, ROOT, data_files_path,\
     sensor_paths, sensors, new_sensor_paths, NEW_DATASET_PATH
 
-# contains the subject list for the data set (available after dataset_analysis() or get_subjects_list())
-SUBJECTS_LIST = []
-
 
 def dataset_rename():
     """
@@ -193,7 +190,7 @@ def dataset_analysis():
 
 def get_subjects_list():
     """
-    Returns the subjects list for the Data set. (Includes functionality of dataset_rename())
+    Returns the subjects list for the Data set. (Includes functionality of dataset_analysis())
 
     WARNING :
     Use generate_subjects_data() instead!
@@ -204,7 +201,6 @@ def get_subjects_list():
     :return SUBJECTS_LIST: or None on failure
     """
 
-    global SUBJECTS_LIST
     temp_list = []
 
     def is_normalized():
@@ -257,16 +253,17 @@ def get_subjects_list():
 def generate_subjects_data(gen_csv=None, indexing=True):
     """
     Generates a subjects list and subjects data along with an optional
-    .csv file in the current working directory.
+    .csv file in the current working directory. Also verifies with the IDGenderAgeList.csv file.
+    This function should be used instead of get_subjects_list() when running the first time!
 
     :param gen_csv: generates a .csv file from the data as well (Optional)
     :param indexing: implements an indexing column for the .csv file on True (Optional)
     :returns subject_list, subject_data: List, DataFrame
     """
 
-    subject_list = get_subjects_list()
+    SUBJECTS_LIST = get_subjects_list()
 
-    total = len(subject_list)
+    total = len(SUBJECTS_LIST)
     found = 0
     sub_id = []
     gender = []
@@ -274,10 +271,10 @@ def generate_subjects_data(gen_csv=None, indexing=True):
     filename = []
     files_not_found = []
 
-    with open(f"{ROOT}\\data-files\\IDGenderAgelist.csv", 'r') as myfile:
+    with open(f"{data_files_path}\\IDGenderAgelist.csv", 'r') as myfile:
         lines = myfile.readlines()
 
-    for subject in subject_list:
+    for subject in SUBJECTS_LIST:
         pattern = re.compile((re.escape(subject[2:8])) + r',([01]),(\d{1,2})')
         line_num = -1
         is_found = False
@@ -327,7 +324,7 @@ def generate_subjects_data(gen_csv=None, indexing=True):
                         del_count += 1
 
             print(f'\nTotal files deleted from all folders = {del_count}\n')
-            print(f'Removing the deleted entries from the global SUBJECTS_LIST')
+            print(f'Removing the deleted entries from the SUBJECTS_LIST')
             try:
                 for file_na in files_not_found:
                     i = SUBJECTS_LIST.index(file_na)
@@ -382,8 +379,10 @@ def read_csv(filename):
     """
     Reads a .csv file in the current working directory and returns it as a DataFrame.
 
-    :param filename:    path or file name (without extension)
-    :return DataFrame:  pandas data frame
+    :param
+    filename (string):  path or file name (without extension)
+    :returns
+    DataFrame:  pandas data frame
     """
 
     try:
@@ -425,11 +424,16 @@ def dataframe_concatenator(single_file=False):
     print(f'Generating 3 separate .csv files...\n') if not single_file else print(f'Generating 1 main .csv file...\n')
     if not single_file:
         datasets[0].to_csv(f'{NEW_DATASET_PATH}\\ds_center.csv', sep="\t", index=True, float_format='%g')
+        print(f'File generated : "ds_center.csv"')
         datasets[1].to_csv(f'{NEW_DATASET_PATH}\\ds_left.csv', sep="\t", index=True, float_format='%g')
+        print(f'File generated : "ds_left.csv"')
         datasets[2].to_csv(f'{NEW_DATASET_PATH}\\ds_right.csv', sep="\t", index=True, float_format='%g')
+        print(f'File generated : "ds_right.csv"')
     else:
         data_file = pd.concat(datasets, ignore_index=True)
         data_file.to_csv(f'{NEW_DATASET_PATH}\\ds_all.csv', sep="\t", index=True, float_format='%g')
+        print(f'File generated : "ds_all.csv"')
+    print(f'\nProcess complete!\n')
 
 
 def end_tab_remover(subs_list):
