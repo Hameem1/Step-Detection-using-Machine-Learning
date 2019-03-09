@@ -2,12 +2,7 @@
 
 import pandas as pd
 from dataset.dataset_manipulator import get_subjects_list, sensor_paths
-
-# Configuration variables
-# set to "True" for verbose status messages
-FILE_STATUS_MESSAGES = False
-# storage selector for SUBJECTS_REPO (Dict/List)
-STORAGE = "List"
+from config import FILE_STATUS_MESSAGES, STORAGE
 
 # Every label in "labels" contains data which belongs to it's 'ClassLabel'
 # and is not null valued (all zeros)

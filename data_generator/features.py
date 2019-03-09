@@ -18,7 +18,7 @@ import pandas as pd
 import statistics as stat
 from scipy.fftpack import fft
 from scipy.stats import kurtosis, skew, entropy, pearsonr
-from config import WINDOW_SIZE, WINDOW_TYPE, USED_CLASS_LABEL, STEP_SIZE
+from config import WINDOW_SIZE, WINDOW_TYPE, USED_CLASS_LABEL, STEP_SIZE, SENSOR
 
 
 class Features:
@@ -302,7 +302,7 @@ def update_step_positions(data):
 
 
 # This is the exposed endpoint for usage via import
-def feature_extractor(sub, sensor_pos, sensor_type, output_type='dict'):
+def feature_extractor(sub, sensor_pos, sensor_type=SENSOR, output_type='dict'):
     """This function returns the features dictionary for the requested data
 
         :param sub: A Subject class object

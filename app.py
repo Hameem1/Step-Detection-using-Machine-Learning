@@ -17,7 +17,7 @@ from graphing.feature_plot import feature_plot as fp
 from data_generator.features import feature_extractor
 from data_generator.age_comparison import gen_age_histogram
 from dataset import data_structs as ds, dataset_manipulator as dm
-from config import USED_CLASS_LABEL, SENSOR
+from config import USED_CLASS_LABEL
 
 # Configuration variables
 # True if the Data set needs to be fixed, otherwise False
@@ -43,7 +43,7 @@ if __name__ == '__main__':
     sub = ds.Subject(subs_list[TEST_SUBJECT_ID])
     # Generating & Printing the features
     features_list, features, step_positions_actual, step_positions_updated, step_positions_updated_bool = \
-        feature_extractor(sub, "right", SENSOR)
+        feature_extractor(sub, "right")
 
     # from data_generator.features import print_features
     # print_features(features)
@@ -104,13 +104,12 @@ else:
         sub = ds.Subject(subs_list[TEST_SUBJECT_ID])
         print(f'\nThe "Subject" class object "sub" has been created for testing.\n')
         sensor_pos = 'right'
-        sensor_type = SENSOR
         data = sub.sensor_pos[sensor_pos].label[USED_CLASS_LABEL]
 
         res = str(input(f"Which output type for feature_extractor()? (df/dict)")).lower()
         if res == 'df':
             col_names, df, step_positions_actual, step_positions_updated, step_positions_updated_bool \
-                = feature_extractor(sub, sensor_pos, sensor_type, output_type='df')
+                = feature_extractor(sub, sensor_pos, output_type='df')
             print(f'\n"col_names", "df", "step_positions_actual", "step_positions_updated" and '
                   f'"step_positions_updated_bool" have been returned after a call to feature_extractor()\n')
             print(f'\nRatio of no_step(0)/step(1) for subject - {sub.subject_id[-4]} = '
@@ -118,7 +117,7 @@ else:
 
         elif res == 'dict':
             features_list, features, step_positions_actual, step_positions_updated, step_positions_updated_bool = \
-                feature_extractor(sub, "right", SENSOR)
+                feature_extractor(sub, "right")
             print(f'\n"features_list", "features", "step_positions_actual", "step_positions_updated" and '
                   f'"step_positions_updated_bool" have been returned after a call to feature_extractor()\n')
         else:
