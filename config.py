@@ -103,9 +103,15 @@ age_dirs = {"Age_" + dirName: f'{DATASET_ROOT}\\{DATASET_FOLDER}_Age_Sorted\\Age
 sensor_dirs = {"Age_" + dirName: [f'{DATASET_ROOT}\\{DATASET_FOLDER}_Age_Sorted\\Age_{dirName}\\{sensor}'
                                   for sensor in sensors]
                for dirName in ageGroups}
-# loading in the actual dataset for one sensor (Data under test)
-DATA_PATH = f"{ROOT}\\Features_Dataset\\ds_right.csv"
+# loading in the actual dataset for the ML classifier
+DATA_PATH = f"{ROOT}\\Features_Dataset\\ds_all.csv"
 # Directory name for new data set which contains the training/testing data for the classifier
 NEW_DATASET = "Features_Dataset"
 # Directory path for new data set which contains the training/testing data for the classifier
 NEW_DATASET_PATH = f'{ROOT}\\{NEW_DATASET}'
+# Trained Model directory name
+TRAINED_MODEL_DIR = 'Trained_Model'
+# Trained Model directory path
+TRAINED_MODEL_PATH = f'{ROOT}\\{TRAINED_MODEL_DIR}'
+# Trained Model Name
+TRAINED_MODEL_NAME = 'step_detection_model.pkl'
