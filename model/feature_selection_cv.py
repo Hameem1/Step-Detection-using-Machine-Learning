@@ -4,8 +4,15 @@ The model used is a Random Forest classifier.
 The model is trained during the feature selection phase and is tested at the end on test data from the best features.
 
 """
-# Todo: Normalize the data before feeding it to the model (Train+Test)
-# Todo: Adjust the parameters and test feature_selection_cv
+
+# Todo: Generate a csv file containing the feature ranking
+# Todo: Combine the feature selection functionality of both models and rename feature_selection.py to model.py
+# Todo: Use model.py for training the model with selected features (all for max performance)
+# Todo: Generate the # of features vs score plot using plotly
+# Todo: Use scikit-learn for normalization
+# Todo: Test with disjoint datasets (e.g. train with ds_right and test on ds_left)
+# Todo: Organize results
+
 
 # Imports
 import os
@@ -33,8 +40,10 @@ RF_ESTIMATORS = 100
 SCORING = 'f1_weighted'
 # If True, the dataset is normalized before training
 DATA_NORMALIZATION = True
-# If True, a selected portion of the entire dataset is used for training
+# If True, a selected portion of the entire dataset is used for training (# of rows = row_count)
 DATA_REDUCE = True
+# Top t features to show
+t = 30
 
 
 def normalize(data):
@@ -82,6 +91,8 @@ if __name__ == '__main__':
     print(f"Selected Features:\n{fit.support_}\n{feature_names}\n")
     ranking = pd.DataFrame({'rank': fit.ranking_, 'feature': DATA.columns[0:-1]})
     ranking = ranking.sort_values(by=['rank']).reset_index(drop=True)
+    top_t_features = list(ranking.feature[0:t])
+    print(f'Top {t} features list:\n{top_t_features}\n')
     print(f"Feature Ranking:\n{fit.ranking_}\n{ranking}\n")
     print(f"Optimal number of features : {rfecv.n_features_}")
     # Plotting number of features VS. cross-validation scores
