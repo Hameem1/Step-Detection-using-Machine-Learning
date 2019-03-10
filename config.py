@@ -113,5 +113,7 @@ NEW_DATASET_PATH = f'{ROOT}\\{NEW_DATASET}'
 TRAINED_MODEL_DIR = 'Trained_Model'
 # Trained Model directory path
 TRAINED_MODEL_PATH = f'{ROOT}\\{TRAINED_MODEL_DIR}'
-# Trained Model Name
+# Trained Model name
 TRAINED_MODEL_NAME = 'step_detection_model.pkl'
+# Trained Normalizer name
+TRAINED_NORMALIZER_NAME = 'step_detection_min_max_norm.pkl'
