@@ -41,6 +41,8 @@ row_count = 5000
 RF_ESTIMATORS = 100
 # Test Data size (out of 1.0)
 TEST_SIZE = 0.5
+# Cross validation folds
+K_FOLD = 2
 # Performance metric to optimize the model for
 SCORING = 'f1_weighted'
 # If True, the dataset is normalized before training
@@ -103,6 +105,20 @@ def get_selected_features():
     return list(f_sel['selected features'])
 
 
+def import_trained_model():
+    if os.path.exists(f"{TRAINED_MODEL_PATH}\\{TRAINED_MODEL_NAME}"):
+        with open(f"{TRAINED_MODEL_PATH}\\{TRAINED_MODEL_NAME}", 'rb') as step_detection_model:
+            model = pickle.load(step_detection_model)
+        print('>> Model Imported.\n')
+        print("The following model is now available for testing:\n\n"
+              f"{model}\n\n"
+              f">> This model was trained on {model.n_features_} features:\n{get_selected_features()}\n")
+        return model
+    else:
+        print(f'No .pkl file found in the directory : "{TRAINED_MODEL_DIR}"\n')
+        return None
+
+
 if __name__ == '__main__':
     # starting timer
     start = time()
@@ -128,7 +144,7 @@ if __name__ == '__main__':
     # Feature selection
     # Recursive Feature Elimination/Model Based Feature Selection (with cross-validated selection of best # of features)
     model = RandomForestClassifier(n_estimators=RF_ESTIMATORS)
-    rfecv = RFECV(estimator=model, cv=StratifiedKFold(2), scoring=SCORING, n_jobs=1)
+    rfecv = RFECV(estimator=model, cv=StratifiedKFold(K_FOLD), scoring=SCORING, n_jobs=1)
     print('>> Training the model & Performing feature ranking simultaneously\n')
     fit = rfecv.fit(X_train, y_train)
     print('>> Model Trained!\n')
@@ -166,6 +182,7 @@ if __name__ == '__main__':
         X_test = TEST_DATA[:, 0:-1]
         y_test = TEST_DATA[:, -1]
 
+    print(f'Cross validation : Stratified {K_FOLD}-Fold\n')
     print(f'Performance metric used for model optimization : "{SCORING}"\n')
     y_pred = rfecv.predict(X_test)
     print(f'Confusion Matrix:\n{confusion_matrix(y_test, y_pred)}\n')
@@ -196,13 +213,8 @@ if __name__ == '__main__':
 else:
     print(f"\nModule imported : {__name__}\n")
     # Loading the trained model
-    if os.path.exists(f"{TRAINED_MODEL_PATH}\\{TRAINED_MODEL_NAME}"):
-        with open(f"{TRAINED_MODEL_PATH}\\{TRAINED_MODEL_NAME}", 'rb') as step_detection_model:
-            model = pickle.load(step_detection_model)
-        print('>> Model Imported.\n')
-        print("The following model is now available for testing:\n\n"
-              f"{model}\n\n"
-              f">> This model was trained on {model.n_features_} features:\n{get_selected_features()}\n")
-    else:
-        print(f'No .pkl file found in the directory : "{TRAINED_MODEL_DIR}"\n')
+    model = import_trained_model()
+    if model is None:
+        del model
+
 
