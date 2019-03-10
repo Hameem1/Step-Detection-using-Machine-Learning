@@ -161,12 +161,11 @@ def gen_box_plot(y, open_plot=True):
                        font=dict(family='arial', size=16, color='#000000'))
     fig = go.Figure(data=data, layout=layout)
     filename = str(input("Please enter a name for the Box plot file: ")).lower()
-    path = f'{ROOT}\\data-files'
-    if not os.path.exists(path):
-        print(f'\nWARNING: The path does not exist. Creating new directory...\n{path}\n')
-        os.mkdir(path)
-    pyo.plot(fig, filename=f'{path}\\{filename}.html', auto_open=open_plot)
-    print(f'\nAge comparison Box plot generated.\nLocation: "{path}\\{filename}.html"\n')
+    if not os.path.exists(data_files_path):
+        print(f'\nWARNING: The path does not exist. Creating new directory...\n{data_files_path}\n')
+        os.mkdir(data_files_path)
+    pyo.plot(fig, filename=f'{data_files_path}\\{filename}.html', auto_open=open_plot)
+    print(f'\nAge comparison Box plot generated.\nLocation: "{data_files_path}\\{filename}.html"\n')
 
 
 def gen_age_histogram(open_plot=True):
@@ -200,12 +199,11 @@ def gen_age_histogram(open_plot=True):
 
     fig = go.Figure(data=data, layout=layout)
     filename = 'age_distribution_by_gender'
-    path = f'{ROOT}\\data-files'
-    if not os.path.exists(path):
-        print(f'\nWARNING: The path does not exist. Creating new directory...\n{path}\n')
-        os.mkdir(path)
-    pyo.plot(fig, filename=f'{path}\\{filename}.html', auto_open=open_plot)
-    print(f'\nAge Distribution Histogram generated.\nLocation: "{path}\\{filename}.html"\n')
+    if not os.path.exists(data_files_path):
+        print(f'\nWARNING: The path does not exist. Creating new directory...\n{data_files_path}\n')
+        os.mkdir(data_files_path)
+    pyo.plot(fig, filename=f'{data_files_path}\\{filename}.html', auto_open=open_plot)
+    print(f'\nAge Distribution Histogram generated.\nLocation: "{data_files_path}\\{filename}.html"\n')
 
 
 if __name__ == '__main__':
