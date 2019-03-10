@@ -5,11 +5,11 @@ The model is trained during the feature selection phase and is tested at the end
 
 """
 
+# Todo: Use scikit-learn for more flexible normalization and save the trained classifiers
+# Todo: Allow the use of import and export model functions that take in a path
 # Todo: Combine the feature selection functionality of both models and rename feature_selection.py to model.py
 # Todo: Use model.py for training the model with selected features (all for max performance)
-# Todo: Try the "roc-auc" metric as well (Study first)
 # Todo: Organize results
-# Todo: Use scikit-learn for more flexible normalization
 # Todo: Add docstrings for the entire "model" package
 # Todo: Refactor the variable names involving paths, used in config.py
 
@@ -105,18 +105,29 @@ def get_selected_features():
     return list(f_sel['selected features'])
 
 
-def import_trained_model():
-    if os.path.exists(f"{TRAINED_MODEL_PATH}\\{TRAINED_MODEL_NAME}"):
-        with open(f"{TRAINED_MODEL_PATH}\\{TRAINED_MODEL_NAME}", 'rb') as step_detection_model:
+def import_trained_model(dir_path, name):
+    if os.path.exists(f"{dir_path}\\{name}"):
+        with open(f"{dir_path}\\{name}", 'rb') as step_detection_model:
             model = pickle.load(step_detection_model)
         print('>> Model Imported.\n')
-        print("The following model is now available for testing:\n\n"
-              f"{model}\n\n"
-              f">> This model was trained on {model.n_features_} features:\n{get_selected_features()}\n")
         return model
     else:
         print(f'No .pkl file found in the directory : "{TRAINED_MODEL_DIR}"\n')
         return None
+
+
+def export_trained_model(dir_path, name):
+    # Creating the directory for the trained model
+    if not os.path.exists(TRAINED_MODEL_PATH):
+        print(f'WARNING: The path does not exist. Creating new directory...\n{TRAINED_MODEL_PATH}\n')
+        os.mkdir(TRAINED_MODEL_PATH)
+    else:
+        print(f"Path for '{TRAINED_MODEL_DIR}' already exists!\n")
+
+    # Saving the model externally in TRAINED_MODEL_PATH
+    with open(f"{dir_path}\\{name}", 'wb') as step_detection_model:
+        pickle.dump(rfecv, step_detection_model)
+    print(f'>> Model stored externally as "{name}"\n')
 
 
 if __name__ == '__main__':
@@ -196,25 +207,24 @@ if __name__ == '__main__':
     duration = time() - start
     print('Operation took:', f'{duration:.2f} seconds.\n' if duration < 60 else f'{duration / 60:.2f} minutes.\n')
 
+    # Exporting the trained classification model
     if EXPORT_MODEL:
-        # Creating the directory for the trained model
-        if not os.path.exists(TRAINED_MODEL_PATH):
-            print(f'WARNING: The path does not exist. Creating new directory...\n{TRAINED_MODEL_PATH}\n')
-            os.mkdir(TRAINED_MODEL_PATH)
-        else:
-            print(f"Path for '{TRAINED_MODEL_DIR}' already exists!\n")
-
-        # Saving the model externally in TRAINED_MODEL_PATH
-        with open(f"{TRAINED_MODEL_PATH}\\{TRAINED_MODEL_NAME}", 'wb') as step_detection_model:
-            pickle.dump(rfecv, step_detection_model)
-        print(f'>> Model stored externally as "{TRAINED_MODEL_NAME}"\n')
+        path = f'{TRAINED_MODEL_PATH}'
+        export_trained_model(path, TRAINED_MODEL_NAME)
 
 
 else:
     print(f"\nModule imported : {__name__}\n")
-    # Loading the trained model
-    model = import_trained_model()
+
+    # Loading the trained model for testing
+    path = f'{TRAINED_MODEL_PATH}'
+    model = import_trained_model(path, TRAINED_MODEL_NAME)
     if model is None:
         del model
+    else:
+        print("The following model is now available for testing:\n\n"
+              f"{model}\n\n"
+              f">> This model was trained on {model.n_features_} features:\n{get_selected_features()}\n")
+
 
 
