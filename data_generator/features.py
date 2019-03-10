@@ -248,7 +248,7 @@ class Features:
                 temp = func(window_data)
                 # If the data is a float (Store up to 5 decimal places)
                 if not float(temp).is_integer():
-                    ret.append("{0:.5f}".format(temp))
+                    ret.append(float("{0:.5f}".format(temp)))
                 # if the data is an int
                 else:
                     ret.append(temp)
@@ -262,7 +262,7 @@ class Features:
                 temp = func(window_data)
                 # If the data is a float (Store up to 5 decimal places)
                 if not float(temp).is_integer():
-                    ret.append("{0:.5f}".format(temp))
+                    ret.append(float("{0:.5f}".format(temp)))
                 # if the data is an int
                 else:
                     ret.append(temp)
