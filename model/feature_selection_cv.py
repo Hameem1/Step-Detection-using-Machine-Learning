@@ -5,8 +5,6 @@ The model is trained during the feature selection phase and is tested at the end
 
 """
 
-# Todo: Use scikit-learn for more flexible normalization and save the trained classifiers
-# Todo: Allow the use of import and export model functions that take in a path
 # Todo: Combine the feature selection functionality of both models and rename feature_selection.py to model.py
 # Todo: Use model.py for training the model with selected features (all for max performance)
 # Todo: Organize results
@@ -49,7 +47,7 @@ SCORING = 'f1_weighted'
 # If True, the dataset is normalized before training
 DATA_NORMALIZATION = True
 # If True, a selected portion of the entire dataset is used for training (# of rows = row_count)
-DATA_REDUCE = True
+DATA_REDUCE = False
 # If True, generate a .csv file for the feature ranking
 GEN_RANKING_FILE = True
 # If True, a plot will be generated for the # of features used vs performance metric
@@ -208,19 +206,23 @@ if __name__ == '__main__':
     print('Operation took:', f'{duration:.2f} seconds.\n' if duration < 60 else f'{duration / 60:.2f} minutes.\n')
 
     # Re-training the normalizer with updated features (because they may have reduced)
-    # removing the previous normalizer
-    print('>> Removing the previous Normalizer\n')
-    del scaler, normalizer
+    if DATA_NORMALIZATION:
+        # removing the previous normalizer
+        print('>> Removing the previous Normalizer\n')
+        del scaler, normalizer
     print('>> Re-training the Normalizer\n')
     scaler = MinMaxScaler(feature_range=(0, 1))
+    # Converting a selected section of the dataset to a numpy array (based on best features)
     data_matrix = DATA[get_selected_features()+['StepLabel']].values
     X = data_matrix[:, 0:-1]
     y = data_matrix[:, -1]
     # Splitting the data into training and testing splits
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=TEST_SIZE, random_state=101)
+    # Re-training
     normalizer = scaler.fit(X_train)
+    print('>> Normalizer re-trained\n')
 
-    # Exporting the trained classification model and normalizer
+    # Exporting the trained classifier and normalizer
     if EXPORT_MODEL:
         export_trained_model(rfecv, TRAINED_MODEL_PATH, TRAINED_MODEL_NAME)
         export_trained_model(normalizer, TRAINED_MODEL_PATH, TRAINED_NORMALIZER_NAME)
