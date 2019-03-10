@@ -116,7 +116,7 @@ else:
                 = feature_extractor(sub, sensor_pos, output_type='df')
             print(f'\n"col_names", "df", "step_positions_actual", "step_positions_updated" and '
                   f'"step_positions_updated_bool" have been returned after a call to feature_extractor()\n')
-            print(f'\nRatio of no_step(0)/step(1) for subject - {sub.subject_id[-4]} = '
+            print(f'\nRatio of no_step(0)/step(1) for subject - {sub.subject_id[:-4]} = '
                   f'{len(df[df["StepLabel"]==0]) / len(df[df["StepLabel"]==1])}\n')
 
         elif res == 'dict':
