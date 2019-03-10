@@ -22,12 +22,13 @@ from time import time
 import plotly.offline as pyo
 import plotly.graph_objs as go
 import matplotlib.pyplot as plt
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import RFECV
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split, StratifiedKFold
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, f1_score, recall_score, roc_auc_score
-from config import new_sensor_paths, DATA_PATH, data_files_path, ROOT, \
-    TRAINED_MODEL_PATH, TRAINED_MODEL_NAME, TRAINED_MODEL_DIR
+from config import new_sensor_paths, DATA_PATH, data_files_path, ROOT, TRAINED_MODEL_PATH, \
+    TRAINED_MODEL_NAME, TRAINED_MODEL_DIR, TRAINED_NORMALIZER_NAME
 
 
 # Configuration Variables
@@ -48,7 +49,7 @@ SCORING = 'f1_weighted'
 # If True, the dataset is normalized before training
 DATA_NORMALIZATION = True
 # If True, a selected portion of the entire dataset is used for training (# of rows = row_count)
-DATA_REDUCE = False
+DATA_REDUCE = True
 # If True, generate a .csv file for the feature ranking
 GEN_RANKING_FILE = True
 # If True, a plot will be generated for the # of features used vs performance metric
@@ -59,16 +60,6 @@ DISJOINT_TESTING = False
 TEST_DATA_PATH = f"{ROOT}\\Features_Dataset\\ds_left.csv"
 # If True, trained model is exported to TRAINED_MODEL_PATH
 EXPORT_MODEL = True
-
-
-def normalize(data):
-    feature_dic = dict()
-    # Performing Min-Max Scaling
-    for feature in cols[:-1]:
-        feature_dic[feature] = list((data[feature] - data[feature].min()) / (data[feature].max() - data[feature].min()))
-    feature_dic['StepLabel'] = data[cols[-1]]
-    df_new = pd.DataFrame.from_dict(feature_dic)
-    return df_new
 
 
 def plot_n_features_vs_score(grid_scores, mp_lib=False):
@@ -108,15 +99,15 @@ def get_selected_features():
 def import_trained_model(dir_path, name):
     if os.path.exists(f"{dir_path}\\{name}"):
         with open(f"{dir_path}\\{name}", 'rb') as step_detection_model:
-            model = pickle.load(step_detection_model)
+            ret_model = pickle.load(step_detection_model)
         print('>> Model Imported.\n')
-        return model
+        return ret_model
     else:
         print(f'No .pkl file found in the directory : "{TRAINED_MODEL_DIR}"\n')
         return None
 
 
-def export_trained_model(dir_path, name):
+def export_trained_model(model, dir_path, name):
     # Creating the directory for the trained model
     if not os.path.exists(TRAINED_MODEL_PATH):
         print(f'WARNING: The path does not exist. Creating new directory...\n{TRAINED_MODEL_PATH}\n')
@@ -126,7 +117,7 @@ def export_trained_model(dir_path, name):
 
     # Saving the model externally in TRAINED_MODEL_PATH
     with open(f"{dir_path}\\{name}", 'wb') as step_detection_model:
-        pickle.dump(rfecv, step_detection_model)
+        pickle.dump(model, step_detection_model)
     print(f'>> Model stored externally as "{name}"\n')
 
 
@@ -140,10 +131,6 @@ if __name__ == '__main__':
     if DATA_REDUCE:
         DATA = DATA.iloc[0:row_count, :]
     print('>> Dataset loaded\n')
-    # Normalizing the dataset
-    if DATA_NORMALIZATION:
-        DATA = normalize(DATA)
-        print('>> Dataset normalized\n')
     # Converting the data to numpy arrays
     data_matrix = DATA.values
     # separating the data into predictors and target
@@ -152,10 +139,21 @@ if __name__ == '__main__':
     # Splitting the data into training and testing splits
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=TEST_SIZE, random_state=101)
 
+    # Data Normalization
+    if DATA_NORMALIZATION:
+        scaler = MinMaxScaler(feature_range=(0, 1))
+        # Training the normalizer
+        normalizer = scaler.fit(X_train)
+        # Normalizing the training data
+        X_train = normalizer.transform(X_train)
+        print('>> Training set normalized.\n')
+
+    # x = pd.DataFrame(X_train, columns=cols[:-1])  # To convert from np.array to DataFrame
+
     # Feature selection
     # Recursive Feature Elimination/Model Based Feature Selection (with cross-validated selection of best # of features)
-    model = RandomForestClassifier(n_estimators=RF_ESTIMATORS)
-    rfecv = RFECV(estimator=model, cv=StratifiedKFold(K_FOLD), scoring=SCORING, n_jobs=1)
+    classifier = RandomForestClassifier(n_estimators=RF_ESTIMATORS)
+    rfecv = RFECV(estimator=classifier, cv=StratifiedKFold(K_FOLD), scoring=SCORING, n_jobs=1)
     print('>> Training the model & Performing feature ranking simultaneously\n')
     fit = rfecv.fit(X_train, y_train)
     print('>> Model Trained!\n')
@@ -189,10 +187,12 @@ if __name__ == '__main__':
     # Testing the model
     print('>> Testing model\n')
     if DISJOINT_TESTING:
-        TEST_DATA = normalize(pd.read_csv(TEST_DATA_PATH, sep='\t', index_col=0)).values
+        TEST_DATA = pd.read_csv(TEST_DATA_PATH, sep='\t', index_col=0).values
         X_test = TEST_DATA[:, 0:-1]
         y_test = TEST_DATA[:, -1]
 
+    # Normalizing the test data
+    X_test = normalizer.transform(X_test)
     print(f'Cross validation : Stratified {K_FOLD}-Fold\n')
     print(f'Performance metric used for model optimization : "{SCORING}"\n')
     y_pred = rfecv.predict(X_test)
@@ -207,24 +207,54 @@ if __name__ == '__main__':
     duration = time() - start
     print('Operation took:', f'{duration:.2f} seconds.\n' if duration < 60 else f'{duration / 60:.2f} minutes.\n')
 
-    # Exporting the trained classification model
+    # Re-training the normalizer with updated features (because they may have reduced)
+    # removing the previous normalizer
+    print('>> Removing the previous Normalizer\n')
+    del scaler, normalizer
+    print('>> Re-training the Normalizer\n')
+    scaler = MinMaxScaler(feature_range=(0, 1))
+    data_matrix = DATA[get_selected_features()+['StepLabel']].values
+    X = data_matrix[:, 0:-1]
+    y = data_matrix[:, -1]
+    # Splitting the data into training and testing splits
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=TEST_SIZE, random_state=101)
+    normalizer = scaler.fit(X_train)
+
+    # Exporting the trained classification model and normalizer
     if EXPORT_MODEL:
-        path = f'{TRAINED_MODEL_PATH}'
-        export_trained_model(path, TRAINED_MODEL_NAME)
+        export_trained_model(rfecv, TRAINED_MODEL_PATH, TRAINED_MODEL_NAME)
+        export_trained_model(normalizer, TRAINED_MODEL_PATH, TRAINED_NORMALIZER_NAME)
 
 
 else:
     print(f"\nModule imported : {__name__}\n")
 
-    # Loading the trained model for testing
-    path = f'{TRAINED_MODEL_PATH}'
-    model = import_trained_model(path, TRAINED_MODEL_NAME)
-    if model is None:
-        del model
+    # Loading the trained classification model for testing
+    classifier = import_trained_model(TRAINED_MODEL_PATH, TRAINED_MODEL_NAME)
+    if classifier is None:
+        del classifier
     else:
         print("The following model is now available for testing:\n\n"
-              f"{model}\n\n"
-              f">> This model was trained on {model.n_features_} features:\n{get_selected_features()}\n")
+              f"{classifier}\n\n"
+              f">> This model was trained on {classifier.n_features_} features:\n{get_selected_features()}\n"
+              f">> Classifier imported : {TRAINED_MODEL_NAME}\n")
 
+    # Loading the trained normalizer for testing
+    normalizer = import_trained_model(TRAINED_MODEL_PATH, TRAINED_NORMALIZER_NAME)
+    if normalizer is None:
+        del normalizer
+    else:
+        print("The following model is now available for testing:\n\n"
+              f"{normalizer} - Type = {type(normalizer)}\n\n"
+              f">> Normalizer imported : {TRAINED_NORMALIZER_NAME}\n")
 
+    print(f'DataFrames must be converted to numpy arrays before passing them to the models. (i.e., df.values)\n')
 
+    # Setting up variables for testing via console
+    DATA = pd.read_csv(DATA_PATH, sep='\t', index_col=0)
+    if DATA_REDUCE:
+        DATA = DATA.iloc[0:row_count, :]
+    data_matrix = DATA[get_selected_features()+['StepLabel']].values
+    X = data_matrix[:, 0:-1]
+    y = data_matrix[:, -1]
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=TEST_SIZE, random_state=101)
