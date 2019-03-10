@@ -46,7 +46,7 @@ SCORING = 'f1_weighted'
 # If True, the dataset is normalized before training
 DATA_NORMALIZATION = True
 # If True, a selected portion of the entire dataset is used for training (# of rows = row_count)
-DATA_REDUCE = True
+DATA_REDUCE = False
 # If True, generate a .csv file for the feature ranking
 GEN_RANKING_FILE = True
 # If True, a plot will be generated for the # of features used vs performance metric
@@ -55,6 +55,8 @@ PLOT = True
 DISJOINT_TESTING = False
 # Path for disjoint test dataset
 TEST_DATA_PATH = f"{ROOT}\\Features_Dataset\\ds_left.csv"
+# If True, trained model is exported to TRAINED_MODEL_PATH
+EXPORT_MODEL = True
 
 
 def normalize(data):
@@ -165,26 +167,30 @@ if __name__ == '__main__':
     duration = time() - start
     print('Operation took:', f'{duration:.2f} seconds.\n' if duration < 60 else f'{duration / 60:.2f} minutes.\n')
 
-    # Creating the directory for the trained model
-    if not os.path.exists(TRAINED_MODEL_PATH):
-        print(f'WARNING: The path does not exist. Creating new directory...\n{TRAINED_MODEL_PATH}\n')
-        os.mkdir(TRAINED_MODEL_PATH)
-    else:
-        print(f"Path for '{TRAINED_MODEL_DIR}' already exists!\n")
+    if EXPORT_MODEL:
+        # Creating the directory for the trained model
+        if not os.path.exists(TRAINED_MODEL_PATH):
+            print(f'WARNING: The path does not exist. Creating new directory...\n{TRAINED_MODEL_PATH}\n')
+            os.mkdir(TRAINED_MODEL_PATH)
+        else:
+            print(f"Path for '{TRAINED_MODEL_DIR}' already exists!\n")
 
-    # Saving the model externally in TRAINED_MODEL_PATH
-    with open(f"{TRAINED_MODEL_PATH}\\{TRAINED_MODEL_NAME}", 'wb') as step_detection_model:
-        pickle.dump(rfecv, step_detection_model)
-    print(f'>> Model stored externally as "{TRAINED_MODEL_NAME}"\n')
+        # Saving the model externally in TRAINED_MODEL_PATH
+        with open(f"{TRAINED_MODEL_PATH}\\{TRAINED_MODEL_NAME}", 'wb') as step_detection_model:
+            pickle.dump(rfecv, step_detection_model)
+        print(f'>> Model stored externally as "{TRAINED_MODEL_NAME}"\n')
 
 
 else:
     print(f"\nModule imported : {__name__}\n")
     # Loading the trained model
-    with open(f"{TRAINED_MODEL_PATH}\\{TRAINED_MODEL_NAME}", 'rb') as step_detection_model:
-        model = pickle.load(step_detection_model)
-    print('>> Model Imported.\n')
-    print("The following model is now available for testing:\n\n"
-          f"{model}\n\n"
-          f">> This model was trained on {model.n_features_} features.\n")
+    if os.path.exists(f"{TRAINED_MODEL_PATH}\\{TRAINED_MODEL_NAME}"):
+        with open(f"{TRAINED_MODEL_PATH}\\{TRAINED_MODEL_NAME}", 'rb') as step_detection_model:
+            model = pickle.load(step_detection_model)
+        print('>> Model Imported.\n')
+        print("The following model is now available for testing:\n\n"
+              f"{model}\n\n"
+              f">> This model was trained on {model.n_features_} features.\n")
+    else:
+        print(f'No .pkl file found in the directory : "{TRAINED_MODEL_DIR}"\n')
 
