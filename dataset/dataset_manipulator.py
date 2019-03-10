@@ -1,4 +1,7 @@
-"""This module provides functions and variables to manipulate the entire data set"""
+"""
+This module provides functions and variables to manipulate the entire data set.
+
+"""
 
 import os
 import re
@@ -11,10 +14,12 @@ def dataset_rename():
     """
     Renames files in all three sub-directories of the Data set.
 
-    WARNING :
-    This function renames files in the given data set folder (does NOT make copies)
-    Place the entire data set folder in the same directory as this .py file
-    Will only process files which are named as in the original data set
+    Warnings
+    --------
+    This function renames files in the given data set folder (does NOT make copies).
+    Place the entire data set folder in the same directory as this .py file.
+    Will only process files which are named as in the original data set.
+
     """
     rename_count = -1
     unchanged_total = 0
@@ -89,15 +94,18 @@ def dataset_rename():
 
 def dataset_analysis():
     """
-    Analyzes and Normalizes the Data set. (Not required if using get_subjects_list() or generate_subjects_data())
+    Analyzes and Normalizes the Data set.
 
-    WARNING :
-    Should only be executed once the files have been renamed (dataset_rename())
+    Not required if using get_subjects_list() or generate_subjects_data().
+
+    Warnings
+    --------
+    Should only be executed once the files have been renamed (dataset_rename()).
     This function analyses and deletes files from the three
-    subdirectories which are not common to all of them
+    subdirectories which are not common to all of them.
 
+    Place the entire data set folder in the same directory as this .py file.
 
-    Place the entire data set folder in the same directory as this .py file
     """
 
     del_count = 0
@@ -190,15 +198,22 @@ def dataset_analysis():
 
 def get_subjects_list():
     """
-    Returns the subjects list for the Data set. (Includes functionality of dataset_analysis())
+    Returns the subjects list for the Data set.
 
-    WARNING :
+    Includes functionality of dataset_analysis()
+
+    Warnings
+    --------
     Use generate_subjects_data() instead!
-    Should be executed once the data set is normalized (dataset_analysis())
-    Will also work directly on an un-normalized data set by providing the option to normalize
-    Place the entire data set folder in the same directory as this .py file
+    Should be executed once the data set is normalized (dataset_analysis()).
+    Will also work directly on an un-normalized data set by providing the option to normalize.
+    Place the entire data set folder in the same directory as this .py file.
 
-    :return SUBJECTS_LIST: or None on failure
+    Returns
+    -------
+    SUBJECTS_LIST : list of str or None
+        List of subject filenames (subject_ids)
+
     """
 
     temp_list = []
@@ -254,11 +269,23 @@ def generate_subjects_data(gen_csv=None, indexing=True):
     """
     Generates a subjects list and subjects data along with an optional
     .csv file in the current working directory. Also verifies with the IDGenderAgeList.csv file.
+
     This function should be used instead of get_subjects_list() when running the first time!
 
-    :param gen_csv: generates a .csv file from the data as well (Optional)
-    :param indexing: implements an indexing column for the .csv file on True (Optional)
-    :returns subject_list, subject_data: List, DataFrame
+    Parameters
+    ----------
+    gen_csv : bool, optional
+        Generates a .csv file from the data as well (default = 'None')
+    indexing : bool, optional
+        Implements an indexing column for the .csv file (default = 'True')
+
+    Returns
+    -------
+    subject_list : list
+        List of subject filenames (subject_ids)
+    subject_data : DataFrame
+        Information about Subjects
+
     """
 
     SUBJECTS_LIST = get_subjects_list()
@@ -375,20 +402,25 @@ def generate_subjects_data(gen_csv=None, indexing=True):
     return SUBJECTS_LIST, df
 
 
-def read_csv(filename):
+def read_csv(file_path):
     """
-    Reads a .csv file in the current working directory and returns it as a DataFrame.
+    Reads in a .csv file from the specified file_path and returns it as a DataFrame.
 
-    :param
-    filename (string):  path or file name (without extension)
-    :returns
-    DataFrame:  pandas data frame
+    Parameters
+    ----------
+    file_path : str
+        path + file name (without file extension)
+
+    Returns
+    -------
+    DataFrame : DataFrame
+
     """
 
     try:
-        data = pd.read_csv(filename + ".csv", sep='\t', index_col=0)
+        data = pd.read_csv(file_path + ".csv", sep='\t', index_col=0)
     except FileNotFoundError:
-        print(f"\nError : File not found.\nThis file does not exist at location:\n{filename}.csv")
+        print(f"\nError : File not found.\nThis file does not exist at location:\n{file_path}.csv")
     else:
         # print(f"\nPreview of the .csv file contents:\n\n{data.head()}")
         return data
@@ -399,7 +431,11 @@ def dataframe_concatenator(single_file=False):
     Generates the 'Features_Dataset' within the project directory which will be used for the classifier.
     Three separate files for each sensor will be generated, with each file containing the data for every subject.
 
-    :param single_file: Merges the three files into a single data file if 'True'
+    Parameters
+    ----------
+    single_file : bool, optional
+        Merges the three files into a single data file if True (default = False)
+
     """
 
     datasets = []
@@ -438,10 +474,18 @@ def dataframe_concatenator(single_file=False):
 
 def end_tab_remover(subs_list):
     """
-    WARNING : This function has been deprecated (Avoid this if using "index_col=False" in data_structs.py)
-    Removes a tab space from the end of each line of each file in the given subjects list
+    Removes a tab space from the end of each line of each file in the given subjects list.
 
-    :param subs_list: list of subjects
+    Parameters
+    ----------
+    subs_list : list of str
+        Subjects list
+
+
+    Warnings
+    --------
+    This function has been deprecated (Avoid this if using "index_col=False" in data_structs.py)
+
     """
 
     ret = str(input("\nWould you like to proceed with removing trailing tabs from the whole data set? (y/n)\n")).lower()

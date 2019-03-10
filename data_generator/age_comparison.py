@@ -1,4 +1,7 @@
-"""This module provides functions to analyze data for different age groups"""
+"""
+This module provides functions to analyze data for different age groups.
+
+"""
 
 import os
 import numpy as np
@@ -16,10 +19,18 @@ LIMITS = get_limits(ageGroups)
 
 def get_samples(n):
     """
-    Gets n random samples (filenames) from each group in ageGroups
+    Gets n random samples (filenames) from each group in ageGroups.
 
-    :param n: int(sample size)
-    :return samples: dict('ageGroup1' : [n_samples], 'ageGroup2' : [n_samples], ...)
+    Parameters
+    ----------
+    n : int
+        Sample size
+
+    Returns
+    -------
+    samples : dict
+        {'ageGroup1' : [n_samples], 'ageGroup2' : [n_samples], ...}
+
     """
 
     samples = {}
@@ -36,10 +47,19 @@ def get_feature_stats(samples, sensor_pos='right'):
     """
     Calculates the mean (Ax, Ay, Az) of every feature in FEATURES_USED, for every file in each ageGroup.
 
-    :param sensor_pos: str('center', 'left', 'right')
-    :param samples: dict(returned from 'get_samples()')
-    :returns groups, raw_groups: dict('ageGroup1': {'stat1':{'feature1': [], 'feature2': []}}, 'ageGroup2': {...}, ...),
-                                dict(raw_data)
+    Parameters
+    ----------
+    sensor_pos: {'right', 'center', 'left')}
+    samples: dict
+        Returned from 'get_samples()'
+
+    Returns
+    -------
+    groups : dict
+        {'ageGroup1': {'stat1':{'feature1': [], 'feature2': []}}, 'ageGroup2': {...}, ...}
+    raw_groups : dict
+        Raw_data
+
     """
 
     path = f'{DATASET_ROOT}\\{DATASET_FOLDER}\\{sensor_pos.capitalize()}'
@@ -84,9 +104,13 @@ def get_feature_stats(samples, sensor_pos='right'):
 
 def print_statistics(group_stats):
     """
-    Pretty prints the contents of the main Groups dictionary
+    Pretty prints the contents of the main Groups dictionary.
 
-    :param group_stats: dict(returned by get_feature_stats())
+    Parameters
+    ----------
+    group_stats : dict
+        returned by get_feature_stats()
+
     """
 
     for age_group, stats in group_stats.items():
@@ -100,20 +124,33 @@ def print_statistics(group_stats):
 
 def sample_average(S):
     """
-    Calculates the average of groups from different samples
+    Calculates the average of groups from different samples.
 
-    :param S: list(sample groups)
-    :return G: dict(average of groups)
+    Parameters
+    ----------
+    S : list
+        Sample groups
+
+    Returns
+    -------
+    G : dict
+        Average of groups
+
     """
     pass
 
 
 def gen_box_plot(y, open_plot=True):
     """
-    Generates a box plot for the given data
+    Generates a box plot for the given data.
 
-    :param y: dict('AgeGroup1':'RawData1', 'AgeGroup2':'RawData2', ...)
-    :param open_plot: boolean(default: True)
+    Parameters
+    ----------
+    y : dict
+        {'AgeGroup1':'RawData1', 'AgeGroup2':'RawData2', ...}
+    open_plot: bool, optional
+        Show the plot after generation (default = True)
+
     """
 
     names = list(y.keys())
@@ -134,9 +171,13 @@ def gen_box_plot(y, open_plot=True):
 
 def gen_age_histogram(open_plot=True):
     """
-    Generates a histogram representing the distribution of Subject Age by Gender
+    Generates a histogram representing the distribution of Subject Age by Gender.
 
-    :param open_plot: boolean(default: True)
+    Parameters
+    ----------
+    open_plot : bool, optional
+        Show the plot after generation (default = True)
+
     """
 
     df = read_csv(f'{data_files_path}\\subject_data')

@@ -1,4 +1,8 @@
-""" This module implements the high level logic for normalizing the dataset and data visualizations
+"""
+This module implements the high level logic for normalizing the dataset and data visualizations.
+
+Warnings
+--------
 
 Before running any of the code, copy the data set folder named
 "OU-InertGaitAction_wStepAnnotation" into the project directory (app.py).
@@ -6,9 +10,8 @@ Before running any of the code, copy the data set folder named
 Then set FIX = True.
 After the first run, set Fix = False.
 
-This is required!
+INFO: This module can also be used for testing the entire code. Import as: >>> from app import *
 
-INFO: This module can also be used for testing the entire code. Import as: >>from app import *
 """
 
 from threading import Thread

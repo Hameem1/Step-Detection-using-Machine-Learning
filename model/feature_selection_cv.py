@@ -4,6 +4,7 @@ The model used is a Random Forest classifier.
 The model is trained during the feature selection phase and is tested at the end on test data from the best features.
 
 """
+# Todo: Fix problem with imported data into Subject objects being non numeric
 # Todo: Normalize the data before feeding it to the model (Train+Test)
 # Todo: Adjust the parameters and test feature_selection_cv
 

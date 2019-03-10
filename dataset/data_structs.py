@@ -1,4 +1,7 @@
-"""This module implements the data structures used to store the dataset"""
+"""
+This module implements the data structures used to store the dataset.
+
+"""
 
 import pandas as pd
 from dataset.dataset_manipulator import get_subjects_list, sensor_paths
@@ -17,13 +20,19 @@ labels_extra = ["complete", "valid", "null_data"]
 
 class Dataset:
     """
-    This class contains the data imported from the file whose name/path
-    is passed in as a parameter. The data is separated into multiple Pandas
-    data frames according to their ClassLabel value.
+    This class contains the data imported from the given file.
+    The data is separated into multiple Pandas data frames according to their ClassLabel value.
 
-    :param path: The path of the file to create the Dataset object from
+    Parameters
+    ----------
+    path : str
+        The path of the file to create the Dataset object from (with .txt)
 
-    - the path must have .txt appended at the end of the file name
+    Attributes
+    ----------
+    fs : int
+        Sampling frequency for the data set
+    label : {"valid", "invalid", "level", "upstairs", "downstairs", "incline", "decline", "complete", "null_data"}
 
     """
 
@@ -80,21 +89,31 @@ class Dataset:
 class Subject:
     """
     This class contains the entire data on one subject (from all three sensors).
-    Each sensor's data is represented as a Dataset class object.
+    Each sensor's data is represented as a Dataset Class object.
 
-    :param subject_id: the subject id (e.g. 'Idxxxxxx.txt')
+    Parameters
+    ----------
+    filename : str
+        The filename to create the Subject from (e.g. 'Idxxxxxx.txt')
+
+    Attributes
+    ----------
+    subject_id : str
+        Filename of the Subject (e.g. "Idxxxxxx.txt")
+    sensor_pos : dict of Dataset
+        'center', 'left' or 'right'
 
     """
 
-    def __init__(self, subject_id):
+    def __init__(self, filename):
         try:
-            self.subject_id = subject_id
-            self.sensor_pos = {"center": Dataset(f"{sensor_paths[0]}\\{subject_id}"),
-                               "left": Dataset(f"{sensor_paths[1]}\\{subject_id}"),
-                               "right": Dataset(f"{sensor_paths[2]}\\{subject_id}")}
+            self.subject_id = filename
+            self.sensor_pos = {"center": Dataset(f"{sensor_paths[0]}\\{filename}"),
+                               "left": Dataset(f"{sensor_paths[1]}\\{filename}"),
+                               "right": Dataset(f"{sensor_paths[2]}\\{filename}")}
 
             if FILE_STATUS_MESSAGES:
-                print(f"'Subject' object created for file : {subject_id}\n")
+                print(f"'Subject' object created for file : {filename}\n")
 
         except:
             print("There is a problem with the 'Subject' object instantiation!\n")
@@ -105,11 +124,18 @@ class Subject:
 
 def get_subjects_repo(subs_list, storage='list'):
     """
-    Returns a list or dict of Subject class objects for every file in the data set
+    Returns a list or dict of Subject class objects for every file in the data set.
 
-    :param subs_list: list of subject filenames
-    :param storage: string('list' or 'dict')
-    :returns subjects_repo: list or dict (configurable via the global STORAGE variable)
+    Parameters
+    ----------
+    subs_list : list
+        List of subject filenames
+    storage : {'list', 'dict'}
+
+    Returns
+    -------
+    SUBJECTS_REPO : list or dict
+        configurable via the global STORAGE variable
 
     """
 

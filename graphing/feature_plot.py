@@ -1,4 +1,7 @@
-"""This module implements the plotting functionality for the feature data generated from the base data"""
+"""
+This module implements the plotting functionality for the feature data generated from the base data.
+
+"""
 
 import dash
 import dash_core_components as dcc
@@ -23,6 +26,10 @@ app.scripts.config.serve_locally = True
 
 
 def serve_layout():
+    """
+    Returns the HTML Layout of the web interface.
+
+    """
     # Main Div (1st level)
     layout = html.Div([
 
@@ -87,12 +94,22 @@ def features_dropdown_callback(value):
               [Input('axis-dropdown', 'value'),
                Input('features-dropdown', 'value')])
 def graph_callback(axis, feature):
-    """This function plots a graph for the given parameters
+    """
+    This function plots a graph for the given parameters.
 
-        :param axis: str(selected from the dropdown menu)
-        :param feature: str(selected from the dropdown menu)
-        :return figure: a figure property
-        """
+    Parameters
+    ----------
+    axis : str
+        selected from the dropdown menu
+    feature : str
+        selected from the dropdown menu
+
+    Returns
+    -------
+    figure : dict
+        A figure property
+
+    """
 
     # Graph variables
     try:
@@ -134,12 +151,24 @@ def graph_callback(axis, feature):
 
 
 def feature_step_marker(feature_data, bool_mask=True):
-    """This function returns the x and y coordinates for steps detected in the given feature data vs t
+    """
+    This function returns the x and y coordinates for steps detected in the given feature data vs t.
 
-        :param feature_data: dict(feature=[data])
-        :param bool_mask: bool(Uses boolean mask for step marking if True)
-        :returns steps_x, steps_y: list(steps_x), list(steps_y)
-        """
+    Parameters
+    ----------
+    feature_data : dict
+        {feature=[feature_values], name=feature_name}
+    bool_mask : bool, optional
+        Uses boolean mask for step marking if True, else mark single step points
+
+    Returns
+    -------
+    steps_x : list
+        Step positions in the x-axis
+    steps_y : list
+        Step positions in the y-axis
+
+    """
 
     steps_y = []
     indices = list(range(len(feature_data['feature'])))
@@ -152,13 +181,21 @@ def feature_step_marker(feature_data, bool_mask=True):
 def feature_plot(sub, features_list, features, updated_step_positions, updated_step_positions_bool):
     """
     This function accepts the data values from a function call and makes them global.
-    It also acts as the feature plotting endpoint and starts the Dash server
+    It also acts as the feature plotting endpoint and starts the Dash server.
 
-    :param sub: Subject(the subject for which the features have been provided)
-    :param features_list: list(features_list)
-    :param features: dict(features)
-    :param updated_step_positions: list containing updated x_axis values for steps
-    :param updated_step_positions_bool: list containing a boolean mask representing step width
+    Parameters
+    ----------
+    sub : Subject
+        The Subject for which the features have been provided
+    features_list : list
+        Features_list
+    features : dict
+        Features data
+    updated_step_positions : list
+        Containing updated x_axis values for steps
+    updated_step_positions_bool : list
+        Containing a boolean mask representing step width
+
     """
 
     global SUB, FEATURES_LIST, FEATURES, STEP_POSITIONS, STEP_POSITIONS_BOOL

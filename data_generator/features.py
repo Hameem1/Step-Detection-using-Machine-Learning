@@ -1,4 +1,7 @@
-"""This module calculates the features from the base data using a moving window and stores them"""
+"""
+This module calculates the features from the base data using a moving window and stores them.
+
+"""
 
 # Imports
 import numpy as np
@@ -22,8 +25,50 @@ Total = 19
 
 
 class Features:
-    """This class contains the calculated features for the given
-        dataset and provides the functions to calculate them
+    """
+    This class contains the calculated features for the given data.
+
+    The data should be Pandas Series or DataFrame objects, containing decimal numbers.
+
+    Parameters
+    ----------
+    data : Series or DataFrame
+        Data to calculate features for
+    step_positions_actual : list
+        List of x-coordinate step positions in the original data
+    window_size : int, optional
+        Window size for the window which runs over the data
+    window_type : str, optional
+        Window type to be used for the data calculations
+
+    Attributes
+    ----------
+    data : Series or DataFrame
+        Contains the data used in the calculations (time domain)
+    data_freq : float
+        Contains the data used in the calculations (frequency domain) - [Future implementation]
+    window_size : int
+    window_type : str
+    step_positions_actual : list
+        List of x-coordinate step positions in the original data
+    mean, median, variance, standard_deviation, iqr : float
+        Basic statistical features (time domain)
+    value_max, value_min : float
+        Min and max values
+    index_max, index_min : int
+        Indices of min and max values
+    rms, signal_magnitude_area, energy, entropy, skewness, kurtosis, mean_abs_deviation : float
+        Advanced statistical features (time domain)
+    corr_xy, corr_xz, corr_yz : float
+        Cross-correlation features (between the axes)
+    features : list
+        List of names of extracted features
+
+    Methods
+    -------
+    get_features_list()
+        Generates a list of available features from the class which have been calculated
+
     """
 
     def __init__(self, data, step_positions_actual, window_size=WINDOW_SIZE, window_type=WINDOW_TYPE):
@@ -226,7 +271,7 @@ class Features:
 
         return ret
 
-    # Generates a list of available features from what has been calculated in the class
+    # Generates a list of available features from the class which have been calculated
     def get_features_list(self):
         self.features = list(
             f for f in dir(self) if not f.startswith('__')
@@ -240,9 +285,14 @@ class Features:
 
 
 def print_features(features):
-    """This function prints the given features dictionary
+    """
+    This function prints the given features dictionary.
 
-        :param features: dict(features)
+    Parameters
+    ----------
+    features : dict
+        features = {Axes: {feature_names: [feature_values]}}
+
     """
     total_features = 0
     for axis, features_data in features.items():
@@ -265,10 +315,22 @@ def print_features(features):
 
 
 def update_step_positions(data):
-    """This function returns lists of actual and updated step position indices according to the window type being used
+    """
+    This function returns lists of step positions according to the window type being used.
 
-        :param data: DataFrame(subject data)
-        :returns list(step_positions_actual), list(step_positions_updated), list(step_positions_updated_bool)
+    Parameters
+    ----------
+    data : DataFrame(subject data)
+
+    Returns
+    -------
+    step_positions_actual : list
+        List of x-axis step coordinates in the original data, i.e., Subject().sensor_pos[SENSOR].label[USED_CLASS_LABEL]
+    step_positions_updated : list
+        List of x-axis step coordinates in the windowed data
+    step_positions_updated_bool : list
+        List containing a boolean mask implementing STEP_SIZE for x-axis step coordinates in the windowed data
+
     """
 
     step_positions_actual = []
@@ -304,13 +366,26 @@ def update_step_positions(data):
 
 # This is the exposed endpoint for usage via import
 def feature_extractor(sub, sensor_pos, sensor_type=SENSOR, output_type='dict'):
-    """This function returns the features dictionary for the requested data
+    """
+    This function returns the extracted features data for for the given subject.
 
-        :param sub: A Subject class object
-        :param sensor_pos: str('center', 'left', 'right')
-        :param sensor_type: str('acc', 'gyr')
-        :param output_type: str('dict', 'df')
-        :returns features_list, features, step_positions_updated: dict(features_list), dict/df(features), dict(step x_values)
+    Parameters
+    ----------
+    sub : Subject
+    sensor_pos : {'center', 'left', 'right'}
+    sensor_type : {'acc', 'gyr'}
+    output_type : {'dict', 'df'}
+
+    Returns
+    -------
+    features_list, features : dict
+    step_positions_actual : int
+        List of x-axis step coordinates in the original data
+    step_positions_updated : int
+        List of x-axis step coordinates in the windowed data
+    step_positions_updated_bool : bool
+        List containing a boolean mask implementing STEP_SIZE for x-axis step coordinates in the windowed data
+
     """
     features = {}
     features_list = {}

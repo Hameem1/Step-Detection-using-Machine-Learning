@@ -1,4 +1,7 @@
-"""This module implements the plotting functionality for the base data"""
+"""
+This module implements the plotting functionality for the base data.
+
+"""
 
 import dash
 import dash_core_components as dcc
@@ -97,13 +100,24 @@ app.layout = html.Div([
                Input('position-dropdown', 'value'),
                Input('motion-dropdown', 'value')])
 def graph_callback(sensor, position, motion):
-    """This function plots a graph for the given parameters
+    """
+    This function plots a graph for the given parameters.
 
-        :param sensor: str(selected from the dropdown menu)
-        :param position: str(selected from the dropdown menu)
-        :param motion: str(selected from the dropdown menu)
-        :return figure: a figure property
-        """
+    Parameters
+    ----------
+    sensor : str
+        selected from the dropdown menu
+    position : str
+        selected from the dropdown menu
+    motion : str
+        selected from the dropdown menu
+
+    Returns
+    -------
+    figure : dict
+        A figure property
+
+    """
 
     # Graph variables
     t = np.array([num for num in range(0, len(sub.sensor_pos[position].label[motion]))]) / Fs
@@ -152,13 +166,22 @@ def graph_callback(sensor, position, motion):
 
 
 def step_marker(pos, sensor=SENSOR, motion_type=USED_CLASS_LABEL):
-    """This function returns the y coordinates for steps detected in the given subject data vs t
+    """
+    This function returns the y-coordinates for steps detected in the given subject data vs t.
 
-        :param pos: str ('center', 'left', 'right')
-        :param sensor: str ('acc', 'gyr')
-        :param motion_type: str('complete', 'valid', etc)
-        :returns steps_y: dict(steps_y)
-        """
+    Parameters
+    ----------
+    pos : {'center', 'left', 'right'}
+    sensor : {'acc', 'gyr'}
+    motion_type : str
+        'complete', 'valid', etc.
+
+    Returns
+    -------
+    steps_y : dict
+        Y-coordinates for the steps
+
+    """
 
     steps_y = {'x': [], 'y': [], 'z': []}
     data = sub.sensor_pos[pos].label[motion_type]
@@ -176,9 +199,14 @@ def data_plot(subject, actual_step_positions, sensor_axis="all"):
     This function accepts the data values from a function call and makes them global.
     It also acts as the feature plotting endpoint and starts the Dash server.
 
-    :param subject: A Subject class object
-    :param actual_step_positions: dict of lists containing x_axis values for steps
-    :param sensor_axis: str ('x', 'y', 'z', 'all')
+    Parameters
+    ----------
+    subject : Subject
+        A Subject class object
+    actual_step_positions : list
+        containing x_axis values for steps (from the original dataset)
+    sensor_axis : {'x', 'y', 'z', 'all'}
+
     """
 
     global sub, axis, STEP_POSITIONS

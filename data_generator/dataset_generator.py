@@ -1,4 +1,7 @@
-"""This module should not be imported, it is meant to be run directly after adjusting the Configuration variables"""
+"""
+This module should not be imported, it is meant to be run directly after adjusting the Configuration variables.
+
+"""
 
 # Imports
 import os
@@ -32,7 +35,10 @@ if not os.path.exists(DATASET_ROOT):
 
 
 def create_dataset_folder_structure():
-    """Creates the folder structure for the new dataset"""
+    """
+    Creates the folder structure for the new dataset.
+
+    """
 
     path = f'{DATASET_ROOT}\\{DATASET_FOLDER}'
     if not os.path.exists(path):
@@ -53,7 +59,10 @@ def create_dataset_folder_structure():
 
 
 def create_age_folder_structure():
-    """Creates the folder structure for the Age Sorted Dataset"""
+    """
+    Creates the folder structure for the Age Sorted Dataset.
+
+    """
 
     try:
         new_dataset_path = f'{DATASET_ROOT}\\{DATASET_FOLDER}_Age_Sorted'
@@ -89,10 +98,18 @@ def create_age_folder_structure():
 
 def get_limits(age_groups):
     """
-    Generates numerical limits from string representations
+    Generates numerical limits from string representations.
 
-    :param age_groups: list of strings ['(2-3)','(6-7)', ...]
-    :return: dict('Age(X-Y)': [min, max], ...)
+    Parameters
+    ----------
+    age_groups: list of str
+        ['(2-3)','(6-7)', ...]
+
+    Returns
+    -------
+    limits : dict
+        {'Age(X-Y)': [min, max], ...}
+
     """
 
     limits = {}
@@ -107,7 +124,10 @@ def get_limits(age_groups):
 
 
 def sort_dataset_by_age():
-    """Sorts the Dataset created by create_dataset() into a new Age sorted Dataset"""
+    """
+    Sorts the Dataset created by create_dataset() into a new Age sorted Dataset.
+
+    """
 
     data = read_csv(f'{data_files_path}\\subject_data')
     limits = get_limits(ageGroups)
@@ -140,11 +160,17 @@ def sort_dataset_by_age():
 
 def create_dataset(subs_list, indexing=True):
     """
-    Creates the New Dataset using features calculated from the base data
+    Creates the New Dataset using features calculated from the base data.
 
-    :param subs_list: list of subjects to create the new dataset for
-    :param indexing: dataset index column (default:True)
+    Parameters
+    ----------
+    subs_list : list
+        list of subjects to create the new dataset for
+    indexing : bool, optional
+        dataset index column (default = True)
+
     """
+
     S = None
     print(f'\nProcess - {current_process().name} has {len(subs_list)} files to work on.\n')
 
@@ -173,6 +199,23 @@ def create_dataset(subs_list, indexing=True):
 
 
 def file_exists(subs_list):
+    """
+    Checks to see if any previous files with feature extracted data exist in the Dataset and returns the
+    updated list of files which don't exist in the Dataset.
+
+    This is done because generating the files is expensive and this avoids having to start over from scratch.
+
+    Parameters
+    ----------
+    subs_list : list
+        Complete subjects list
+
+    Returns
+    -------
+    updated_subs : list
+        list of subject files which are not already in the new Dataset
+
+    """
     updated_subs = []
     print(f'Checking for existing files in directories:\n')
     for dir in new_sensor_paths:
