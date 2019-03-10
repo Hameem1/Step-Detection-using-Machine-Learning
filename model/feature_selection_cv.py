@@ -97,6 +97,12 @@ def plot_n_features_vs_score(grid_scores, mp_lib=False):
         plt.show()
 
 
+def get_selected_features():
+    path = f'{data_files_path}\\features selected.csv'
+    f_sel = pd.read_csv(path, sep='\t', index_col=0)
+    return list(f_sel['selected features'])
+
+
 if __name__ == '__main__':
     # starting timer
     start = time()
@@ -132,15 +138,22 @@ if __name__ == '__main__':
     print(f"# of selected features:     {fit.n_features_}/{len(cols[:-1])}\n")
     feature_names = list(DATA.columns[0:-1][fit.support_])
     print(f"Selected Features:\n\n{feature_names}\n")
-    ranking = pd.DataFrame({'rank': fit.ranking_, 'feature': DATA.columns[0:-1]})
-    ranking = ranking.sort_values(by=['rank']).reset_index(drop=True)
+    ranking = pd.DataFrame({'Feature': DATA.columns[0:-1], 'Rank': fit.ranking_})
+    grid_score = pd.DataFrame({'Cumulative Predicted F1-score': [f'{i * 100:.2f}%' for i in rfecv.grid_scores_]})
+    ranking = ranking.sort_values(by=['Rank']).reset_index(drop=True)
+    ranking = ranking.join(grid_score)
     ranking.index = np.arange(1, len(ranking) + 1)
     print(f"Optimal number of features : {rfecv.n_features_}\n")
     # print(f"Feature Ranking:\n{fit.ranking_}\n{ranking}\n")
 
     # Generating .csv file from feature ranking
-    ranking.to_csv(f'{data_files_path}\\feature ranking' + ".csv", sep="\t", index=True)
-    print(f'>> File generated : feature ranking.csv\n')
+    if GEN_RANKING_FILE:
+        ranking.to_csv(f'{data_files_path}\\feature ranking' + ".csv", sep="\t",
+                       index=True, index_label='No. of features')
+        print(f'>> File generated : feature ranking.csv\n')
+        features_sel_df = pd.DataFrame({'selected features': feature_names})
+        features_sel_df.to_csv(f'{data_files_path}\\features selected' + ".csv", sep="\t", index=True)
+        print(f'>> File generated : features selected.csv\n')
 
     # Plotting number of features VS. cross-validation scores
     if PLOT:
@@ -154,14 +167,13 @@ if __name__ == '__main__':
         y_test = TEST_DATA[:, -1]
 
     print(f'Performance metric used for model optimization : "{SCORING}"\n')
-    print(f'Score of the classifier on test data = {rfecv.score(X_test, y_test) * 100:.3f}%\n')
     y_pred = rfecv.predict(X_test)
     print(f'Confusion Matrix:\n{confusion_matrix(y_test, y_pred)}\n')
     print(f'Score of the classifier on test data:\n'
           f'Accuracy  = {accuracy_score(y_test, y_pred) * 100:.3f}%\n'
           f'Precision = {precision_score(y_test, y_pred) * 100:.3f}%\n'
           f'Recall    = {recall_score(y_test, y_pred) * 100:.3f}%\n'
-          f'F1 score  = {f1_score(y_test, y_pred) * 100:.3f}%\n'
+          f'F1-score  = {f1_score(y_test, y_pred) * 100:.3f}%\n'
           f'ROC_AUC   = {roc_auc_score(y_test, y_pred) * 100:.3f}%\n\n')
 
     duration = time() - start
@@ -190,7 +202,7 @@ else:
         print('>> Model Imported.\n')
         print("The following model is now available for testing:\n\n"
               f"{model}\n\n"
-              f">> This model was trained on {model.n_features_} features.\n")
+              f">> This model was trained on {model.n_features_} features:\n{get_selected_features()}\n")
     else:
         print(f'No .pkl file found in the directory : "{TRAINED_MODEL_DIR}"\n')
 
