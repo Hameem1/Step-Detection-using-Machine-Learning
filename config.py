@@ -96,7 +96,7 @@ DATASET_ROOT = f"{ROOT}\\..\\DATASETS"
 # Paths to sensor directories in the NEW Dataset
 new_sensor_paths = [f"{DATASET_ROOT}\\{DATASET_FOLDER}\\{sensor}" for sensor in sensors]
 # Data-files directory path
-data_files_path = ROOT + '\\data-files'
+data_files_path = ROOT + '\\Data_Files'
 # Age sorted dataset directories
 age_dirs = {"Age_" + dirName: f'{DATASET_ROOT}\\{DATASET_FOLDER}_Age_Sorted\\Age_{dirName}' for dirName in ageGroups}
 # Paths to C, L and R in the age folders
