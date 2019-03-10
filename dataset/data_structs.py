@@ -101,7 +101,7 @@ class Subject:
     subject_id : str
         Filename of the Subject (e.g. "Idxxxxxx.txt")
     sensor_pos : dict of Dataset
-        'center', 'left' or 'right'
+        {'center' : Dataset, 'left': Dataset, 'right': Dataset}
 
     """
 
