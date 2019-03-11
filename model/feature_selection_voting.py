@@ -33,7 +33,7 @@ if __name__ == '__main__':
     # loading in the entire actual dataset for one sensor
     print(f'{DATA_PATH}\n')
     DATA = pd.read_csv(DATA_PATH, sep='\t', index_col=0)
-    # Loading the relevant data (limiting # of rows)
+    # limiting the # of rows used
     if DATA_REDUCE:
         DATA = DATA.iloc[0:row_count, :]
     print('>> Dataset loaded\n')
@@ -43,13 +43,13 @@ if __name__ == '__main__':
     X = data_matrix[:, 0:-1]
     y = data_matrix[:, -1]
     # Splitting the data into training and testing splits
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=101)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=TEST_SIZE, random_state=101)
     if DATA_NORMALIZATION:
         X_train, normalizer = normalize(X_train)
 
     # Feature selection
     # Recursive Feature Elimination/Model Based Feature Selection (More powerful than Uni-variate selection)
-    model = RandomForestClassifier(n_estimators=100, n_jobs=-1)
+    model = RandomForestClassifier(n_estimators=RF_ESTIMATORS, n_jobs=1)
     rfe = RFE(model, n_features)
 
     # Voting between multiple (r) Random forest based rankings
