@@ -5,7 +5,6 @@ The model is trained during the feature selection phase and is tested at the end
 
 """
 
-# Todo: Combine the feature selection functionality of both models and rename feature_selection.py to model.py
 # Todo: Use model.py for training the model with selected features (all for max performance)
 # Todo: Organize results
 # Todo: Add docstrings for the entire "model" package
@@ -16,17 +15,18 @@ import os
 import numpy as np
 import pandas as pd
 from time import time
+from sklearn.externals import joblib
 import plotly.offline as pyo
 import plotly.graph_objs as go
 import matplotlib.pyplot as plt
-from sklearn.externals import joblib
 from sklearn.feature_selection import RFECV
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split, StratifiedKFold
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, f1_score, recall_score, roc_auc_score
-from config import new_sensor_paths, DATA_PATH, data_files_path, ROOT, TRAINED_MODEL_PATH, \
-    TRAINED_MODEL_NAME, TRAINED_MODEL_DIR, TRAINED_NORMALIZER_NAME
+from config import new_sensor_paths, data_files_path, ROOT
+from model_config import DATA_PATH, TRAINED_MODEL_PATH, TRAINED_MODEL_NAME, TRAINED_MODEL_DIR,\
+    TRAINED_NORMALIZER_NAME, TESTING
 
 
 # Configuration Variables
@@ -52,12 +52,13 @@ DATA_REDUCE = False
 GEN_RANKING_FILE = True
 # If True, a plot will be generated for the # of features used vs performance metric
 PLOT = True
+# If True, trained model is exported to TRAINED_MODEL_PATH
+EXPORT_MODEL = True
+
 # Test on a separate dataset
 DISJOINT_TESTING = False
 # Path for disjoint test dataset
 TEST_DATA_PATH = f"{ROOT}\\Features_Dataset\\ds_left.csv"
-# If True, trained model is exported to TRAINED_MODEL_PATH
-EXPORT_MODEL = True
 
 
 def plot_n_features_vs_score(grid_scores, mp_lib=False):
@@ -101,7 +102,7 @@ def import_trained_model(dir_path, name):
         print('>> Model Imported.\n')
         return ret_model
     else:
-        print(f'No .pkl file found in the directory : "{TRAINED_MODEL_DIR}"\n')
+        print(f'The file {name} does not exist in the directory : "{TRAINED_MODEL_DIR}"\n')
         return None
 
 
@@ -120,6 +121,7 @@ def export_trained_model(model, dir_path, name):
 
 
 if __name__ == '__main__':
+    # Preparing the Data
     # starting timer
     start = time()
     # loading in the entire actual dataset
@@ -137,7 +139,7 @@ if __name__ == '__main__':
     # Splitting the data into training and testing splits
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=TEST_SIZE, random_state=101)
 
-    # Data Normalization
+    # Normalizing the training data
     if DATA_NORMALIZATION:
         scaler = MinMaxScaler(feature_range=(0, 1))
         # Training the normalizer
@@ -229,34 +231,46 @@ if __name__ == '__main__':
 
 
 else:
-    print(f"\nModule imported : {__name__}\n")
+    if TESTING:
+        # Loading the trained classification model for testing
+        # To override the model names
+        # TRAINED_MODEL_NAME = 'step_detection_model.pkl'
+        # TRAINED_NORMALIZER_NAME = 'step_detection_min_max_norm.pkl'
 
-    # Loading the trained classification model for testing
-    classifier = import_trained_model(TRAINED_MODEL_PATH, TRAINED_MODEL_NAME)
-    if classifier is None:
-        del classifier
+        classifier = import_trained_model(TRAINED_MODEL_PATH, TRAINED_MODEL_NAME)
+        if classifier is None:
+            del classifier
+        else:
+            print("The following model is now available for testing:\n\n"
+                  f"{classifier}\n\n"
+                  f">> This model was trained on {classifier.n_features_} features:\n{get_selected_features()}\n"
+                  f">> Classifier imported : {TRAINED_MODEL_NAME}\n")
+
+        # Loading the trained normalizer for testing
+        normalizer = import_trained_model(TRAINED_MODEL_PATH, TRAINED_NORMALIZER_NAME)
+        if normalizer is None:
+            del normalizer
+        else:
+            print("The following model is now available for testing:\n\n"
+                  f"{normalizer} - Type = {type(normalizer)}\n\n"
+                  f">> Normalizer imported : {TRAINED_NORMALIZER_NAME}\n")
+
+        print(f'DataFrames must be converted to numpy arrays before passing them to the models. (i.e., df.values)\n')
+
+        # Setting up variables for testing via console
+        DATA = pd.read_csv(DATA_PATH, sep='\t', index_col=0)
+        if DATA_REDUCE:
+            DATA = DATA.iloc[0:row_count, :]
+        data_matrix = DATA[get_selected_features()+['StepLabel']].values
+        X = data_matrix[:, 0:-1]
+        y = data_matrix[:, -1]
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=TEST_SIZE, random_state=101)
+        print(f'The variables : DATA, data_matrix, X, Y, X_train, X_test, y_train, y_test have been generated from:\n'
+              f'Dataset = {DATA_PATH}\n\n'
+              f'The following models are also available:\n'
+              f'classifier (The trained classifier)\n'
+              f'normalizer (The trained normalizer)\n')
+        print()
+
     else:
-        print("The following model is now available for testing:\n\n"
-              f"{classifier}\n\n"
-              f">> This model was trained on {classifier.n_features_} features:\n{get_selected_features()}\n"
-              f">> Classifier imported : {TRAINED_MODEL_NAME}\n")
-
-    # Loading the trained normalizer for testing
-    normalizer = import_trained_model(TRAINED_MODEL_PATH, TRAINED_NORMALIZER_NAME)
-    if normalizer is None:
-        del normalizer
-    else:
-        print("The following model is now available for testing:\n\n"
-              f"{normalizer} - Type = {type(normalizer)}\n\n"
-              f">> Normalizer imported : {TRAINED_NORMALIZER_NAME}\n")
-
-    print(f'DataFrames must be converted to numpy arrays before passing them to the models. (i.e., df.values)\n')
-
-    # Setting up variables for testing via console
-    DATA = pd.read_csv(DATA_PATH, sep='\t', index_col=0)
-    if DATA_REDUCE:
-        DATA = DATA.iloc[0:row_count, :]
-    data_matrix = DATA[get_selected_features()+['StepLabel']].values
-    X = data_matrix[:, 0:-1]
-    y = data_matrix[:, -1]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=TEST_SIZE, random_state=101)
+        print(f"\nModule imported : {__name__}\n")
