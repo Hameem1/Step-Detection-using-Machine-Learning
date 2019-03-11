@@ -3,58 +3,40 @@ This module implements Model Based Feature Selection (with cross-validated selec
 The model used is a Random Forest classifier.
 The model is trained during the feature selection phase and is tested at the end on test data using the best features.
 
+Notes
+-----
+This module/algorithm provides:
+1)  A ranking of all the features and the predicted model accuracy for using n-features - saved in the data_files_path.
+2)  A plot of "# of features used" vs "Model Performance" - saved in the data_files_path.
+3)  A .csv file containing a list of the features selected for optimal model performance - saved in the data_files_path.
+4)  Two exported trained models, one classifier and one normalizer - saved in the Trained_Model directory.
+5)  Option to import this module and begin testing the pre-trained models (set TESTING = True - in model_config.py)
+
+- The results have proved that the model has the highest accuracy when trained on all 51 features.
+- The model stats on training/testing with a ratio of 1:1 on the entire feature extracted dataset yielded:
+    Accuracy    = 92.865%
+    Precision   = 90.040%
+    Recall      = 92.205%
+    F1-score    = 91.110%
+    ROC_AUC     = 92.752%
+
 """
 
 # Todo: Use model.py for training the model with selected features (all for max performance)
 # Todo: Organize results
-# Todo: Add docstrings for the entire "model" package
-# Todo: Refactor the variable names involving paths, used in config.py
+# Todo: Refactor the variable names involving paths, used in config.py and model.py
 
 # Imports
-import os
-import numpy as np
-import pandas as pd
-from time import time
-from sklearn.externals import joblib
 import plotly.offline as pyo
 import plotly.graph_objs as go
 import matplotlib.pyplot as plt
 from sklearn.feature_selection import RFECV
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split, StratifiedKFold
+from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, f1_score, recall_score, roc_auc_score
-from config import new_sensor_paths, data_files_path, ROOT
-from model_config import DATA_PATH, TRAINED_MODEL_PATH, TRAINED_MODEL_NAME, TRAINED_MODEL_DIR,\
-    TRAINED_NORMALIZER_NAME, TESTING
-
+from config import data_files_path
+from model_config import *
 
 # Configuration Variables
-# list of all feature labels + StepLabel
-cols = pd.read_csv(f'{new_sensor_paths[0]}\\{os.listdir(new_sensor_paths[0])[0]}', sep='\t', index_col=0).columns
-# Setting numpy print precision
-np.set_printoptions(precision=5)
-# no. of rows of dataset to be used
-row_count = 5000
-# no. of Decision Trees per Random Forest
-RF_ESTIMATORS = 100
-# Test Data size (out of 1.0)
-TEST_SIZE = 0.5
-# Cross validation folds
-K_FOLD = 2
-# Performance metric to optimize the model for
-SCORING = 'f1_weighted'
-# If True, the dataset is normalized before training
-DATA_NORMALIZATION = True
-# If True, a selected portion of the entire dataset is used for training (# of rows = row_count)
-DATA_REDUCE = False
-# If True, generate a .csv file for the feature ranking
-GEN_RANKING_FILE = True
-# If True, a plot will be generated for the # of features used vs performance metric
-PLOT = True
-# If True, trained model is exported to TRAINED_MODEL_PATH
-EXPORT_MODEL = True
-
 # Test on a separate dataset
 DISJOINT_TESTING = False
 # Path for disjoint test dataset
@@ -62,6 +44,18 @@ TEST_DATA_PATH = f"{ROOT}\\Features_Dataset\\ds_left.csv"
 
 
 def plot_n_features_vs_score(grid_scores, mp_lib=False):
+    """
+    Creates a plot for 'No. of features used' vs 'Model Performance'.
+    It is saved in 'data_files_path'.
+
+    Parameters
+    ----------
+    grid_scores
+        Result of model.grid_scores_
+    mp_lib : bool
+        Set to True if also plotting with matplotlib (default = False)
+
+    """
     x = list(range(1, len(grid_scores) + 1))
     y = grid_scores
     # Generating the plot trace
@@ -90,12 +84,35 @@ def plot_n_features_vs_score(grid_scores, mp_lib=False):
 
 
 def get_selected_features():
+    """
+    Returns a list of selected features read in from the 'features selected.csv' file.
+
+    Returns
+    -------
+    list : selected features
+
+    """
     path = f'{data_files_path}\\features selected.csv'
     f_sel = pd.read_csv(path, sep='\t', index_col=0)
     return list(f_sel['selected features'])
 
 
 def import_trained_model(dir_path, name):
+    """
+    Imports a trained model from the given directory.
+
+    Parameters
+    ----------
+    dir_path : str
+        Directory of the saved model.
+    name : str
+        Name of the saved model.
+
+    Returns
+    -------
+    None or Model
+
+    """
     if os.path.exists(f"{dir_path}\\{name}"):
         path = f'{dir_path}\\{name}'
         ret_model = joblib.load(path)
@@ -107,6 +124,16 @@ def import_trained_model(dir_path, name):
 
 
 def export_trained_model(model, dir_path, name):
+    """
+    Imports a trained model to the given directory.
+
+    Parameters
+    ----------
+    model : The trained model to be exported
+    dir_path : Target directory
+    name : File name to save the model as
+
+    """
     # Creating the directory for the trained model
     if not os.path.exists(TRAINED_MODEL_PATH):
         print(f'WARNING: The path does not exist. Creating new directory...\n{TRAINED_MODEL_PATH}\n')
@@ -118,6 +145,29 @@ def export_trained_model(model, dir_path, name):
     path = f'{dir_path}\\{name}'
     joblib.dump(model, path)
     print(f'>> Model stored externally as "{name}"\n')
+
+
+def normalize(x_train):
+    """
+    Trains a normalizer with the given data and return the normalized data along with the normalizer model.
+
+    Parameters
+    ----------
+    x_train : np.Array
+        Data to train the model on
+
+    Returns
+    -------
+    np.Array : Normalized data
+    Model : Trained normalization model
+
+    """
+    # Training the normalizer
+    norm_model = MinMaxScaler(feature_range=(0, 1)).fit(x_train)
+    # Normalizing the training data
+    x_train = normalizer.transform(x_train)
+    print('>> Training set normalized.\n')
+    return x_train, norm_model
 
 
 if __name__ == '__main__':
@@ -141,14 +191,7 @@ if __name__ == '__main__':
 
     # Normalizing the training data
     if DATA_NORMALIZATION:
-        scaler = MinMaxScaler(feature_range=(0, 1))
-        # Training the normalizer
-        normalizer = scaler.fit(X_train)
-        # Normalizing the training data
-        X_train = normalizer.transform(X_train)
-        print('>> Training set normalized.\n')
-
-    # x = pd.DataFrame(X_train, columns=cols[:-1])  # To convert from np.array to DataFrame
+        X_train, normalizer = normalize(X_train)
 
     # Feature selection
     # Recursive Feature Elimination/Model Based Feature Selection (with cross-validated selection of best # of features)
@@ -207,22 +250,17 @@ if __name__ == '__main__':
     duration = time() - start
     print('Operation took:', f'{duration:.2f} seconds.\n' if duration < 60 else f'{duration / 60:.2f} minutes.\n')
 
-    # Re-training the normalizer with updated features (because they may have reduced)
-    if DATA_NORMALIZATION:
-        # removing the previous normalizer
-        print('>> Removing the previous Normalizer\n')
-        del scaler, normalizer
-    print('>> Re-training the Normalizer\n')
-    scaler = MinMaxScaler(feature_range=(0, 1))
     # Converting a selected section of the dataset to a numpy array (based on best features)
     data_matrix = DATA[get_selected_features()+['StepLabel']].values
     X = data_matrix[:, 0:-1]
     y = data_matrix[:, -1]
     # Splitting the data into training and testing splits
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=TEST_SIZE, random_state=101)
-    # Re-training
-    normalizer = scaler.fit(X_train)
-    print('>> Normalizer re-trained\n')
+    # Re-training the normalizer with updated features (because they may have been reduced)
+    if DATA_NORMALIZATION:
+        print('>> Re-training the Normalizer\n')
+        X_train, normalizer = normalize(X_train)
+        print('>> Normalizer re-trained\n')
 
     # Exporting the trained classifier and normalizer
     if EXPORT_MODEL:
@@ -232,11 +270,11 @@ if __name__ == '__main__':
 
 else:
     if TESTING:
-        # Loading the trained classification model for testing
-        # To override the model names
+        # To OVERRIDE the model names
         # TRAINED_MODEL_NAME = 'step_detection_model.pkl'
         # TRAINED_NORMALIZER_NAME = 'step_detection_min_max_norm.pkl'
 
+        # Loading the trained classification model for testing
         classifier = import_trained_model(TRAINED_MODEL_PATH, TRAINED_MODEL_NAME)
         if classifier is None:
             del classifier
