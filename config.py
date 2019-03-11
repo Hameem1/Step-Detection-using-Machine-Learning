@@ -45,12 +45,6 @@ age_dirs : dict of list
     Age sorted dataset directories
 sensor_dirs : dict of list
     Paths to sensor directories in the age folders
-DATA_PATH : str
-    loading in the actual dataset for one sensor (Data under test)
-NEW_DATASET : str
-    Directory name for new data set which contains the training/testing data for the classifier
-NEW_DATASET_PATH : str
-    Directory path for new data set which contains the training/testing data for the classifier
 
 """
 
