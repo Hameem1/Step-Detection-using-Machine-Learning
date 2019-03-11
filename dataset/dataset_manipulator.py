@@ -6,8 +6,9 @@ This module provides functions and variables to manipulate the entire data set.
 import os
 import re
 import pandas as pd
+from model_config import NEW_DATASET_PATH
 from config import FORCE, FILE_STATUS_MESSAGES, FOLDER_NAME, ROOT, data_files_path,\
-    sensor_paths, sensors, new_sensor_paths, NEW_DATASET_PATH
+    sensor_paths, sensors, new_sensor_paths
 
 
 def dataset_rename():
