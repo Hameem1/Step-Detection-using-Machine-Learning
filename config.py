@@ -114,6 +114,6 @@ TRAINED_MODEL_DIR = 'Trained_Model'
 # Trained Model directory path
 TRAINED_MODEL_PATH = f'{ROOT}\\{TRAINED_MODEL_DIR}'
 # Trained Model name
-TRAINED_MODEL_NAME = 'step_detection_model.pkl'
+TRAINED_MODEL_NAME = 'step_detection_model_v2.pkl'
 # Trained Normalizer name
-TRAINED_NORMALIZER_NAME = 'step_detection_min_max_norm.pkl'
+TRAINED_NORMALIZER_NAME = 'step_detection_min_max_norm_v2.pkl'

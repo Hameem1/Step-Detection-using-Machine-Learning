@@ -13,13 +13,13 @@ The model is trained during the feature selection phase and is tested at the end
 
 # Imports
 import os
-import pickle
 import numpy as np
 import pandas as pd
 from time import time
 import plotly.offline as pyo
 import plotly.graph_objs as go
 import matplotlib.pyplot as plt
+from sklearn.externals import joblib
 from sklearn.feature_selection import RFECV
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.ensemble import RandomForestClassifier
@@ -96,8 +96,8 @@ def get_selected_features():
 
 def import_trained_model(dir_path, name):
     if os.path.exists(f"{dir_path}\\{name}"):
-        with open(f"{dir_path}\\{name}", 'rb') as step_detection_model:
-            ret_model = pickle.load(step_detection_model)
+        path = f'{dir_path}\\{name}'
+        ret_model = joblib.load(path)
         print('>> Model Imported.\n')
         return ret_model
     else:
@@ -114,8 +114,8 @@ def export_trained_model(model, dir_path, name):
         print(f"Path for '{TRAINED_MODEL_DIR}' already exists!\n")
 
     # Saving the model externally in TRAINED_MODEL_PATH
-    with open(f"{dir_path}\\{name}", 'wb') as step_detection_model:
-        pickle.dump(model, step_detection_model)
+    path = f'{dir_path}\\{name}'
+    joblib.dump(model, path)
     print(f'>> Model stored externally as "{name}"\n')
 
 
