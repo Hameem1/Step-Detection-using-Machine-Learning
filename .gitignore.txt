@@ -5,3 +5,4 @@ OU-InertGaitAction_wStepAnnotation/
 Step_Detection_Dataset/
 Features_Dataset/
 *.pkl
+Backups/
