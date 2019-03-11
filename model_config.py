@@ -3,12 +3,46 @@ Contains the global configurations for model related tasks and performs common i
 
 Attributes
 ----------
+cols : list of str
+    List of all feature labels + StepLabel
+row_count : int
+    No. of rows of dataset to be used
+RF_ESTIMATORS : int
+    No. of Decision Trees per Random Forest
+TEST_SIZE : float
+    Test Data size (out of 1.0)
+K_FOLD : int
+    No. of Cross validation folds
+SCORING : str
+    Performance metric to optimize the model for
+TESTING : bool
+    Set to True if testing with the Python CONSOLE
+DATA_NORMALIZATION : bool
+    If True, the dataset is normalized before training and testing
+DATA_REDUCE : bool
+    If True, a selected portion of the entire dataset is used for training+testing (# of rows = row_count)
+GEN_RANKING_FILE : bool
+    If True, generate a .csv file for the feature ranking
+PLOT : bool
+    If True, a plot will be generated for the # of features used vs performance metric
+EXPORT_MODEL : bool
+    If True, trained model is exported to TRAINED_MODEL_PATH
+
 DATA_PATH : str
     loading in the actual dataset for one sensor (Data under test)
 NEW_DATASET : str
     Directory name for new data set which contains the training/testing data for the classifier
 NEW_DATASET_PATH : str
     Directory path for new data set which contains the training/testing data for the classifier
+TRAINED_MODEL_DIR : str
+    Trained Model directory name
+TRAINED_MODEL_PATH : str
+    Trained Model directory path
+TRAINED_MODEL_NAME : str
+    Trained Model name
+TRAINED_NORMALIZER_NAME : str
+    Trained Normalizer name
+
 """
 
 # Global imports
@@ -38,18 +72,18 @@ TEST_SIZE = 0.5
 K_FOLD = 2
 # Performance metric to optimize the model for
 SCORING = 'f1_weighted'
-# Set to True if TESTING with console
+# Set to True if TESTING with the Python CONSOLE
 TESTING = False
-# If True, the dataset is normalized before training
+# If True, the dataset is normalized before training & testing
 DATA_NORMALIZATION = True
-# If True, a selected portion of the entire dataset is used for training (# of rows = row_count)
-DATA_REDUCE = False
+# If True, a selected portion of the entire dataset is used for training+testing (# of rows = row_count)
+DATA_REDUCE = True
 # If True, generate a .csv file for the feature ranking
-GEN_RANKING_FILE = True
+GEN_RANKING_FILE = False
 # If True, a plot will be generated for the # of features used vs performance metric
-PLOT = True
+PLOT = False
 # If True, trained model is exported to TRAINED_MODEL_PATH
-EXPORT_MODEL = True
+EXPORT_MODEL = False
 
 # Paths
 # loading in the actual dataset for the ML classifier
