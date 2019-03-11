@@ -170,6 +170,16 @@ def normalize(x_train):
     return x_train, norm_model
 
 
+def print_scores(y_test, y_pred):
+    print(f'Confusion Matrix:\n{confusion_matrix(y_test, y_pred)}\n')
+    print(f'Score of the classifier on test data:\n'
+          f'Accuracy  = {accuracy_score(y_test, y_pred) * 100:.3f}%\n'
+          f'Precision = {precision_score(y_test, y_pred) * 100:.3f}%\n'
+          f'Recall    = {recall_score(y_test, y_pred) * 100:.3f}%\n'
+          f'F1-score  = {f1_score(y_test, y_pred) * 100:.3f}%\n'
+          f'ROC_AUC   = {roc_auc_score(y_test, y_pred) * 100:.3f}%\n\n')
+
+
 if __name__ == '__main__':
     # Preparing the Data
     # starting timer
@@ -177,7 +187,7 @@ if __name__ == '__main__':
     # loading in the entire actual dataset
     print(f'{DATA_PATH}\n')
     DATA = pd.read_csv(DATA_PATH, sep='\t', index_col=0)
-    # Loading the relevant data (limiting # of rows)
+    # limiting the # of rows used
     if DATA_REDUCE:
         DATA = DATA.iloc[0:row_count, :]
     print('>> Dataset loaded\n')
@@ -202,7 +212,7 @@ if __name__ == '__main__':
     print('>> Model Trained!\n')
     print('>> Feature Ranking complete!\n')
 
-    # Summarizing the ranking and generating a .csv file
+    # Summarizing the feature ranking
     print(f"# of selected features:     {fit.n_features_}/{len(cols[:-1])}\n")
     feature_names = list(DATA.columns[0:-1][fit.support_])
     print(f"Selected Features:\n\n{feature_names}\n")
@@ -214,7 +224,7 @@ if __name__ == '__main__':
     print(f"Optimal number of features : {rfecv.n_features_}\n")
     # print(f"Feature Ranking:\n{fit.ranking_}\n{ranking}\n")
 
-    # Generating .csv file from feature ranking
+    # Generating .csv files from feature ranking and selected features
     if GEN_RANKING_FILE:
         ranking.to_csv(f'{data_files_path}\\feature ranking' + ".csv", sep="\t",
                        index=True, index_label='No. of features')
@@ -238,15 +248,11 @@ if __name__ == '__main__':
     X_test = normalizer.transform(X_test)
     print(f'Cross validation : Stratified {K_FOLD}-Fold\n')
     print(f'Performance metric used for model optimization : "{SCORING}"\n')
+    # Testing the model with the test set
     y_pred = rfecv.predict(X_test)
-    print(f'Confusion Matrix:\n{confusion_matrix(y_test, y_pred)}\n')
-    print(f'Score of the classifier on test data:\n'
-          f'Accuracy  = {accuracy_score(y_test, y_pred) * 100:.3f}%\n'
-          f'Precision = {precision_score(y_test, y_pred) * 100:.3f}%\n'
-          f'Recall    = {recall_score(y_test, y_pred) * 100:.3f}%\n'
-          f'F1-score  = {f1_score(y_test, y_pred) * 100:.3f}%\n'
-          f'ROC_AUC   = {roc_auc_score(y_test, y_pred) * 100:.3f}%\n\n')
-
+    # Printing model scores
+    print_scores(y_test, y_pred)
+    # Stopping the timer
     duration = time() - start
     print('Operation took:', f'{duration:.2f} seconds.\n' if duration < 60 else f'{duration / 60:.2f} minutes.\n')
 
