@@ -165,7 +165,7 @@ def normalize(x_train):
     # Training the normalizer
     norm_model = MinMaxScaler(feature_range=(0, 1)).fit(x_train)
     # Normalizing the training data
-    x_train = normalizer.transform(x_train)
+    x_train = norm_model.transform(x_train)
     print('>> Training set normalized.\n')
     return x_train, norm_model
 
