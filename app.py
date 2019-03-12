@@ -1,5 +1,5 @@
 """
-This module implements the high level logic for normalizing the dataset and data visualizations.
+This module implements the high level logic for data pre-processing and data visualizations.
 
 Warnings
 --------
