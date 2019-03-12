@@ -286,7 +286,8 @@ if __name__ == '__main__':
     # Exporting the trained classifier and normalizer
     if EXPORT_MODEL:
         export_trained_model(rfecv, TRAINED_MODEL_PATH, TRAINED_MODEL_NAME)
-        export_trained_model(normalizer, TRAINED_MODEL_PATH, TRAINED_NORMALIZER_NAME)
+        if DATA_NORMALIZATION:
+            export_trained_model(normalizer, TRAINED_MODEL_PATH, TRAINED_NORMALIZER_NAME)
 
 
 else:
