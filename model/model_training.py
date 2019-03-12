@@ -67,5 +67,11 @@ if __name__ == '__main__':
     print('Operation took:', f'{duration:.2f} seconds.\n' if duration < 60 else f'{duration / 60:.2f} minutes.\n')
     print(f'\nProcess ended at :\n\nDate  :  {dt.today().strftime("%x")}\nTime  :  {dt.today().strftime("%X")}\n')
 
+    # Exporting the trained classifier and normalizer
+    if EXPORT_MODEL:
+        export_trained_model(model, TRAINED_MODEL_PATH, TRAINED_MODEL_NAME)
+        if DATA_NORMALIZATION:
+            export_trained_model(normalizer, TRAINED_MODEL_PATH, TRAINED_NORMALIZER_NAME)
+
 else:
     print(f"\nModule imported : {__name__}\n")
