@@ -30,8 +30,10 @@ if __name__ == '__main__':
     # Preparing the Data
     # starting timer
     start = time()
+    print(f'\nProcess started at :\n\nDate  :  {dt.today().strftime("%x")}\nTime  :  {dt.today().strftime("%X")}\n')
     # loading in the entire actual dataset for one sensor
-    print(f'{DATA_PATH}\n')
+    print('>> Loading the dataset\n')
+    print(f'Location : {DATA_PATH}\n')
     DATA = pd.read_csv(DATA_PATH, sep='\t', index_col=0)
     # limiting the # of rows used
     if DATA_REDUCE:
@@ -49,7 +51,7 @@ if __name__ == '__main__':
 
     # Feature selection
     # Recursive Feature Elimination/Model Based Feature Selection (More powerful than Uni-variate selection)
-    model = RandomForestClassifier(n_estimators=RF_ESTIMATORS, n_jobs=1)
+    model = RandomForestClassifier(n_estimators=RF_ESTIMATORS, n_jobs=N_JOBS, verbose=VERBOSE)
     rfe = RFE(model, n_features)
 
     # Voting between multiple (r) Random forest based rankings
@@ -75,6 +77,7 @@ if __name__ == '__main__':
     print(f'Feature selection with "{r}" separate Random Forest Classifiers complete\n')
     duration = time() - start
     print('Operation took:', f'{duration:.2f} seconds.' if duration < 60 else f'{duration/60:.2f} minutes.\n\n')
+    print(f'\nProcess ended at :\n\nDate  :  {dt.today().strftime("%x")}\nTime  :  {dt.today().strftime("%X")}\n')
 
     print(f'Best {n_features} features selected:\n{selected_features}\n')
 
