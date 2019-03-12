@@ -11,6 +11,10 @@ RF_ESTIMATORS : int
     No. of Decision Trees per Random Forest
 TEST_SIZE : float
     Test Data size (out of 1.0)
+VERBOSE : int or bool
+    Controls Model processing verbosity
+N_JOBS : int
+    Controls the no. of threads to use for computations (N_JOBS = -1 for auto)
 K_FOLD : int
     No. of Cross validation folds
 SCORING : str
@@ -47,15 +51,20 @@ TRAINED_NORMALIZER_NAME : str
 
 # Global imports
 import os
+import locale
 import numpy as np
 import pandas as pd
 from time import time
+from datetime import datetime as dt
 from sklearn.externals import joblib
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from config import new_sensor_paths, ROOT
 
+# Configuring locale for datetime purposes
+lang = 'de_DE'
+locale.setlocale(locale.LC_ALL, lang)
 
 # Model Configuration Variables
 # list of all feature labels + StepLabel
@@ -63,11 +72,15 @@ cols = pd.read_csv(f'{new_sensor_paths[0]}\\{os.listdir(new_sensor_paths[0])[0]}
 # Setting numpy print precision
 np.set_printoptions(precision=5)
 # no. of rows of dataset to be used
-row_count = 5000
+row_count = 50000
 # no. of Decision Trees per Random Forest
 RF_ESTIMATORS = 100
 # Test Data size (out of 1.0)
 TEST_SIZE = 0.5
+# Controls Model processing verbosity
+VERBOSE = True
+# Controls the no. of threads to use for computations (N_JOBS = -1 for auto)
+N_JOBS = -1
 # Cross validation folds
 K_FOLD = 2
 # Performance metric to optimize the model for
@@ -77,7 +90,7 @@ TESTING = False
 # If True, the dataset is normalized before training & testing
 DATA_NORMALIZATION = True
 # If True, a selected portion of the entire dataset is used for training+testing (# of rows = row_count)
-DATA_REDUCE = True
+DATA_REDUCE = False
 # If True, generate a .csv file for the feature ranking
 GEN_RANKING_FILE = False
 # If True, a plot will be generated for the # of features used vs performance metric
