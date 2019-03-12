@@ -22,7 +22,6 @@ This module/algorithm provides:
 
 """
 
-# Todo: Use model.py for training the model with selected features (all for max performance)
 # Todo: Organize results
 # Todo: Refactor the variable names involving paths, used in config.py and model.py
 
@@ -32,7 +31,8 @@ import plotly.graph_objs as go
 import matplotlib.pyplot as plt
 from sklearn.feature_selection import RFECV
 from sklearn.model_selection import StratifiedKFold
-from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, f1_score, recall_score, roc_auc_score
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, f1_score, recall_score, \
+    roc_auc_score, classification_report
 from config import data_files_path
 from model_config import *
 
@@ -41,6 +41,18 @@ from model_config import *
 DISJOINT_TESTING = False
 # Path for disjoint test dataset
 TEST_DATA_PATH = f"{ROOT}\\Features_Dataset\\ds_left.csv"
+
+
+def create_dir(path, suppress_print=False):
+    if not os.path.exists(path):
+        if not suppress_print:
+            print(f'WARNING: The path does not exist. Creating new directory...\n{path}\n')
+        os.mkdir(path)
+    else:
+        if not suppress_print:
+            print(f"Path for '{path}' already exists!\n")
+        else:
+            pass
 
 
 def plot_n_features_vs_score(grid_scores, mp_lib=False):
@@ -72,6 +84,7 @@ def plot_n_features_vs_score(grid_scores, mp_lib=False):
 
     # Plotting the figure
     fig = dict(data=data, layout=layout)
+    create_dir(data_files_path, suppress_print=True)
     pyo.plot(fig, filename=f'{data_files_path}\\Number of features vs Model score' + '.html', auto_open=False)
     print(f'>> File Generated : Number of features vs Model score' + '.html\n')
 
@@ -135,11 +148,7 @@ def export_trained_model(model, dir_path, name):
 
     """
     # Creating the directory for the trained model
-    if not os.path.exists(TRAINED_MODEL_PATH):
-        print(f'WARNING: The path does not exist. Creating new directory...\n{TRAINED_MODEL_PATH}\n')
-        os.mkdir(TRAINED_MODEL_PATH)
-    else:
-        print(f"Path for '{TRAINED_MODEL_DIR}' already exists!\n")
+    create_dir(TRAINED_MODEL_PATH)
 
     # Saving the model externally in TRAINED_MODEL_PATH
     path = f'{dir_path}\\{name}'
@@ -177,15 +186,18 @@ def print_scores(y_test, y_pred):
           f'Precision = {precision_score(y_test, y_pred) * 100:.3f}%\n'
           f'Recall    = {recall_score(y_test, y_pred) * 100:.3f}%\n'
           f'F1-score  = {f1_score(y_test, y_pred) * 100:.3f}%\n'
-          f'ROC_AUC   = {roc_auc_score(y_test, y_pred) * 100:.3f}%\n\n')
+          f'ROC_AUC   = {roc_auc_score(y_test, y_pred) * 100:.3f}%\n\n'
+          f'Classification Report: \n{classification_report(y_test, y_pred)}\n\n')
 
 
 if __name__ == '__main__':
     # Preparing the Data
     # starting timer
     start = time()
+    print(f'\nProcess started at :\n\nDate  :  {dt.today().strftime("%x")}\nTime  :  {dt.today().strftime("%X")}\n')
     # loading in the entire actual dataset
-    print(f'{DATA_PATH}\n')
+    print('>> Loading the dataset\n')
+    print(f'Location : {DATA_PATH}\n')
     DATA = pd.read_csv(DATA_PATH, sep='\t', index_col=0)
     # limiting the # of rows used
     if DATA_REDUCE:
@@ -205,8 +217,8 @@ if __name__ == '__main__':
 
     # Feature selection
     # Recursive Feature Elimination/Model Based Feature Selection (with cross-validated selection of best # of features)
-    classifier = RandomForestClassifier(n_estimators=RF_ESTIMATORS)
-    rfecv = RFECV(estimator=classifier, cv=StratifiedKFold(K_FOLD), scoring=SCORING, n_jobs=1)
+    classifier = RandomForestClassifier(n_estimators=RF_ESTIMATORS, n_jobs=N_JOBS, verbose=VERBOSE)
+    rfecv = RFECV(estimator=classifier, cv=StratifiedKFold(K_FOLD), scoring=SCORING, n_jobs=N_JOBS, verbose=VERBOSE)
     print('>> Training the model & Performing feature ranking simultaneously\n')
     fit = rfecv.fit(X_train, y_train)
     print('>> Model Trained!\n')
@@ -226,6 +238,8 @@ if __name__ == '__main__':
 
     # Generating .csv files from feature ranking and selected features
     if GEN_RANKING_FILE:
+        # Creating the data files directory incase it doesn't exist already
+        create_dir(data_files_path)
         ranking.to_csv(f'{data_files_path}\\feature ranking' + ".csv", sep="\t",
                        index=True, index_label='No. of features')
         print(f'>> File generated : feature ranking.csv\n')
@@ -255,6 +269,7 @@ if __name__ == '__main__':
     # Stopping the timer
     duration = time() - start
     print('Operation took:', f'{duration:.2f} seconds.\n' if duration < 60 else f'{duration / 60:.2f} minutes.\n')
+    print(f'\nProcess ended at :\n\nDate  :  {dt.today().strftime("%x")}\nTime  :  {dt.today().strftime("%X")}\n')
 
     # Converting a selected section of the dataset to a numpy array (based on best features)
     data_matrix = DATA[get_selected_features()+['StepLabel']].values
