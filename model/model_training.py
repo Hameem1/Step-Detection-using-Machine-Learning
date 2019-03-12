@@ -2,25 +2,38 @@
 This module simply trains and tests a Random Forest classifier with the data from the specified dataset.
 N top features are used for the training.
 
+Notes
+----------
+N : int or 'all'
+    Number of top features to use
+
 """
+
+# # Code required for using this program from the terminal (calling the module from the project root)
+# import sys
+# import os
+# sys.path.append(os.getcwd())
 
 from model.feature_selection_complete import normalize, import_trained_model, export_trained_model, print_scores
 from config import data_files_path
 from model_config import *
 
-N = 20
+N = 'all'
 
 if __name__ == '__main__':
     # Preparing the Data
     # starting timer
     start = time()
+    print(f'\nProcess started at :\n\nDate  :  {dt.today().strftime("%x")}\nTime  :  {dt.today().strftime("%X")}\n')
     # loading in the entire actual dataset
-    print(f'{DATA_PATH}\n')
+    print('>> Loading the dataset\n')
+    print(f'Location : {DATA_PATH}\n')
     DATA = pd.read_csv(DATA_PATH, sep='\t', index_col=0)
-    # Selecting best N features
-    fr = pd.read_csv(data_files_path + '\\feature ranking.csv', sep='\t', index_col=0)
-    top_N_features = list(fr['Feature'][:N])
-    DATA = DATA[top_N_features]
+    # Selecting the best N features
+    if N is not 'all':
+        fr = pd.read_csv(data_files_path + '\\feature ranking.csv', sep='\t', index_col=0)
+        top_N_features = list(fr['Feature'][:N])+['StepLabel']
+        DATA = DATA[top_N_features]
     # limiting the # of rows used
     if DATA_REDUCE:
         DATA = DATA.iloc[0:row_count, :]
@@ -38,7 +51,7 @@ if __name__ == '__main__':
         X_train, normalizer = normalize(X_train)
 
     # Initializing the classifier
-    model = RandomForestClassifier(n_estimators=RF_ESTIMATORS, n_jobs=1, verbose=True)
+    model = RandomForestClassifier(n_estimators=RF_ESTIMATORS, n_jobs=N_JOBS, verbose=VERBOSE)
     # Training the classifier
     print('>> Training the model\n')
     model.fit(X_train, y_train)
@@ -52,6 +65,7 @@ if __name__ == '__main__':
     # Stopping the timer
     duration = time() - start
     print('Operation took:', f'{duration:.2f} seconds.\n' if duration < 60 else f'{duration / 60:.2f} minutes.\n')
+    print(f'\nProcess ended at :\n\nDate  :  {dt.today().strftime("%x")}\nTime  :  {dt.today().strftime("%X")}\n')
 
 else:
     print(f"\nModule imported : {__name__}\n")
