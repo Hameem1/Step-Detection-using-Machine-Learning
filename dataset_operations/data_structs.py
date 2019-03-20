@@ -1,10 +1,10 @@
 """
-This module implements the data structures used to store the dataset.
+This module implements the data structures used to store the dataset_operations.
 
 """
 
 import pandas as pd
-from dataset.dataset_manipulator import get_subjects_list, sensor_paths
+from dataset_operations.dataset_manipulator import get_subjects_list, sensor_paths
 from config import FILE_STATUS_MESSAGES, STORAGE, Fs
 
 # Every label in "labels" contains data which belongs to it's 'ClassLabel'
@@ -42,9 +42,9 @@ class Dataset:
 
         try:
             # Reading in a Single Dataset file
-            # sep = "\t" because the dataset is delimited by a tab space
+            # sep = "\t" because the dataset_operations is delimited by a tab space
             # Header = 1 : because the first line is a header
-            # index_col = False : because the dataset is malformed (delimiter at the end of each row)
+            # index_col = False : because the dataset_operations is malformed (delimiter at the end of each row)
             data_table = pd.read_csv(path, sep="\t", header=1, index_col=False)
         except FileNotFoundError:
             print("The file name could not be found, please make sure the file name/path is correct.")
@@ -79,7 +79,7 @@ class Dataset:
                 print(f"'Dataset' object created for file :\n{path}\n")
 
     def __str__(self):
-        label_name = str(input('Which "label" would you like to print for this dataset?')).lower()
+        label_name = str(input('Which "label" would you like to print for this dataset_operations?')).lower()
         if label_name in labels or label_name in labels_extra:
             return self.label[label_name].to_string()
         else:

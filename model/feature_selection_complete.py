@@ -9,11 +9,11 @@ This module/algorithm provides:
 1)  A ranking of all the features and the predicted model accuracy for using n-features - saved in the data_files_path.
 2)  A plot of "# of features used" vs "Model Performance" - saved in the data_files_path.
 3)  A .csv file containing a list of the features selected for optimal model performance - saved in the data_files_path.
-4)  Two exported trained models, one classifier and one normalizer - saved in the Trained_Model directory.
+4)  Two exported trained models, one classifier and one normalizer - saved in the Trained_Models directory.
 5)  Option to import this module and begin testing the pre-trained models (set TESTING = True - in model_config.py)
 
 - The results have proved that the model has the highest accuracy when trained on all 51 features.
-- The model stats on training/testing with a ratio of 1:1 on the entire feature extracted dataset yielded:
+- The model stats on training/testing with a ratio of 1:1 on the entire feature extracted dataset_operations yielded:
     Accuracy    = 92.865%
     Precision   = 90.040%
     Recall      = 92.205%
@@ -37,9 +37,9 @@ from config import data_files_path
 from model_config import *
 
 # Configuration Variables
-# Test on a separate dataset
+# Test on a separate dataset_operations
 DISJOINT_TESTING = False
-# Path for disjoint test dataset
+# Path for disjoint test dataset_operations
 TEST_DATA_PATH = f"{ROOT}\\Features_Dataset\\ds_left.csv"
 
 
@@ -195,8 +195,8 @@ if __name__ == '__main__':
     # starting timer
     start = time()
     print(f'\nProcess started at :\n\nDate  :  {dt.today().strftime("%x")}\nTime  :  {dt.today().strftime("%X")}\n')
-    # loading in the entire actual dataset
-    print('>> Loading the dataset\n')
+    # loading in the entire actual dataset_operations
+    print('>> Loading the dataset_operations\n')
     print(f'Location : {DATA_PATH}\n')
     DATA = pd.read_csv(DATA_PATH, sep='\t', index_col=0)
     # limiting the # of rows used
@@ -271,7 +271,7 @@ if __name__ == '__main__':
     print('Operation took:', f'{duration:.2f} seconds.\n' if duration < 60 else f'{duration / 60:.2f} minutes.\n')
     print(f'\nProcess ended at :\n\nDate  :  {dt.today().strftime("%x")}\nTime  :  {dt.today().strftime("%X")}\n')
 
-    # Converting a selected section of the dataset to a numpy array (based on best features)
+    # Converting a selected section of the dataset_operations to a numpy array (based on best features)
     data_matrix = DATA[get_selected_features()+['StepLabel']].values
     X = data_matrix[:, 0:-1]
     y = data_matrix[:, -1]

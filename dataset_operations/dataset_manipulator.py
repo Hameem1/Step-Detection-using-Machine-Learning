@@ -333,7 +333,7 @@ def generate_subjects_data(gen_csv=None, indexing=True):
         print(f"Data for the following {not_found} files was not found in IDGenderAgelist.csv:\n")
         for file_na in files_not_found:
             print(file_na)
-        ret = str(input(f"Would you like to remove these files from the dataset? (y/n)\n")).lower()
+        ret = str(input(f"Would you like to remove these files from the dataset_operations? (y/n)\n")).lower()
 
         if ret == 'y':
             print("\ndeleting extra files...\n")
@@ -361,7 +361,7 @@ def generate_subjects_data(gen_csv=None, indexing=True):
                 print("An error occurred while deleting an entry from the SUBJECTS_LIST")
 
         elif ret == 'n':
-            print("Files NOT deleted from the dataset.\n")
+            print("Files NOT deleted from the dataset_operations.\n")
         else:
             print("Invalid input! Please run the program again.")
 

@@ -31,8 +31,8 @@ if __name__ == '__main__':
     # starting timer
     start = time()
     print(f'\nProcess started at :\n\nDate  :  {dt.today().strftime("%x")}\nTime  :  {dt.today().strftime("%X")}\n')
-    # loading in the entire actual dataset for one sensor
-    print('>> Loading the dataset\n')
+    # loading in the entire actual dataset_operations for one sensor
+    print('>> Loading the dataset_operations\n')
     print(f'Location : {DATA_PATH}\n')
     DATA = pd.read_csv(DATA_PATH, sep='\t', index_col=0)
     # limiting the # of rows used

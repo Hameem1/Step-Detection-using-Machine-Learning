@@ -204,7 +204,7 @@ def data_plot(subject, actual_step_positions, sensor_axis="all"):
     subject : Subject
         A Subject class object
     actual_step_positions : list
-        containing x_axis values for steps (from the original dataset)
+        containing x_axis values for steps (from the original dataset_operations)
     sensor_axis : {'x', 'y', 'z', 'all'}
 
     """

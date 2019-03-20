@@ -8,10 +8,10 @@ import os
 import re
 from time import time
 from shutil import copyfile
-from dataset.data_structs import Subject
+from dataset_operations.data_structs import Subject
 from multiprocessing import Pool, current_process
 from data_generator.features import feature_extractor
-from dataset.dataset_manipulator import read_csv, generate_subjects_data
+from dataset_operations.dataset_manipulator import read_csv, generate_subjects_data
 from config import ageGroups, DATASET_FOLDER, DATASET_ROOT, age_dirs, sensor_dirs, data_files_path, sensors
 
 # Configuration Variables
@@ -36,7 +36,7 @@ if not os.path.exists(DATASET_ROOT):
 
 def create_dataset_folder_structure():
     """
-    Creates the folder structure for the new dataset.
+    Creates the folder structure for the new dataset_operations.
 
     """
 
@@ -70,7 +70,7 @@ def create_age_folder_structure():
             print(f'\nWARNING: The path does not exist. Creating new directory...\n{new_dataset_path}\n')
             os.mkdir(new_dataset_path)
     except:
-        print("ERROR in creating the sorted dataset directory within folder \\DATASETS")
+        print("ERROR in creating the sorted dataset_operations directory within folder \\DATASETS")
         return False
 
     try:
@@ -165,9 +165,9 @@ def create_dataset(subs_list, indexing=True):
     Parameters
     ----------
     subs_list : list
-        list of subjects to create the new dataset for
+        list of subjects to create the new dataset_operations for
     indexing : bool, optional
-        dataset index column (default = True)
+        dataset_operations index column (default = True)
 
     """
 
@@ -257,7 +257,7 @@ if __name__ == '__main__':
             start = time()
             # Generating processes from a pool
             pool = Pool(processes=nProcesses)
-            # Each process works on creating the dataset for it's own subset of the subs_list
+            # Each process works on creating the dataset_operations for it's own subset of the subs_list
             for output in pool.map(create_dataset, s_list):
                 pass
 
@@ -276,7 +276,7 @@ if __name__ == '__main__':
         if create_age_folder_structure():
             print("\nFolder structure successfully created!\n")
             start = time()
-            # Sorting the dataset
+            # Sorting the dataset_operations
             sort_dataset_by_age()
             duration = time() - start
             print(f'Dataset "{DATASET_FOLDER}" sorted by Age.\n',

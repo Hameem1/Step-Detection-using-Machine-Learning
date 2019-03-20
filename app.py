@@ -15,11 +15,11 @@ INFO: This module can also be used for testing the entire code. Import as: >>> f
 """
 
 from threading import Thread
-from graphing.data_plot import data_plot as dp
-from graphing.feature_plot import feature_plot as fp
+from visualization.data_plot import data_plot as dp
+from visualization.feature_plot import feature_plot as fp
 from data_generator.features import feature_extractor
 from data_generator.age_comparison import gen_age_histogram
-from dataset import data_structs as ds, dataset_manipulator as dm
+from dataset_operations import data_structs as ds, dataset_manipulator as dm
 from config import USED_CLASS_LABEL
 
 # Configuration variables

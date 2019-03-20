@@ -6,7 +6,7 @@ Attributes
 cols : list of str
     List of all feature labels + StepLabel
 row_count : int
-    No. of rows of dataset to be used
+    No. of rows of dataset_operations to be used
 RF_ESTIMATORS : int
     No. of Decision Trees per Random Forest
 TEST_SIZE : float
@@ -22,9 +22,9 @@ SCORING : str
 TESTING : bool
     Set to True if testing with the Python CONSOLE
 DATA_NORMALIZATION : bool
-    If True, the dataset is normalized before training and testing
+    If True, the dataset_operations is normalized before training and testing
 DATA_REDUCE : bool
-    If True, a selected portion of the entire dataset is used for training+testing (# of rows = row_count)
+    If True, a selected portion of the entire dataset_operations is used for training+testing (# of rows = row_count)
 GEN_RANKING_FILE : bool
     If True, generate a .csv file for the feature ranking
 PLOT : bool
@@ -33,7 +33,7 @@ EXPORT_MODEL : bool
     If True, trained model is exported to TRAINED_MODEL_PATH
 
 DATA_PATH : str
-    loading in the actual dataset for one sensor (Data under test)
+    loading in the actual dataset_operations for one sensor (Data under test)
 NEW_DATASET : str
     Directory name for new data set which contains the training/testing data for the classifier
 NEW_DATASET_PATH : str
@@ -71,7 +71,7 @@ locale.setlocale(locale.LC_ALL, lang)
 cols = pd.read_csv(f'{new_sensor_paths[0]}\\{os.listdir(new_sensor_paths[0])[0]}', sep='\t', index_col=0).columns
 # Setting numpy print precision
 np.set_printoptions(precision=5)
-# no. of rows of dataset to be used
+# no. of rows of dataset_operations to be used
 row_count = 50000
 # no. of Decision Trees per Random Forest
 RF_ESTIMATORS = 100
@@ -86,10 +86,10 @@ K_FOLD = 2
 # Performance metric to optimize the model for
 SCORING = 'f1_weighted'
 # Set to True if TESTING with the Python CONSOLE
-TESTING = False
-# If True, the dataset is normalized before training & testing
+TESTING = True
+# If True, the dataset_operations is normalized before training & testing
 DATA_NORMALIZATION = True
-# If True, a selected portion of the entire dataset is used for training+testing (# of rows = row_count)
+# If True, a selected portion of the entire dataset_operations is used for training+testing (# of rows = row_count)
 DATA_REDUCE = False
 # If True, generate a .csv file for the feature ranking
 GEN_RANKING_FILE = False
@@ -99,14 +99,14 @@ PLOT = False
 EXPORT_MODEL = False
 
 # Paths
-# loading in the actual dataset for the ML classifier
+# loading in the actual dataset_operations for the ML classifier
 DATA_PATH = f"{ROOT}\\Features_Dataset\\ds_all.csv"
 # Directory name for new data set which contains the training/testing data for the classifier
 NEW_DATASET = "Features_Dataset"
 # Directory path for new data set which contains the training/testing data for the classifier
 NEW_DATASET_PATH = f'{ROOT}\\{NEW_DATASET}'
 # Trained Model directory name
-TRAINED_MODEL_DIR = 'Trained_Model'
+TRAINED_MODEL_DIR = 'Trained_Models'
 # Trained Model directory path
 TRAINED_MODEL_PATH = f'{ROOT}\\{TRAINED_MODEL_DIR}'
 # Trained Model name

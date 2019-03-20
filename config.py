@@ -34,7 +34,7 @@ DATASET_FOLDER : str
 sensors : list of str
     List of sensor directory names
 sensor_paths : list of str
-    Sensor directory paths in original dataset
+    Sensor directory paths in original dataset_operations
 DATASET_ROOT : str
     DATASETS directory path (Generated data sets)
 new_sensor_paths : list of str
@@ -42,7 +42,7 @@ new_sensor_paths : list of str
 data_files_path : str
     Data-files directory path
 age_dirs : dict of list
-    Age sorted dataset directories
+    Age sorted dataset_operations directories
 sensor_dirs : dict of list
     Paths to sensor directories in the age folders
 
@@ -82,7 +82,7 @@ ROOT = str(Path(__file__).parent)
 FOLDER_NAME = "OU-InertGaitAction_wStepAnnotation"
 # Feature Dataset directory name
 DATASET_FOLDER = "Step_Detection_Dataset (w=40, s=20, sliding)"
-# Sensor paths in original dataset
+# Sensor paths in original dataset_operations
 sensors = ["Center", "Left", "Right"]
 sensor_paths = [f"{ROOT}\\{FOLDER_NAME}\\{sensor}" for sensor in sensors]
 # DATASETS directory path (Generated data sets)
@@ -91,7 +91,7 @@ DATASET_ROOT = f"{ROOT}\\..\\DATASETS"
 new_sensor_paths = [f"{DATASET_ROOT}\\{DATASET_FOLDER}\\{sensor}" for sensor in sensors]
 # Data-files directory path
 data_files_path = ROOT + '\\Data_Files_TEST'
-# Age sorted dataset directories
+# Age sorted dataset_operations directories
 age_dirs = {"Age_" + dirName: f'{DATASET_ROOT}\\{DATASET_FOLDER}_Age_Sorted\\Age_{dirName}' for dirName in ageGroups}
 # Paths to C, L and R in the age folders
 sensor_dirs = {"Age_" + dirName: [f'{DATASET_ROOT}\\{DATASET_FOLDER}_Age_Sorted\\Age_{dirName}\\{sensor}'

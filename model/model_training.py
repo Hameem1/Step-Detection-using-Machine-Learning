@@ -1,5 +1,5 @@
 """
-This module simply trains and tests a Random Forest classifier with the data from the specified dataset.
+This module simply trains and tests a Random Forest classifier with the data from the specified dataset_operations.
 N top features are used for the training.
 
 Notes
@@ -25,8 +25,8 @@ if __name__ == '__main__':
     # starting timer
     start = time()
     print(f'\nProcess started at :\n\nDate  :  {dt.today().strftime("%x")}\nTime  :  {dt.today().strftime("%X")}\n')
-    # loading in the entire actual dataset
-    print('>> Loading the dataset\n')
+    # loading in the entire actual dataset_operations
+    print('>> Loading the dataset_operations\n')
     print(f'Location : {DATA_PATH}\n')
     DATA = pd.read_csv(DATA_PATH, sep='\t', index_col=0)
     # Selecting the best N features
