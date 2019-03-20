@@ -35,7 +35,7 @@ def serve_layout():
 
         # Sub-Div (2nd level)
         # Heading (Title)
-        html.Div([html.H1(children="Project Dashboard",
+        html.Div([html.H1(children="Feature Data Dashboard",
                           className='twelve columns',
                           style={'text-align': 'center',
                                  'margin': '2% 0% 2% 0%',

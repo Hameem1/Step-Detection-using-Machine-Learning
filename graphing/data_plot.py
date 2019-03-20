@@ -29,7 +29,7 @@ app.layout = html.Div([
 
     # Sub-Div (2nd level)
     # Heading (Title)
-    html.Div([html.H1(children="Project Dashboard",
+    html.Div([html.H1(children="Raw Data Dashboard",
                       className='twelve columns',
                       style={'text-align': 'center',
                              'margin': '2% 0% 2% 0%',
