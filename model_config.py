@@ -72,13 +72,13 @@ cols = pd.read_csv(f'{new_sensor_paths[0]}\\{os.listdir(new_sensor_paths[0])[0]}
 # Setting numpy print precision
 np.set_printoptions(precision=5)
 # no. of rows of dataset_operations to be used
-row_count = 50000
+row_count = 1200000
 # no. of Decision Trees per Random Forest
 RF_ESTIMATORS = 100
 # Test Data size (out of 1.0)
 TEST_SIZE = 0.5
 # Controls Model processing verbosity
-VERBOSE = True
+VERBOSE = False
 # Controls the no. of threads to use for computations (N_JOBS = -1 for auto)
 N_JOBS = -1
 # Cross validation folds
@@ -86,7 +86,7 @@ K_FOLD = 2
 # Performance metric to optimize the model for
 SCORING = 'f1_weighted'
 # Set to True if TESTING with the Python CONSOLE
-TESTING = True
+TESTING = False
 # If True, the dataset_operations is normalized before training & testing
 DATA_NORMALIZATION = True
 # If True, a selected portion of the entire dataset_operations is used for training+testing (# of rows = row_count)
