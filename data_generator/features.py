@@ -314,18 +314,18 @@ def print_features(features):
     print(f'\nTotal # of unique features calculated = {total_features}')
 
 
-def update_step_positions(data):
+def update_step_positions(sub):
     """
-    This function returns lists of step positions according to the window type being used.
+    This function returns lists with different versions of step positions, according to the window type being used.
 
     Parameters
     ----------
-    data : DataFrame(subject data)
+    sub : subject
 
     Returns
     -------
-    step_positions_actual : list
-        List of x-axis step coordinates in the original data, i.e., Subject().sensor_pos[SENSOR].label[USED_CLASS_LABEL]
+    step_positions_actual : dict
+        Dict of x-axis step coordinates in the original data, i.e., Subject().sensor_pos[Any].label[All]
     step_positions_updated : list
         List of x-axis step coordinates in the windowed data
     step_positions_updated_bool : list
@@ -333,16 +333,21 @@ def update_step_positions(data):
 
     """
 
-    step_positions_actual = []
+    labels = ["valid", "complete", "level", "upstairs", "downstairs", "incline", "decline"]
+    step_positions_actual = {label: [] for label in labels}
 
-    for i in range(1, len(data['StepLabel'])):
-        if (data.loc[i, 'StepLabel']) > (data.loc[i - 1, 'StepLabel']):
-            step_positions_actual.append(i)
+    data = sub.sensor_pos['right']
+    for LABEL in labels:
+        for i in range(1, len(data.label[LABEL]['StepLabel'])):
+            if (data.label[LABEL].loc[i, 'StepLabel']) > (data.label[LABEL].loc[i - 1, 'StepLabel']):
+                step_positions_actual[LABEL].append(i)
 
+    # Any sensor position can be used
+    data = sub.sensor_pos['right'].label[USED_CLASS_LABEL]
     # For a "sliding" window
     if WINDOW_TYPE == 'sliding':
         # Shifting the step indices
-        step_positions_updated = np.array(step_positions_actual) - int(WINDOW_SIZE / 2)
+        step_positions_updated = np.array(step_positions_actual[USED_CLASS_LABEL]) - int(WINDOW_SIZE / 2)
         # Eliminating step indices which don't have enough data around them for the window
         step_positions_updated = [x for x in step_positions_updated if (x >= 0) and
                                   (x < (len(data['StepLabel'][int(WINDOW_SIZE/2):-int(WINDOW_SIZE/2)]) - STEP_SIZE))]
@@ -391,7 +396,7 @@ def feature_extractor(sub, sensor_pos, sensor_type=SENSOR, output_type='dict'):
     features_list = {}
     data = sub.sensor_pos[sensor_pos].label[USED_CLASS_LABEL]
 
-    step_positions_actual, step_positions_updated, step_positions_updated_bool = update_step_positions(data)
+    step_positions_actual, step_positions_updated, step_positions_updated_bool = update_step_positions(sub)
 
     if sensor_type == "acc":
         base_data = [col for col in data.columns if col.startswith('A')]
@@ -402,9 +407,9 @@ def feature_extractor(sub, sensor_pos, sensor_type=SENSOR, output_type='dict'):
 
     for axis in base_data:
         if axis is not 'all':
-            f = Features(data[axis], step_positions_actual)
+            f = Features(data[axis], step_positions_actual[USED_CLASS_LABEL])   # TODO: step_positions_actual[USED_CLASS_LABEL]
         else:
-            f = Features(data[base_data[0:3]], step_positions_actual)
+            f = Features(data[base_data[0:3]], step_positions_actual[USED_CLASS_LABEL])   # TODO: same
         features_list[axis] = f.features
         features[axis] = {x: getattr(f, x) for x in f.features}
 

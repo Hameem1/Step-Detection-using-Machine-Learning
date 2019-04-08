@@ -16,9 +16,9 @@ axes = {"x": {"acc": "Ax", "gyr": "Gx"},
         "y": {"acc": "Ay", "gyr": "Gy"},
         "z": {"acc": "Az", "gyr": "Gz"}}
 
-sub = None
+SUB = None
 axis = None
-STEP_POSITIONS = []
+STEP_POSITIONS = {}
 
 app = dash.Dash(__name__)
 app.css.config.serve_locally = True
@@ -101,16 +101,16 @@ app.layout = html.Div([
                Input('motion-dropdown', 'value')])
 def graph_callback(sensor, position, motion):
     """
-    This function plots a graph for the given parameters.
+    This function plots a graph for the given parameters in the dropdown menus.
 
     Parameters
     ----------
     sensor : str
-        selected from the dropdown menu
+        Accelerometer, Gyroscope
     position : str
-        selected from the dropdown menu
+        Center, Left, Right
     motion : str
-        selected from the dropdown menu
+        Valid, Complete, Level, Upstairs, Downstairs, Incline, Decline
 
     Returns
     -------
@@ -120,15 +120,18 @@ def graph_callback(sensor, position, motion):
     """
 
     # Graph variables
-    t = np.array([num for num in range(0, len(sub.sensor_pos[position].label[motion]))]) / Fs
+    # Generating a time series (in secs) for the selected graphing parameters
+    t = np.array([num for num in range(0, len(SUB.sensor_pos[position].label[motion]))]) / Fs
+    # Setting one axis to keep visible by default
     visible = "x" if axis == "all" else axis
+    # Setting Graph Labels
     xlabel = 'time (s)'
     ylabel = 'Acceleration (g)' if sensor == "acc" else 'Angular Velocity (rad/s)'
     title = 'Plot of ' + '"' + ('Acceleration' if sensor == "acc" else 'Angular Velocity') + '"' + ' vs Time'
 
     # Generating plot traces
     traces = [go.Scatter(x=t,
-                         y=sub.sensor_pos[position].label[motion][axes[ax][sensor]],
+                         y=SUB.sensor_pos[position].label[motion][axes[ax][sensor]],
                          mode="lines",
                          name=axes[ax][sensor]) for ax in axes]
 
@@ -137,11 +140,11 @@ def graph_callback(sensor, position, motion):
         if trace.name is not axes[visible][sensor]:
             trace.visible = "legendonly"
 
-    # Generating x and y step coordinates for all axes
-    steps_y = step_marker(position)
+    # Generating y-axis step coordinates for all sensor axes
+    steps_y = step_marker(position, sensor, motion)
 
     # Generating step traces
-    step_traces = [go.Scatter(x=np.array(STEP_POSITIONS) / Fs,
+    step_traces = [go.Scatter(x=np.array(STEP_POSITIONS[motion]) / Fs,
                               y=steps_y[ax],
                               mode="markers",
                               name=axes[ax][sensor]) for ax in axes]
@@ -165,7 +168,7 @@ def graph_callback(sensor, position, motion):
     return fig
 
 
-def step_marker(pos, sensor=SENSOR, motion_type=USED_CLASS_LABEL):
+def step_marker(pos, sensor, motion_type):
     """
     This function returns the y-coordinates for steps detected in the given subject data vs t.
 
@@ -184,24 +187,25 @@ def step_marker(pos, sensor=SENSOR, motion_type=USED_CLASS_LABEL):
     """
 
     steps_y = {'x': [], 'y': [], 'z': []}
-    data = sub.sensor_pos[pos].label[motion_type]
+    data = SUB.sensor_pos[pos].label[motion_type]
 
     for ax in axes:
-        for i in STEP_POSITIONS:
+        for i in STEP_POSITIONS[motion_type]:
             steps_y[ax].append(float("{0:.3f}".format(data.loc[i, axes[ax][sensor]])))
 
-    print(f'\nStep Count for Subject - {sub.subject_id[:-4]} = {len(STEP_POSITIONS)}\n')
+    print(f'\nStep Count for Subject - {SUB.subject_id[:-4]} ({motion_type}) = '
+          f'{len(STEP_POSITIONS[motion_type])}\n')
     return steps_y
 
 
-def data_plot(subject, actual_step_positions, sensor_axis="all"):
+def data_plot(sub, actual_step_positions, sensor_axis="all"):
     """
     This function accepts the data values from a function call and makes them global.
-    It also acts as the feature plotting endpoint and starts the Dash server.
+    It also acts as the data plotting endpoint and starts the Dash server.
 
     Parameters
     ----------
-    subject : Subject
+    sub : Subject
         A Subject class object
     actual_step_positions : list
         containing x_axis values for steps (from the original dataset_operations)
@@ -209,8 +213,8 @@ def data_plot(subject, actual_step_positions, sensor_axis="all"):
 
     """
 
-    global sub, axis, STEP_POSITIONS
-    sub = subject
+    global SUB, axis, STEP_POSITIONS
+    SUB = sub
     axis = sensor_axis
     STEP_POSITIONS = actual_step_positions
     app.run_server(debug=False, port=5000)
