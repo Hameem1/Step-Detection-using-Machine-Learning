@@ -12,14 +12,14 @@ from dataset_operations.data_structs import Subject
 from multiprocessing import Pool, current_process
 from data_generator.features import feature_extractor
 from dataset_operations.dataset_manipulator import read_csv, generate_subjects_data
-from config import ageGroups, DATASET_FOLDER, DATASET_ROOT, age_dirs, sensor_dirs, data_files_path, sensors
+from config import ageGroups, DATASET_FOLDER, DATASET_ROOT, age_dirs, sensor_dirs, data_files_path, sensors, Path
 
 # Configuration Variables
 # ------------------------
 GENERATE_DATASET = True
 SORT_BY_AGE = False
-TESTING = False
-TEST_COUNT = 4  # Should be >= 4
+TESTING = True
+TEST_COUNT = 8  # Should be >= 4
 # ------------------------
 
 if not TESTING:
@@ -27,7 +27,7 @@ if not TESTING:
 else:
     DATASET_FOLDER = DATASET_FOLDER + "_TEST"
 
-new_sensor_paths = [f"{DATASET_ROOT}\\{DATASET_FOLDER}\\{sensor}" for sensor in sensors]
+new_sensor_paths = [Path(f"{DATASET_ROOT}/{DATASET_FOLDER}/{sensor}") for sensor in sensors]
 
 if not os.path.exists(DATASET_ROOT):
     print(f'\nWARNING: The path does not exist. Creating new directory...\n{DATASET_ROOT}\n')
@@ -40,7 +40,7 @@ def create_dataset_folder_structure():
 
     """
 
-    path = f'{DATASET_ROOT}\\{DATASET_FOLDER}'
+    path = Path(f'{DATASET_ROOT}/{DATASET_FOLDER}')
     if not os.path.exists(path):
         print(f'\nWARNING: The path does not exist. Creating new directory...\n{path}\n')
         os.mkdir(path)
@@ -65,12 +65,12 @@ def create_age_folder_structure():
     """
 
     try:
-        new_dataset_path = f'{DATASET_ROOT}\\{DATASET_FOLDER}_Age_Sorted'
+        new_dataset_path = Path(f'{DATASET_ROOT}/{DATASET_FOLDER}_Age_Sorted')
         if not os.path.exists(new_dataset_path):
             print(f'\nWARNING: The path does not exist. Creating new directory...\n{new_dataset_path}\n')
             os.mkdir(new_dataset_path)
     except:
-        print("ERROR in creating the sorted dataset_operations directory within folder \\DATASETS")
+        print("ERROR in creating the sorted dataset_operations directory within folder /DATASETS")
         return False
 
     try:
@@ -80,7 +80,7 @@ def create_age_folder_structure():
             else:
                 print(f"The directory {folder} already exists.")
     except:
-        print("ERROR in creating age based directories in \\DATASETS\\Dataset_Age_Sorted")
+        print("ERROR in creating age based directories in /DATASETS/Dataset_Age_Sorted")
         return False
 
     try:
@@ -92,7 +92,7 @@ def create_age_folder_structure():
                     print(f"The directory {sub_path} already exists.")
         return True
     except:
-        print("ERROR in creating sensor directories in \\DATASETS\\Dataset_Age_Sorted\\[age_Groups]")
+        print("ERROR in creating sensor directories in /DATASETS/Dataset_Age_Sorted/[age_Groups]")
         return False
 
 
@@ -129,7 +129,7 @@ def sort_dataset_by_age():
 
     """
 
-    data = read_csv(f'{data_files_path}\\subject_data')
+    data = read_csv(Path(f'{data_files_path}/subject_data'))
     limits = get_limits(ageGroups)
     sortedCount = 0
 
@@ -145,9 +145,9 @@ def sort_dataset_by_age():
             # Get the source and destination file paths
             for src, dest in zip(new_sensor_paths, sensor_dirs[target_folder]):
                 # if the file exists in the source directory
-                if os.path.exists(f'{src}\\{filename[:-4]}' + '.csv'):
+                if os.path.exists(Path(f'{src}/{filename[:-4]}.csv')):
                     # copy it to the destination directory
-                    copyfile(f'{src}\\{filename[:-4]}' + '.csv', f'{dest}\\{filename[:-4]}' + '.csv')
+                    copyfile(Path(f'{src}/{filename[:-4]}.csv'), Path(f'{dest}/{filename[:-4]}.csv'))
                     if temp == sortedCount:
                         sortedCount += 1
                         subjectCount += 1
@@ -180,7 +180,7 @@ def create_dataset(subs_list, indexing=True):
         for sub in repo:
             S = sub
             for i in range(3):
-                filePath = f'{new_sensor_paths[i]}\\' + sub.subject_id[:-4] + ".csv"
+                filePath = Path(f'{new_sensor_paths[i]}/{sub.subject_id[:-4]}.csv')
                 if not os.path.exists(filePath):
                     # Most expensive line of code in the module (Takes hours)
                     col_names, df, _, _, _ = feature_extractor(sub, sensors[i].lower(), output_type='df')
@@ -225,7 +225,7 @@ def file_exists(subs_list):
 
     for sub in subs_list:
         for i in range(3):
-            filePath = f'{new_sensor_paths[i]}\\' + sub[:-4] + ".csv"
+            filePath = Path(f'{new_sensor_paths[i]}/{sub[:-4]}.csv')
             if not os.path.exists(filePath):
                 pass
             else:

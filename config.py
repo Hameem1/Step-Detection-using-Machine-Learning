@@ -84,16 +84,16 @@ FOLDER_NAME = "OU-InertGaitAction_wStepAnnotation"
 DATASET_FOLDER = "Step_Detection_Dataset (w=40, s=20, sliding)"
 # Sensor paths in original dataset_operations
 sensors = ["Center", "Left", "Right"]
-sensor_paths = [f"{ROOT}\\{FOLDER_NAME}\\{sensor}" for sensor in sensors]
+sensor_paths = [Path(f"{ROOT}/{FOLDER_NAME}/{sensor}") for sensor in sensors]
 # DATASETS directory path (Generated data sets)
-DATASET_ROOT = f"{ROOT}\\..\\DATASETS"
+DATASET_ROOT = Path(f"{ROOT}/../DATASETS")
 # Paths to sensor directories in the NEW Dataset
-new_sensor_paths = [f"{DATASET_ROOT}\\{DATASET_FOLDER}\\{sensor}" for sensor in sensors]
+new_sensor_paths = [Path(f"{DATASET_ROOT}/{DATASET_FOLDER}/{sensor}") for sensor in sensors]
 # Data-files directory path
-data_files_path = ROOT + '\\Data_Files_TEST'
+data_files_path = Path(f'{ROOT}/Data_Files_TEST')
 # Age sorted dataset_operations directories
-age_dirs = {"Age_" + dirName: f'{DATASET_ROOT}\\{DATASET_FOLDER}_Age_Sorted\\Age_{dirName}' for dirName in ageGroups}
+age_dirs = {"Age_" + dirName: f'{DATASET_ROOT}/{DATASET_FOLDER}_Age_Sorted/Age_{dirName}' for dirName in ageGroups}
 # Paths to C, L and R in the age folders
-sensor_dirs = {"Age_" + dirName: [f'{DATASET_ROOT}\\{DATASET_FOLDER}_Age_Sorted\\Age_{dirName}\\{sensor}'
+sensor_dirs = {"Age_" + dirName: [f'{DATASET_ROOT}/{DATASET_FOLDER}_Age_Sorted/Age_{dirName}/{sensor}'
                                   for sensor in sensors]
                for dirName in ageGroups}

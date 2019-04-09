@@ -15,7 +15,7 @@ N : int or 'all'
 # sys.path.append(os.getcwd())
 
 from model.feature_selection_complete import normalize, import_trained_model, export_trained_model, print_scores
-from config import data_files_path
+from config import data_files_path, Path
 from model_config import *
 
 N = 'all'
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     DATA = pd.read_csv(DATA_PATH, sep='\t', index_col=0)
     # Selecting the best N features
     if N is not 'all':
-        fr = pd.read_csv(data_files_path + '\\feature ranking.csv', sep='\t', index_col=0)
+        fr = pd.read_csv(f'{data_files_path}/feature ranking.csv', sep='\t', index_col=0)
         top_N_features = list(fr['Feature'][:N])+['StepLabel']
         DATA = DATA[top_N_features]
     # limiting the # of rows used

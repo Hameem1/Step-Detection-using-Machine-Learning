@@ -407,9 +407,9 @@ def feature_extractor(sub, sensor_pos, sensor_type=SENSOR, output_type='dict'):
 
     for axis in base_data:
         if axis is not 'all':
-            f = Features(data[axis], step_positions_actual[USED_CLASS_LABEL])   # TODO: step_positions_actual[USED_CLASS_LABEL]
+            f = Features(data[axis], step_positions_actual[USED_CLASS_LABEL])
         else:
-            f = Features(data[base_data[0:3]], step_positions_actual[USED_CLASS_LABEL])   # TODO: same
+            f = Features(data[base_data[0:3]], step_positions_actual[USED_CLASS_LABEL])
         features_list[axis] = f.features
         features[axis] = {x: getattr(f, x) for x in f.features}
 

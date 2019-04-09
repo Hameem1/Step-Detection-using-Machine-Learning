@@ -15,7 +15,7 @@ N : int or 'all'
 # sys.path.append(os.getcwd())
 
 from model.feature_selection_complete import normalize, import_trained_model, export_trained_model, print_scores
-from config import data_files_path
+from config import data_files_path, Path
 from model_config import *
 
 # N = 'all'
@@ -46,7 +46,7 @@ for N in n:
         DATA = Data
         # Selecting the best N features
         if N is not 'all':
-            fr = pd.read_csv(data_files_path + '\\feature ranking.csv', sep='\t', index_col=0)
+            fr = pd.read_csv(f'{data_files_path}/feature ranking.csv', sep='\t', index_col=0)
             top_N_features = list(fr['Feature'][:F])+['StepLabel']
             DATA = DATA[top_N_features]
         # limiting the # of rows used
@@ -93,7 +93,7 @@ for N in n:
                 export_trained_model(normalizer, TRAINED_MODEL_PATH, TRAINED_NORMALIZER_NAME)
 
 times_df = pd.DataFrame({'Samples used': samples, 'Features used': features, 'Time Taken': times})
-times_df.to_csv(f'{data_files_path}\\Computation times' + ".csv", sep="\t", index=True)
+times_df.to_csv(f'{data_files_path}/Computation times.csv', sep="\t", index=True)
 print(f'>> File generated : times.csv\n')
 print(f'\nProcess ended at :\n\nDate  :  {dt.today().strftime("%x")}\nTime  :  {dt.today().strftime("%X")}\n')
 # else:

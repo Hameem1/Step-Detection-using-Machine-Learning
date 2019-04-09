@@ -1,10 +1,10 @@
 from model_config import *
-from config import data_files_path
+from config import data_files_path, Path
 import plotly.graph_objs as go
 import plotly.offline as pyo
 from sklearn.linear_model import LinearRegression
 
-data = pd.read_csv(f'{data_files_path}\\Computation times.csv', sep='\t', index_col=0)
+data = pd.read_csv(f'{data_files_path}/Computation times.csv', sep='\t', index_col=0)
 n = list(data['Samples used'].unique())
 
 X = [data['Features used'][data['Samples used'] == i].values[:, np.newaxis] for i in n]
@@ -32,4 +32,4 @@ layout = go.Layout(title='Computation Times for "n" Training Samples',
                    font=dict(family='arial', size=18, color='#000000'))
 
 fig = go.Figure(data=traces, layout=layout)
-pyo.plot(fig, filename=f'{data_files_path}\\Computation Times Plot.html')
+pyo.plot(fig, filename=f'{data_files_path}/Computation Times Plot.html')

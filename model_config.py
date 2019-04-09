@@ -60,7 +60,7 @@ from sklearn.externals import joblib
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-from config import new_sensor_paths, ROOT
+from config import new_sensor_paths, ROOT, Path
 
 # Configuring locale for datetime purposes
 lang = 'de_DE'
@@ -68,7 +68,7 @@ locale.setlocale(locale.LC_ALL, lang)
 
 # Model Configuration Variables
 # list of all feature labels + StepLabel
-cols = pd.read_csv(f'{new_sensor_paths[0]}\\{os.listdir(new_sensor_paths[0])[0]}', sep='\t', index_col=0).columns
+cols = pd.read_csv(f'{new_sensor_paths[0]}/{os.listdir(new_sensor_paths[0])[0]}', sep='\t', index_col=0).columns
 # Setting numpy print precision
 np.set_printoptions(precision=5)
 # no. of rows of dataset_operations to be used
@@ -100,15 +100,15 @@ EXPORT_MODEL = False
 
 # Paths
 # loading in the actual dataset_operations for the ML classifier
-DATA_PATH = f"{ROOT}\\Features_Dataset\\ds_all.csv"
+DATA_PATH = Path(f"{ROOT}/Features_Dataset/ds_all.csv")
 # Directory name for new data set which contains the training/testing data for the classifier
 NEW_DATASET = "Features_Dataset"
 # Directory path for new data set which contains the training/testing data for the classifier
-NEW_DATASET_PATH = f'{ROOT}\\{NEW_DATASET}'
+NEW_DATASET_PATH = Path(f'{ROOT}/{NEW_DATASET}')
 # Trained Model directory name
 TRAINED_MODEL_DIR = 'Trained_Models'
 # Trained Model directory path
-TRAINED_MODEL_PATH = f'{ROOT}\\{TRAINED_MODEL_DIR}'
+TRAINED_MODEL_PATH = Path(f'{ROOT}/{TRAINED_MODEL_DIR}')
 # Trained Model name
 TRAINED_MODEL_NAME = 'step_detection_model_test.pkl'
 # Trained Normalizer name

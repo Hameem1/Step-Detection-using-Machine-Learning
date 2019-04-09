@@ -33,14 +33,14 @@ from sklearn.feature_selection import RFECV
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, f1_score, recall_score, \
     roc_auc_score, classification_report
-from config import data_files_path
+from config import data_files_path, Path
 from model_config import *
 
 # Configuration Variables
 # Test on a separate dataset_operations
 DISJOINT_TESTING = False
 # Path for disjoint test dataset_operations
-TEST_DATA_PATH = f"{ROOT}\\Features_Dataset\\ds_left.csv"
+TEST_DATA_PATH = Path(f"{ROOT}/Features_Dataset/ds_left.csv")
 
 
 def create_dir(path, suppress_print=False):
@@ -85,7 +85,7 @@ def plot_n_features_vs_score(grid_scores, mp_lib=False):
     # Plotting the figure
     fig = dict(data=data, layout=layout)
     create_dir(data_files_path, suppress_print=True)
-    pyo.plot(fig, filename=f'{data_files_path}\\Number of features vs Model score' + '.html', auto_open=False)
+    pyo.plot(fig, filename=f'{data_files_path}/Number of features vs Model score.html', auto_open=False)
     print(f'>> File Generated : Number of features vs Model score' + '.html\n')
 
     if mp_lib:
@@ -105,7 +105,7 @@ def get_selected_features():
     list : selected features
 
     """
-    path = f'{data_files_path}\\features selected.csv'
+    path = f'{data_files_path}/features selected.csv'
     f_sel = pd.read_csv(path, sep='\t', index_col=0)
     return list(f_sel['selected features'])
 
@@ -126,8 +126,8 @@ def import_trained_model(dir_path, name):
     None or Model
 
     """
-    if os.path.exists(f"{dir_path}\\{name}"):
-        path = f'{dir_path}\\{name}'
+    if os.path.exists(f"{dir_path}/{name}"):
+        path = f'{dir_path}/{name}'
         ret_model = joblib.load(path)
         print('>> Model Imported.\n')
         return ret_model
@@ -151,7 +151,7 @@ def export_trained_model(model, dir_path, name):
     create_dir(TRAINED_MODEL_PATH)
 
     # Saving the model externally in TRAINED_MODEL_PATH
-    path = f'{dir_path}\\{name}'
+    path = f'{dir_path}/{name}'
     joblib.dump(model, path)
     print(f'>> Model stored externally as "{name}"\n')
 
@@ -240,11 +240,11 @@ if __name__ == '__main__':
     if GEN_RANKING_FILE:
         # Creating the data files directory incase it doesn't exist already
         create_dir(data_files_path)
-        ranking.to_csv(f'{data_files_path}\\feature ranking' + ".csv", sep="\t",
+        ranking.to_csv(f'{data_files_path}/feature ranking.csv', sep="\t",
                        index=True, index_label='No. of features')
         print(f'>> File generated : feature ranking.csv\n')
         features_sel_df = pd.DataFrame({'selected features': feature_names})
-        features_sel_df.to_csv(f'{data_files_path}\\features selected' + ".csv", sep="\t", index=True)
+        features_sel_df.to_csv(f'{data_files_path}/features selected.csv', sep="\t", index=True)
         print(f'>> File generated : features selected.csv\n')
 
     # Plotting number of features VS. cross-validation scores

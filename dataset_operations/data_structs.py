@@ -5,7 +5,7 @@ This module implements the data structures used to store the dataset_operations.
 
 import pandas as pd
 from dataset_operations.dataset_manipulator import get_subjects_list, sensor_paths
-from config import FILE_STATUS_MESSAGES, STORAGE, Fs
+from config import FILE_STATUS_MESSAGES, STORAGE, Fs, Path
 
 # Every label in "labels" contains data which belongs to it's 'ClassLabel'
 # and is not null valued (all zeros)
@@ -108,9 +108,9 @@ class Subject:
     def __init__(self, filename):
         try:
             self.subject_id = filename
-            self.sensor_pos = {"center": Dataset(f"{sensor_paths[0]}\\{filename}"),
-                               "left": Dataset(f"{sensor_paths[1]}\\{filename}"),
-                               "right": Dataset(f"{sensor_paths[2]}\\{filename}")}
+            self.sensor_pos = {"center": Dataset(f"{sensor_paths[0]}/{filename}"),
+                               "left": Dataset(f"{sensor_paths[1]}/{filename}"),
+                               "right": Dataset(f"{sensor_paths[2]}/{filename}")}
 
             if FILE_STATUS_MESSAGES:
                 print(f"'Subject' object created for file : {filename}\n")

@@ -8,7 +8,7 @@ import re
 import pandas as pd
 from model_config import NEW_DATASET_PATH
 from config import FORCE, FILE_STATUS_MESSAGES, FOLDER_NAME, ROOT, data_files_path,\
-    sensor_paths, sensors, new_sensor_paths
+    sensor_paths, sensors, new_sensor_paths, Path
 
 
 def dataset_rename():
@@ -64,7 +64,7 @@ def dataset_rename():
                         rename_count += 1
                 if rename_count != -1:
                     name = name.strip()
-                    os.rename(f'{path}\\{f}', f"{path}\\{name}{f_ext}")
+                    os.rename(f'{path}/{f}', f"{path}/{name}{f_ext}")
                     if FILE_STATUS_MESSAGES:
                         print(f"File \"{f}\" renamed to :\"{name}{f_ext}\"")
                     rename_count += 1
@@ -119,7 +119,7 @@ def dataset_analysis():
             for path in sensor_paths:
                 f_list.append(os.listdir(path))
         except:
-            print(f"\nError: The directory \"{ROOT}\\{FOLDER_NAME}\" does not exist.\n")
+            print(f"\nError: The directory \"{ROOT}/{FOLDER_NAME}\" does not exist.\n")
             print("Please make sure the path for the data set directory is correct.")
             print("Note: The data set folder should be in the same directory as the program's .py files.")
             break
@@ -167,7 +167,7 @@ def dataset_analysis():
                 for i in range(len(to_del_list)):
                     for j in to_del_list[i]:
                         try:
-                            os.unlink(f'{sensor_paths[i]}\\{j}')
+                            os.unlink(f'{sensor_paths[i]}/{j}')
                         except:
                             if FILE_STATUS_MESSAGES:
                                 print(f"file \"{j}\" does not exist in folder \"{sensors[i]}\"")
@@ -299,7 +299,7 @@ def generate_subjects_data(gen_csv=None, indexing=True):
     filename = []
     files_not_found = []
 
-    with open(f"{data_files_path}\\IDGenderAgelist.csv", 'r') as myfile:
+    with open(f"{data_files_path}/IDGenderAgelist.csv", 'r') as myfile:
         lines = myfile.readlines()
 
     for subject in SUBJECTS_LIST:
@@ -344,7 +344,7 @@ def generate_subjects_data(gen_csv=None, indexing=True):
                     print(f"Entering directory : {sensor}")
                     print(f"-------------------\n")
                     try:
-                        os.unlink(f'{sensor}\\{file_na}')
+                        os.unlink(f'{sensor}/{file_na}')
                     except:
                         print(f"file \"{file_na}\" does not exist in folder \"{sensor}\"")
                     else:
@@ -391,7 +391,7 @@ def generate_subjects_data(gen_csv=None, indexing=True):
 
         if name:
             try:
-                df.to_csv(name + ".csv", sep="\t", index=indexing)
+                df.to_csv(f'{data_files_path}/{name}.csv', sep="\t", index=indexing)
                 print(f"File generated - '{name}.csv'")
             except:
                 print("An unexpected error occurred while creating the .csv file!")
@@ -449,7 +449,7 @@ def dataframe_concatenator(single_file=False):
         dfs = []
         print(f'Folder => {path}\n')
         for file_name in os.listdir(path):
-            df = pd.read_csv(f'{path}\\{file_name}', sep='\t', index_col=0)
+            df = pd.read_csv(f'{path}/{file_name}', sep='\t', index_col=0)
             dfs.append(df)
         datasets.append(pd.concat(dfs, ignore_index=True))
 
@@ -460,15 +460,15 @@ def dataframe_concatenator(single_file=False):
     print()
     print(f'Generating 3 separate .csv files...\n') if not single_file else print(f'Generating 1 main .csv file...\n')
     if not single_file:
-        datasets[0].to_csv(f'{NEW_DATASET_PATH}\\ds_center.csv', sep="\t", index=True, float_format='%g')
+        datasets[0].to_csv(f'{NEW_DATASET_PATH}/ds_center.csv', sep="\t", index=True, float_format='%g')
         print(f'File generated : "ds_center.csv"')
-        datasets[1].to_csv(f'{NEW_DATASET_PATH}\\ds_left.csv', sep="\t", index=True, float_format='%g')
+        datasets[1].to_csv(f'{NEW_DATASET_PATH}/ds_left.csv', sep="\t", index=True, float_format='%g')
         print(f'File generated : "ds_left.csv"')
-        datasets[2].to_csv(f'{NEW_DATASET_PATH}\\ds_right.csv', sep="\t", index=True, float_format='%g')
+        datasets[2].to_csv(f'{NEW_DATASET_PATH}/ds_right.csv', sep="\t", index=True, float_format='%g')
         print(f'File generated : "ds_right.csv"')
     else:
         data_file = pd.concat(datasets, ignore_index=True)
-        data_file.to_csv(f'{NEW_DATASET_PATH}\\ds_all.csv', sep="\t", index=True, float_format='%g')
+        data_file.to_csv(f'{NEW_DATASET_PATH}/ds_all.csv', sep="\t", index=True, float_format='%g')
         print(f'File generated : "ds_all.csv"')
     print(f'\nProcess complete!\n')
 
@@ -496,9 +496,9 @@ def end_tab_remover(subs_list):
             for path in sensor_paths:
                 print(f"\nProcessing files in the directory:\n{path}")
                 for sub in subs_list:
-                    with open(f"{path}\\{sub}", 'r') as fin:
+                    with open(f"{path}/{sub}", 'r') as fin:
                         lines = [line.rstrip() + "\n" for line in fin]
-                    with open(f"{path}\\{sub}", 'w') as fout:
+                    with open(f"{path}/{sub}", 'w') as fout:
                         fout.writelines(lines)
         except:
             print("An error occurred in function 'end_tab_remover()'")
@@ -530,7 +530,7 @@ if __name__ == '__main__':
     print(f"-------------------")
 
     # Reading the .csv file
-    sub_data_csv = read_csv(f'{data_files_path}\\subject_data')
+    sub_data_csv = read_csv(f'{data_files_path}/subject_data')
 
 else:
     print(f"\nModule imported : {__name__}")

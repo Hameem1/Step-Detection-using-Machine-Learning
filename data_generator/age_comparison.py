@@ -10,7 +10,7 @@ from statistics import mean
 import plotly.offline as pyo
 import plotly.graph_objs as go
 from data_generator.dataset_generator import get_limits, read_csv
-from config import ageGroups, DATASET_FOLDER, DATASET_ROOT, data_files_path
+from config import ageGroups, DATASET_FOLDER, DATASET_ROOT, data_files_path, Path
 
 
 FEATURES_USED = ['mean']
@@ -34,7 +34,7 @@ def get_samples(n):
     """
 
     samples = {}
-    data = read_csv(f'{data_files_path}\\subject_data')
+    data = read_csv(f'{data_files_path}/subject_data')
 
     for target_folder, limit in LIMITS.items():
         age_bin = data[(data['Age'] >= limit[0]) & (data['Age'] <= limit[1])]['Filename'].reset_index(drop=True)
@@ -62,7 +62,7 @@ def get_feature_stats(samples, sensor_pos='right'):
 
     """
 
-    path = f'{DATASET_ROOT}\\{DATASET_FOLDER}\\{sensor_pos.capitalize()}'
+    path = f'{DATASET_ROOT}/{DATASET_FOLDER}/{sensor_pos.capitalize()}'
     groups = {}
     raw_groups = {}
 
@@ -74,7 +74,7 @@ def get_feature_stats(samples, sensor_pos='right'):
 
         for file in files:
             try:
-                df = pd.read_csv(path + f'\\{file[:-4]}' + ".csv", sep='\t', index_col=0)
+                df = pd.read_csv(f'{path}/{file[:-4]}.csv', sep='\t', index_col=0)
             except FileNotFoundError:
                 print(f"\nError : File not found.\nThis file does not exist in the current working directory."
                       f"\n{path}")
@@ -164,8 +164,8 @@ def gen_box_plot(y, open_plot=True):
     if not os.path.exists(data_files_path):
         print(f'\nWARNING: The path does not exist. Creating new directory...\n{data_files_path}\n')
         os.mkdir(data_files_path)
-    pyo.plot(fig, filename=f'{data_files_path}\\{filename}.html', auto_open=open_plot)
-    print(f'\nAge comparison Box plot generated.\nLocation: "{data_files_path}\\{filename}.html"\n')
+    pyo.plot(fig, filename=f'{data_files_path}/{filename}.html', auto_open=open_plot)
+    print(f'\nAge comparison Box plot generated.\nLocation: "{data_files_path}/{filename}.html"\n')
 
 
 if __name__ == '__main__':
