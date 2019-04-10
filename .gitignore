@@ -1,0 +1,7 @@
+.idea/
+.vscode/
+__pycache__/
+venv/
+Data Sets/
+Trained Models/
+*.pkl
