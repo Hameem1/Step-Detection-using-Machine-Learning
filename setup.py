@@ -16,5 +16,6 @@ os.system(f"docker run -it --name app "
           f"-v /.:{container_dir} "
           f"step-detection:latest "
           f"bash")
-print(f"The container has been exited!\n")
+
+print(f"\nThe container has been exited!\n")
 
