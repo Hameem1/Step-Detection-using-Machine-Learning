@@ -12,7 +12,7 @@ from dataset_operations.data_structs import Subject
 from multiprocessing import Pool, current_process
 from data_generator.features import feature_extractor
 from dataset_operations.dataset_manipulator import read_csv, generate_subjects_data
-from config import ageGroups, DATASET_FOLDER, DATASET_ROOT, age_dirs, sensor_dirs, data_files_path, sensors, Path
+from config import ageGroups, FEATURES_DATASET, DATASETS, age_dirs, sensor_dirs, data_files_path, sensors, Path
 
 # Configuration Variables
 # ------------------------
@@ -23,15 +23,15 @@ TEST_COUNT = 8  # Should be >= 4
 # ------------------------
 
 if not TESTING:
-    DATASET_FOLDER = DATASET_FOLDER
+    FEATURES_DATASET = FEATURES_DATASET
 else:
-    DATASET_FOLDER = DATASET_FOLDER + "_TEST"
+    FEATURES_DATASET = FEATURES_DATASET + "_TEST"
 
-new_sensor_paths = [Path(f"{DATASET_ROOT}/{DATASET_FOLDER}/{sensor}") for sensor in sensors]
+new_sensor_paths = [Path(f"{DATASETS}/{FEATURES_DATASET}/{sensor}") for sensor in sensors]
 
-if not os.path.exists(DATASET_ROOT):
-    print(f'\nWARNING: The path does not exist. Creating new directory...\n{DATASET_ROOT}\n')
-    os.mkdir(DATASET_ROOT)
+if not os.path.exists(DATASETS):
+    print(f'\nWARNING: The path does not exist. Creating new directory...\n{DATASETS}\n')
+    os.mkdir(DATASETS)
 
 
 def create_dataset_folder_structure():
@@ -40,7 +40,7 @@ def create_dataset_folder_structure():
 
     """
 
-    path = Path(f'{DATASET_ROOT}/{DATASET_FOLDER}')
+    path = Path(f'{DATASETS}/{FEATURES_DATASET}')
     if not os.path.exists(path):
         print(f'\nWARNING: The path does not exist. Creating new directory...\n{path}\n')
         os.mkdir(path)
@@ -65,12 +65,12 @@ def create_age_folder_structure():
     """
 
     try:
-        new_dataset_path = Path(f'{DATASET_ROOT}/{DATASET_FOLDER}_Age_Sorted')
+        new_dataset_path = Path(f'{DATASETS}/{FEATURES_DATASET}_Age_Sorted')
         if not os.path.exists(new_dataset_path):
             print(f'\nWARNING: The path does not exist. Creating new directory...\n{new_dataset_path}\n')
             os.mkdir(new_dataset_path)
     except:
-        print("ERROR in creating the sorted dataset_operations directory within folder /DATASETS")
+        print("ERROR in creating the sorted dataset_operations directory within folder /Data Sets")
         return False
 
     try:
@@ -80,7 +80,7 @@ def create_age_folder_structure():
             else:
                 print(f"The directory {folder} already exists.")
     except:
-        print("ERROR in creating age based directories in /DATASETS/Dataset_Age_Sorted")
+        print("ERROR in creating age based directories in /Data Sets/Dataset_Age_Sorted")
         return False
 
     try:
@@ -92,7 +92,7 @@ def create_age_folder_structure():
                     print(f"The directory {sub_path} already exists.")
         return True
     except:
-        print("ERROR in creating sensor directories in /DATASETS/Dataset_Age_Sorted/[age_Groups]")
+        print("ERROR in creating sensor directories in /Data Sets/Dataset_Age_Sorted/[age_Groups]")
         return False
 
 
@@ -279,5 +279,5 @@ if __name__ == '__main__':
             # Sorting the dataset_operations
             sort_dataset_by_age()
             duration = time() - start
-            print(f'Dataset "{DATASET_FOLDER}" sorted by Age.\n',
+            print(f'Dataset "{FEATURES_DATASET}" sorted by Age.\n',
                   'Operation took:', f'{duration:.2f} seconds.' if duration < 60 else f'{duration/60:.2f} minutes.')

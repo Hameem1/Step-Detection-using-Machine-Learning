@@ -9,7 +9,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 import plotly.graph_objs as go
 import numpy as np
-from config import USED_CLASS_LABEL, SENSOR, Fs
+from config import USED_CLASS_LABEL, SENSOR, Fs, DEBUGGER
 
 # Global variables
 axes = {"x": {"acc": "Ax", "gyr": "Gx"},
@@ -217,7 +217,7 @@ def data_plot(sub, actual_step_positions, sensor_axis="all"):
     SUB = sub
     axis = sensor_axis
     STEP_POSITIONS = actual_step_positions
-    app.run_server(debug=False, port=5000)
+    app.run_server(debug=DEBUGGER, host="0.0.0.0", port=5000)
 
 
 if __name__ == '__main__':

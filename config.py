@@ -18,6 +18,8 @@ STEP_SIZE : int
 ageGroups : list of str
     Age groups to use for analysis
 
+DEBUGGER : bool
+    Sets the Flask debugger mode
 FILE_STATUS_MESSAGES : bool
     Set to "True" for verbose status messages
 FORCE : bool
@@ -27,16 +29,16 @@ STORAGE : {'list', 'dict'}
 
 ROOT : str
     Root path (project directory)
-FOLDER_NAME : str
+ORIGINAL_DATASET : str
     Raw Dataset directory name
-DATASET_FOLDER : str
+FEATURES_DATASET : str
     Feature Dataset directory name
 sensors : list of str
     List of sensor directory names
 sensor_paths : list of str
     Sensor directory paths in original dataset_operations
-DATASET_ROOT : str
-    DATASETS directory path (Generated data sets)
+DATASETS : str
+    Data Sets directory path (Generated data sets)
 new_sensor_paths : list of str
     Paths to sensor directories in the NEW Dataset
 data_files_path : str
@@ -68,6 +70,8 @@ WINDOW_SIZE = 40
 ageGroups = ['(1-13)', '(5-15)']
 
 # Configuration variables
+# Set to "True" for development
+DEBUGGER = True
 # Set to "True" for verbose status messages
 FILE_STATUS_MESSAGES = False
 # Allows forcing user input to 'y'
@@ -79,21 +83,21 @@ STORAGE = "list"
 # Root path (project directory)
 ROOT = str(Path(__file__).parent)
 # Raw Dataset directory name
-FOLDER_NAME = "OU-InertGaitAction_wStepAnnotation"
+ORIGINAL_DATASET = "OU-InertGaitAction_wStepAnnotation"
 # Feature Dataset directory name
-DATASET_FOLDER = "Step_Detection_Dataset (w=40, s=20, sliding)"
+FEATURES_DATASET = "Step_Detection_Dataset (w=40, s=20, sliding)"
+# Data Sets directory path (Generated data sets)
+DATASETS = Path(f"{ROOT}/Data Sets")
 # Sensor paths in original dataset_operations
 sensors = ["Center", "Left", "Right"]
-sensor_paths = [Path(f"{ROOT}/{FOLDER_NAME}/{sensor}") for sensor in sensors]
-# DATASETS directory path (Generated data sets)
-DATASET_ROOT = Path(f"{ROOT}/../DATASETS")
+sensor_paths = [Path(f"{DATASETS}/{ORIGINAL_DATASET}/{sensor}") for sensor in sensors]
 # Paths to sensor directories in the NEW Dataset
-new_sensor_paths = [Path(f"{DATASET_ROOT}/{DATASET_FOLDER}/{sensor}") for sensor in sensors]
+new_sensor_paths = [Path(f"{DATASETS}/{FEATURES_DATASET}/{sensor}") for sensor in sensors]
 # Data-files directory path
-data_files_path = Path(f'{ROOT}/Data_Files_TEST')
+data_files_path = Path(f'{ROOT}/Data Files')
 # Age sorted dataset_operations directories
-age_dirs = {"Age_" + dirName: f'{DATASET_ROOT}/{DATASET_FOLDER}_Age_Sorted/Age_{dirName}' for dirName in ageGroups}
+age_dirs = {"Age_" + dirName: f'{DATASETS}/{FEATURES_DATASET}_Age_Sorted/Age_{dirName}' for dirName in ageGroups}
 # Paths to C, L and R in the age folders
-sensor_dirs = {"Age_" + dirName: [f'{DATASET_ROOT}/{DATASET_FOLDER}_Age_Sorted/Age_{dirName}/{sensor}'
+sensor_dirs = {"Age_" + dirName: [f'{DATASETS}/{FEATURES_DATASET}_Age_Sorted/Age_{dirName}/{sensor}'
                                   for sensor in sensors]
                for dirName in ageGroups}

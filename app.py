@@ -86,7 +86,7 @@ else:
         if dm.FORCE:
             res = 'y'
         else:
-            res = str(input(f"Would you like to Fix the data set in folder '{dm.FOLDER_NAME}'?")).lower()
+            res = str(input(f"Would you like to Fix the data set in folder '{dm.ORIGINAL_DATASET}'?")).lower()
         if res == 'n':
             print("Program terminated by the user...")
         elif res == 'y':

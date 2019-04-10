@@ -6,9 +6,9 @@ This module provides functions and variables to manipulate the entire data set.
 import os
 import re
 import pandas as pd
-from model_config import NEW_DATASET_PATH
-from config import FORCE, FILE_STATUS_MESSAGES, FOLDER_NAME, ROOT, data_files_path,\
-    sensor_paths, sensors, new_sensor_paths, Path
+from model_config import PROCESSED_DATASET_PATH
+from config import FORCE, FILE_STATUS_MESSAGES, ORIGINAL_DATASET, data_files_path,\
+    sensor_paths, sensors, new_sensor_paths, DATASETS
 
 
 def dataset_rename():
@@ -119,15 +119,15 @@ def dataset_analysis():
             for path in sensor_paths:
                 f_list.append(os.listdir(path))
         except:
-            print(f"\nError: The directory \"{ROOT}/{FOLDER_NAME}\" does not exist.\n")
+            print(f"\nError: The directory \"{DATASETS}/{ORIGINAL_DATASET}\" does not exist.\n")
             print("Please make sure the path for the data set directory is correct.")
             print("Note: The data set folder should be in the same directory as the program's .py files.")
             break
 
         if loop == 1:
             print(f"-------------------")
-            print(f"\nRe-running analysis of subdirectories in \"{FOLDER_NAME}\"")
-        print(f"\nAnalyzing subdirectories in \"{FOLDER_NAME}\"\n")
+            print(f"\nRe-running analysis of subdirectories in \"{ORIGINAL_DATASET}\"")
+        print(f"\nAnalyzing subdirectories in \"{ORIGINAL_DATASET}\"\n")
         print(f"Analysis complete!")
         print(f"\n# of files in \"Center\" = {len(f_list[0])}")
         print(f"# of files in \"Left\" = {len(f_list[1])}")
@@ -184,7 +184,7 @@ def dataset_analysis():
 
         else:
             if loop == 0:
-                print(f"\nAll subdirectories of {FOLDER_NAME} contain:\n"
+                print(f"\nAll subdirectories of {ORIGINAL_DATASET} contain:\n"
                       f"- an equal number of files\n"
                       f"- files with the same names as the other subdirectories\n"
                       f"\nNo changes required!\n")
@@ -269,7 +269,7 @@ def get_subjects_list():
 def generate_subjects_data(gen_csv=None, indexing=True):
     """
     Generates a subjects list and subjects data along with an optional
-    .csv file in the current working directory. Also verifies with the IDGenderAgeList.csv file.
+    .csv file in the current working directory. Also verifies with the IDGenderAgelist.csv file.
 
     This function should be used instead of get_subjects_list() when running the first time!
 
@@ -429,7 +429,7 @@ def read_csv(file_path):
 
 def dataframe_concatenator(single_file=False):
     """
-    Generates the 'Features_Dataset' within the project directory which will be used for the classifier.
+    Generates the 'Processed_Dataset' within the project directory which will be used for the classifier.
     Three separate files for each sensor will be generated, with each file containing the data for every subject.
 
     Parameters
@@ -441,9 +441,9 @@ def dataframe_concatenator(single_file=False):
 
     datasets = []
 
-    if not os.path.exists(NEW_DATASET_PATH):
-        print(f'\nWARNING: The path does not exist. Creating new directory...\n{NEW_DATASET_PATH}\n')
-        os.mkdir(f"{NEW_DATASET_PATH}")
+    if not os.path.exists(PROCESSED_DATASET_PATH):
+        print(f'\nWARNING: The path does not exist. Creating new directory...\n{PROCESSED_DATASET_PATH}\n')
+        os.mkdir(f"{PROCESSED_DATASET_PATH}")
 
     for path in new_sensor_paths:
         dfs = []
@@ -460,15 +460,15 @@ def dataframe_concatenator(single_file=False):
     print()
     print(f'Generating 3 separate .csv files...\n') if not single_file else print(f'Generating 1 main .csv file...\n')
     if not single_file:
-        datasets[0].to_csv(f'{NEW_DATASET_PATH}/ds_center.csv', sep="\t", index=True, float_format='%g')
+        datasets[0].to_csv(f'{PROCESSED_DATASET_PATH}/ds_center.csv', sep="\t", index=True, float_format='%g')
         print(f'File generated : "ds_center.csv"')
-        datasets[1].to_csv(f'{NEW_DATASET_PATH}/ds_left.csv', sep="\t", index=True, float_format='%g')
+        datasets[1].to_csv(f'{PROCESSED_DATASET_PATH}/ds_left.csv', sep="\t", index=True, float_format='%g')
         print(f'File generated : "ds_left.csv"')
-        datasets[2].to_csv(f'{NEW_DATASET_PATH}/ds_right.csv', sep="\t", index=True, float_format='%g')
+        datasets[2].to_csv(f'{PROCESSED_DATASET_PATH}/ds_right.csv', sep="\t", index=True, float_format='%g')
         print(f'File generated : "ds_right.csv"')
     else:
         data_file = pd.concat(datasets, ignore_index=True)
-        data_file.to_csv(f'{NEW_DATASET_PATH}/ds_all.csv', sep="\t", index=True, float_format='%g')
+        data_file.to_csv(f'{PROCESSED_DATASET_PATH}/ds_all.csv', sep="\t", index=True, float_format='%g')
         print(f'File generated : "ds_all.csv"')
     print(f'\nProcess complete!\n')
 
