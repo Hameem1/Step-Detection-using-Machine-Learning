@@ -9,7 +9,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 import plotly.graph_objs as go
 import numpy as np
-from config import Fs
+from config import Fs, DEBUGGER
 from itertools import compress
 
 # Global variables
@@ -204,7 +204,7 @@ def feature_plot(sub, features_list, features, updated_step_positions, updated_s
     FEATURES = features
     STEP_POSITIONS = updated_step_positions
     STEP_POSITIONS_BOOL = updated_step_positions_bool
-    app.run_server(debug=False, port=5001)
+    app.run_server(debug=DEBUGGER, host="0.0.0.0", port=5001)
 
 
 if __name__ == '__main__':

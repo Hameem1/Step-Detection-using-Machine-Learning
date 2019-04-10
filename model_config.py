@@ -3,8 +3,6 @@ Contains the global configurations for model related tasks and performs common i
 
 Attributes
 ----------
-cols : list of str
-    List of all feature labels + StepLabel
 row_count : int
     No. of rows of dataset_operations to be used
 RF_ESTIMATORS : int
@@ -34,9 +32,9 @@ EXPORT_MODEL : bool
 
 DATA_PATH : str
     loading in the actual dataset_operations for one sensor (Data under test)
-NEW_DATASET : str
+PROCESSED_DATASET : str
     Directory name for new data set which contains the training/testing data for the classifier
-NEW_DATASET_PATH : str
+PROCESSED_DATASET_PATH : str
     Directory path for new data set which contains the training/testing data for the classifier
 TRAINED_MODEL_DIR : str
     Trained Model directory name
@@ -60,15 +58,13 @@ from sklearn.externals import joblib
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-from config import new_sensor_paths, ROOT, Path
+from config import new_sensor_paths, ROOT, Path, DATASETS
 
 # Configuring locale for datetime purposes
-lang = 'de_DE'
-locale.setlocale(locale.LC_ALL, lang)
+lang = 'de_DE.UTF-8'
+locale.setlocale(locale.LC_TIME, lang)
 
 # Model Configuration Variables
-# list of all feature labels + StepLabel
-cols = pd.read_csv(f'{new_sensor_paths[0]}/{os.listdir(new_sensor_paths[0])[0]}', sep='\t', index_col=0).columns
 # Setting numpy print precision
 np.set_printoptions(precision=5)
 # no. of rows of dataset_operations to be used
@@ -99,14 +95,14 @@ PLOT = False
 EXPORT_MODEL = False
 
 # Paths
-# loading in the actual dataset_operations for the ML classifier
-DATA_PATH = Path(f"{ROOT}/Features_Dataset/ds_all.csv")
 # Directory name for new data set which contains the training/testing data for the classifier
-NEW_DATASET = "Features_Dataset"
+PROCESSED_DATASET = "Processed_Dataset"
 # Directory path for new data set which contains the training/testing data for the classifier
-NEW_DATASET_PATH = Path(f'{ROOT}/{NEW_DATASET}')
+PROCESSED_DATASET_PATH = Path(f'{DATASETS}/{PROCESSED_DATASET}')
+# loading in the actual dataset for the ML classifier
+DATA_PATH = Path(f"{PROCESSED_DATASET_PATH}/ds_all.csv")
 # Trained Model directory name
-TRAINED_MODEL_DIR = 'Trained_Models'
+TRAINED_MODEL_DIR = 'Trained Models'
 # Trained Model directory path
 TRAINED_MODEL_PATH = Path(f'{ROOT}/{TRAINED_MODEL_DIR}')
 # Trained Model name

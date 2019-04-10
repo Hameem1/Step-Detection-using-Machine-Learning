@@ -15,6 +15,9 @@ from sklearn.feature_selection import RFE
 from model.feature_selection_complete import normalize
 from model_config import *
 
+# list of all feature labels + StepLabel
+cols = pd.read_csv(f'{new_sensor_paths[0]}/{os.listdir(new_sensor_paths[0])[0]}', sep='\t', index_col=0).columns
+
 # Global configurations
 # no. of best features to select
 n_features = 15

@@ -9,7 +9,7 @@ This module/algorithm provides:
 1)  A ranking of all the features and the predicted model accuracy for using n-features - saved in the data_files_path.
 2)  A plot of "# of features used" vs "Model Performance" - saved in the data_files_path.
 3)  A .csv file containing a list of the features selected for optimal model performance - saved in the data_files_path.
-4)  Two exported trained models, one classifier and one normalizer - saved in the Trained_Models directory.
+4)  Two exported trained models, one classifier and one normalizer - saved in the Trained Models directory.
 5)  Option to import this module and begin testing the pre-trained models (set TESTING = True - in model_config.py)
 
 - The results have proved that the model has the highest accuracy when trained on all 51 features.
@@ -33,8 +33,11 @@ from sklearn.feature_selection import RFECV
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, f1_score, recall_score, \
     roc_auc_score, classification_report
-from config import data_files_path, Path
+from config import data_files_path
 from model_config import *
+
+# list of all feature labels + StepLabel
+cols = pd.read_csv(f'{new_sensor_paths[0]}/{os.listdir(new_sensor_paths[0])[0]}', sep='\t', index_col=0).columns
 
 # Configuration Variables
 # Test on a separate dataset_operations
