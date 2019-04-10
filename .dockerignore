@@ -1,0 +1,9 @@
+.idea/
+.vscode/
+*.pkl
+.git
+.dockerignore
+__pycache__/
+venv/
+Trained Models/
+Data Sets/
