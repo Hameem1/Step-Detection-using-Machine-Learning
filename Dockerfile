@@ -12,7 +12,4 @@ WORKDIR /StepDetectionProject
 COPY ./requirements.txt .
 RUN pip install -r requirements.txt
 
-VOLUME /StepDetectionProject
 EXPOSE 5000 5001
-
-CMD ["bash"]

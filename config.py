@@ -71,7 +71,7 @@ ageGroups = ['(1-13)', '(5-15)']
 
 # Configuration variables
 # Set to "True" for development
-DEBUGGER = True
+DEBUGGER = False
 # Set to "True" for verbose status messages
 FILE_STATUS_MESSAGES = False
 # Allows forcing user input to 'y'
