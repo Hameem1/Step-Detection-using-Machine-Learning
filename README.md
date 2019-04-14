@@ -39,7 +39,9 @@ a pre-built image has been made available on dockerhub.
 
 **5)** Run `python setup.py`. This will setup the Docker environment and land you inside the container's terminal.
 
-**6)** Run `python app.py`. This will perform the pre-processing and visualization steps on the original dataset.
+**6)** Run `ls` to verify that all the project files are available inside the container.
+
+**7)** Run `python app.py` inside the container. This will perform the pre-processing and visualization steps on the original dataset.
 
 
 ## Setting up Docker
