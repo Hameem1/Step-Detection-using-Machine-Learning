@@ -3,7 +3,7 @@
 # This script pulls the image from dockerhub & runs the container with the image, using docker-compose.
 # The container is removed upon exiting from it.
 
-import os, subprocess
+import subprocess
 
 IMAGE_NAME = "hameem/step-detection:dev"
 

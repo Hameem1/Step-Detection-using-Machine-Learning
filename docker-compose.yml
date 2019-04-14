@@ -1,7 +1,7 @@
 version: "3"
 services:
   application:
-    build: .
+#    build: .
     image: hameem/step-detection:dev
     ports:
       - 5000:5000
