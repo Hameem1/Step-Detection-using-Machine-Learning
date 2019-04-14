@@ -85,7 +85,7 @@ https://docs.docker.com/install/linux/docker-ce/ubuntu/
 
 ## IDE Tips
 
-From personal experience; PyCharm works best for dockerized applications. 
+From personal experience; PyCharm works best for Dockerized Python applications. 
 VS Code is also great, but as of April 2019, it lacks the ability to use the container's Python interpreter. To get 
 around this problem, a virtual environment can be made using the requirements.txt file provided. 
 This environment can then aid in development, however, this is just an easy workaround and will be rendered unnecessary 
