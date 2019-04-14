@@ -11,6 +11,7 @@ The results determine that a random forest classifier trained on a set of select
 ## Overview
 
 * This project is developed using Python 3.7.
+* All directories with lowercase names are custom Python packages.
 * The function docstrings follow the "numpydoc" format (https://numpydoc.readthedocs.io/en/latest/format.html).
 * Two config files are used to modify overall program behavior:
     * config.py
