@@ -2,6 +2,6 @@
 .vscode/
 __pycache__/
 venv/
-Data Sets/
-Trained Models/
+Data Sets/*/
+Trained Models/*/
 *.pkl
