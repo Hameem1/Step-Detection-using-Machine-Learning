@@ -24,7 +24,7 @@ from config import USED_CLASS_LABEL
 
 # Configuration variables
 # True if the Data set needs to be fixed, otherwise False
-FIX = False
+FIX = True
 DATA_PLOT = False
 DEVELOPER_MODE = True
 DATA_VISUALIZATION = True
