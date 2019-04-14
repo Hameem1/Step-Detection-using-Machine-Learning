@@ -9,6 +9,7 @@ The results determine that a random forest classifier trained on a set of select
 
 
 ## Overview
+
 * This project is developed using Python 3.7.
 * The function docstrings follow the "numpydoc" format (https://numpydoc.readthedocs.io/en/latest/format.html).
 * Two config files are used to modify overall program behavior:
@@ -22,6 +23,8 @@ The results determine that a random forest classifier trained on a set of select
 a pre-built image has been made available on dockerhub.
 * Running the 'setup.py' file automates the docker environment creation.
 * The project directory is used as a shared volume between the host system and the container. This allows for easy development using the docker environment.
+* This implementation is compatible with both Windows and Linux systems.
+* The data used in this implementation comes from : http://www.am.sanken.osaka-u.ac.jp/BiometricDB/SimilarActionsInertialDB.html
 
 ## Installation:
 
@@ -74,17 +77,30 @@ Optionally: Uncheck the box which says `Start Docker Desktop when you log in`, a
 `docker run hello-world`
 
 ### For Linux
-Getting Docker to work on Linux is pretty straightforward. Just follow the steps in the official documentation.
+
+Getting Docker to work on Linux is pretty straightforward. Just follow the steps in the official documentation:
+
+https://docs.docker.com/install/linux/docker-ce/ubuntu/
 
 
-## Recent Changes:
+## IDE Tips
+
+From personal experience; PyCharm works best for dockerized applications. 
+VS Code is also great, but as of April 2019, it lacks the ability to use the container's Python interpreter. To get 
+around this problem, a virtual environment can be made using the requirements.txt file provided. 
+This environment can then aid in development, however, this is just an easy workaround and will be rendered unnecessary 
+with upcoming updates to VS Code. A terminal (like GitBash) can also be used rather easily, since the project uses a docker-compose 
+file to automate all the configurations.
+
+
+## Recent Changes
 
 - Configured the project to run in a container environment using Docker.
 - Fixed minor issues with the visualization dashboards.
 - Automated project installation by creating setup.py.
 
 
-## What the code does:
+## What the code does
 
 - Cleans up the default data set as it requires pre-processing.
 - Creates a new Subject object (this sets the stage for accessing all the data of that subject).
