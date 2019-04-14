@@ -1,4 +1,4 @@
-# Step Detection using ML
+# Step Detection using Machine Learning
 
 The problem of step detection in human gait patterns requires mathematical models which can automatically assess whether a step has been taken or not. 
 Performing strictly rule based analysis on the data has proven to be effective yet cumbersome. 
@@ -13,6 +13,7 @@ The results determine that a random forest classifier trained on a set of select
 * This project is developed using Python 3.7.
 * All directories with lowercase names are custom Python packages.
 * The function docstrings follow the "numpydoc" format (https://numpydoc.readthedocs.io/en/latest/format.html).
+* Both module and project level configuration variables are provided for modifying code behavior.
 * Two config files are used to modify overall program behavior:
     * config.py
     * model_config.py
@@ -106,7 +107,7 @@ the project uses a docker-compose file to automate all the configurations.
 ## What the code does
 
 - Cleans up the default data set as it requires pre-processing.
-- Creates a new Subject object (this sets the stage for accessing all the data of that subject).
+- Implements 'Dataset' and 'Subject' classes (these set the stage for accessing all the data for any subject).
 - Implements web-based dashboards for data visualization.
 - Generates 51 time-domain features using a sliding window.
 - Applies super-sampling to counter class imbalance. 
