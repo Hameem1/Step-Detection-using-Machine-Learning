@@ -87,10 +87,10 @@ https://docs.docker.com/install/linux/docker-ce/ubuntu/
 
 From personal experience; PyCharm works best for Dockerized Python applications. 
 VS Code is also great, but as of April 2019, it lacks the ability to use the container's Python interpreter. To get 
-around this problem, a virtual environment can be made using the requirements.txt file provided. 
-This environment can then aid in development, however, this is just an easy workaround and will be rendered unnecessary 
-with upcoming updates to VS Code. A terminal (like GitBash) can also be used rather easily, since the project uses a docker-compose 
-file to automate all the configurations.
+around this problem, a virtual environment can be made using the provided requirements.txt file. 
+This environment's interpreter can then aid in development, however, this is just an easy workaround and will be 
+rendered unnecessary with upcoming updates to VS Code. A terminal (like GitBash) can also be used rather easily, since 
+the project uses a docker-compose file to automate all the configurations.
 
 
 ## Recent Changes
@@ -108,7 +108,7 @@ file to automate all the configurations.
 - Generates 51 time-domain features using a sliding window.
 - Applies super-sampling to counter class imbalance. 
 - Applies recursive feature elimination with cross validation to select the best features.
-- Trains a random forest classifier and data normalization model.
+- Trains a Random Forest Classifier and Data Normalization Model.
 - Exports the trained models for deployment.
 
 ---
