@@ -26,7 +26,9 @@ a pre-built image has been made available on dockerhub.
 * Running the 'setup.py' file automates the docker environment creation.
 * The project directory is used as a shared volume between the host system and the container. This allows for easy development using the docker environment.
 * This implementation is compatible with both Windows and Linux systems.
-* The data used in this implementation comes from : http://www.am.sanken.osaka-u.ac.jp/BiometricDB/SimilarActionsInertialDB.html
+* The data used in this implementation comes from : 
+    
+    http://www.am.sanken.osaka-u.ac.jp/BiometricDB/SimilarActionsInertialDB.html
 
 ## Installation:
 
