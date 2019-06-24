@@ -7,6 +7,10 @@ In addition, the importance of feature selection is analyzed and is used to supp
 
 The results determine that a random forest classifier trained on a set of selected features performs higher than 90% on all of the test metrics used in the evaluation, i.e. accuracy, precision, recall and f1 score.
 
+#
+
+![](https://i.imgur.com/EXQ0iAi.gif)
+
 
 ## Overview
 
