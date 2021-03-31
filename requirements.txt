@@ -19,7 +19,7 @@ Jinja2>=2.10.1
 jsonschema==3.0.1
 jupyter-core==4.4.0
 kiwisolver==1.0.1
-lxml==4.3.2
+lxml==4.6.3
 MarkupSafe==1.1.1
 matplotlib==3.0.3
 nbformat==4.4.0
